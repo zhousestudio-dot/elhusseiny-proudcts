@@ -10,18 +10,18 @@
 - **Payments & Security:** Paymob Egypt **Intentions API v1** + **Unified Checkout** redirect. Orders are marked `paid`/`failed` **only** inside `netlify/functions/paymob-webhook.ts` after verifying Paymob's 20-field **HMAC-SHA512** signature (`timingSafeEqual`), checking paid amount, and enforcing idempotency.
 - **Admin Security:** `/admin` authenticates via Supabase Auth (`signInWithPassword`) and every action goes through `netlify/functions/admin-api.ts`, which verifies the JWT and enforces `user.email === ADMIN_EMAIL` on the server.
 - **Emails:** Resend HTTP API inside `paymob-webhook.ts` for customer & admin order confirmations.
-- **Backend:** Standalone **Netlify Functions** in `netlify/functions/` configured via `netlify.toml`.
+- **Backend & Hosting:** Migrated from Netlify to **Vercel** (`@astrojs/vercel`, `vercel.json`) with Astro API routes (`src/pages/api/*.ts`, `prerender = false`) because `.netlify.app` was blocked/throttled by Egyptian home ISPs.
 - **Database:** Supabase (Postgres) with strict Row Level Security (RLS), foreign-key/partial indexes, and `paymob_intention_id` tracking.
 
 ## Current Stack
 - **Pages:** Astro (latest) + TypeScript
 - **Styling:** Tailwind CSS v4 (`@tailwindcss/vite`)
 - **Cart:** Vanilla TypeScript (`src/lib/cart.ts`)
-- **Backend:** Netlify Functions
+- **Backend:** Vercel Serverless Functions via Astro API Routes (`src/pages/api/*`)
 - **Database / Auth / Storage:** Supabase (Postgres + Auth + Storage)
 - **Payments:** Paymob Intentions API + Unified Checkout + HMAC-SHA512 Webhook
 - **Emails:** Resend
-- **Hosting:** Netlify
+- **Hosting:** Vercel
 
 ## What Is Finished
 - **Step 1:** Astro + TypeScript + Tailwind CSS v4 project setup (`BaseLayout.astro`, self-hosted Cairo font, `netlify.toml`, `.env.example`, `netlify/functions/health.ts`).

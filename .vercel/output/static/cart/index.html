@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="راجع منتجاتك في سلة التسوق قبل إتمام الطلب."><meta name="theme-color" content="#ffffff"><link rel="canonical" href="http://localhost:4321/cart"><!-- Open Graph / Social Sharing --><meta property="og:title" content="سلة التسوق | منتجات الحسيني"><meta property="og:description" content="راجع منتجاتك في سلة التسوق قبل إتمام الطلب."><meta property="og:type" content="website"><meta property="og:locale" content="ar_EG"><meta property="og:url" content="http://localhost:4321/cart"><meta property="og:image" content="http://localhost:4321/images/hero.svg"><meta property="og:site_name" content="منتجات الحسيني"><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="سلة التسوق | منتجات الحسيني"><meta name="twitter:description" content="راجع منتجاتك في سلة التسوق قبل إتمام الطلب."><meta name="twitter:image" content="http://localhost:4321/images/hero.svg"><title>سلة التسوق | منتجات الحسيني</title><!-- Prevent flash of wrong theme before first paint --><script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("elhusseiny_theme");
+          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (saved === "dark" || (!saved && prefersDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/_astro/admin.COMknBZ6.css"></head> <body class="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 font-sans transition-colors duration-200"> <header class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur"> <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4"> <a href="/" class="flex items-center gap-2.5 text-lg sm:text-xl font-bold text-gray-900 dark:text-white"> <img src="/images/products/product-11.jpg" alt="شعار منتجات الحسيني" width="40" height="40" class="h-10 w-10 rounded-full object-cover border border-emerald-200 dark:border-emerald-800"> <span>منتجات الحسيني</span> </a> <nav aria-label="التنقل الرئيسي" class="flex items-center gap-3 sm:gap-5 text-sm font-medium text-gray-700 dark:text-gray-200"> <a href="/" class="hidden sm:inline-block hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
+الرئيسية
+</a> <a href="/products" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
+المنتجات
+</a> <!-- Night / Light Theme Toggle --> <button id="theme-toggle" type="button" aria-label="تبديل الوضع الليلي والنهاري" title="تبديل الوضع الليلي والنهاري" class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-amber-300 hover:border-emerald-600 transition-colors"> <!-- Sun icon (shown in dark mode) --> <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="hidden dark:block h-4 w-4" aria-hidden="true"> <circle cx="12" cy="12" r="4"></circle> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path> </svg> <!-- Moon icon (shown in light mode) --> <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="block dark:hidden h-4 w-4" aria-hidden="true"> <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path> </svg> </button> <a href="/cart" aria-label="سلة التسوق" class="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-gray-800 dark:text-gray-100 hover:border-emerald-600 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true"> <circle cx="9" cy="21" r="1"></circle> <circle cx="20" cy="21" r="1"></circle> <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path> </svg> <span class="text-xs sm:text-sm font-semibold">السلة</span> <span id="cart-count" class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-700 px-1.5 text-xs font-bold text-white">
+0
+</span> </a> </nav> </div> </header> <script>
+  (function () {
+    var btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var isDark = document.documentElement.classList.toggle("dark");
+      try {
+        localStorage.setItem("elhusseiny_theme", isDark ? "dark" : "light");
+      } catch (e) {}
+    });
+  })();
+</script> <main class="flex-1">  <section class="mx-auto max-w-4xl px-4 py-10 sm:py-12"> <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">سلة التسوق</h1> <!-- Empty Cart State --> <div id="cart-empty" class="hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-10 text-center"> <p class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">سلة التسوق فارغة حالياً</p> <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+تصفح منتجات الحسيني وأضف ما يناسبك إلى السلة.
+</p> <a href="/products" class="inline-block rounded-xl bg-emerald-700 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors">
+تصفح المنتجات
+</a> </div> <!-- Cart Content --> <div id="cart-content" class="hidden space-y-6"> <div id="cart-items" class="divide-y divide-gray-200 dark:divide-gray-800 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"></div> <!-- Summary Box --> <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-6 space-y-4"> <div class="flex items-center justify-between text-base sm:text-lg font-bold text-gray-900 dark:text-white"> <span>الإجمالي التقديري</span> <span id="cart-total" class="text-emerald-700 dark:text-emerald-400">٠ ج.م.</span> </div> <p class="text-xs text-gray-500 dark:text-gray-400">
+يتم تأكيد الأسعار النهائية وتوفر المخزون تلقائياً من قاعدة البيانات عند إتمام الطلب.
+</p> <div class="flex flex-col sm:flex-row gap-3 pt-2"> <a href="/checkout" class="flex-1 rounded-xl bg-emerald-700 px-6 py-3.5 text-center text-base font-semibold text-white hover:bg-emerald-800 transition-colors">
+إتمام الطلب
+</a> <a href="/products" class="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-3.5 text-center text-base font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+إضافة منتجات أخرى
+</a> </div> </div> </div> </section> <script type="module" src="/_astro/cart.astro_astro_type_script_index_0_lang.azU0qygT.js"></script>  </main> <footer class="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300"> <div class="mx-auto max-w-6xl px-4 py-10"> <div class="grid grid-cols-1 gap-8 sm:grid-cols-3"> <div> <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">منتجات الحسيني</h3> <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+طبيعي .. أصيل .. فاخر. منتجات غذائية طبيعية ١٠٠٪ بدون أي إضافات أو مواد حافظة، مع توصيل لباب البيت في مصر.
+</p> </div> <div> <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2">روابط سريعة</h3> <ul class="space-y-2 text-sm"> <li><a href="/" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">الرئيسية</a></li> <li><a href="/products" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">المنتجات</a></li> <li><a href="/cart" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">سلة التسوق</a></li> </ul> </div> <div> <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2">تواصل معنا</h3> <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400"> <li>
+الهاتف / واتساب:  <a href="tel:+201093452806" dir="ltr" class="hover:text-emerald-700 dark:hover:text-emerald-400 font-medium">
+01093452806
+</a> </li> <li>
+رقم إضافي:  <a href="tel:+201010231211" dir="ltr" class="hover:text-emerald-700 dark:hover:text-emerald-400 font-medium">
+01010231211
+</a> </li> <li>التوصيل: لجميع محافظات مصر</li> <li class="pt-1"> <a href="https://wa.me/201093452806?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AD%D8%B3%D9%8A%D9%86%D9%8A" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-800 transition-colors"> <span>تواصل عبر واتساب</span> </a> </li> </ul> </div> </div> <div class="mt-8 border-t border-gray-200 dark:border-gray-800 pt-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+© 2026 منتجات الحسيني (Elhusseiny Products). جميع الحقوق محفوظة.
+</div> </div> </footer> </body></html>

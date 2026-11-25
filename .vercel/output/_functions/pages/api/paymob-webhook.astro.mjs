@@ -1,0 +1,240 @@
+import crypto from 'node:crypto';
+import { createClient } from '@supabase/supabase-js';
+export { renderers } from '../../renderers.mjs';
+
+const prerender = false;
+function escapeHtml(value) {
+  return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function toHmacValue(val) {
+  if (val === null || val === void 0) return "";
+  return String(val);
+}
+function computePaymobHmac(obj, secret) {
+  const concatenated = [
+    toHmacValue(obj.amount_cents),
+    toHmacValue(obj.created_at),
+    toHmacValue(obj.currency),
+    toHmacValue(obj.error_occured),
+    toHmacValue(obj.has_parent_transaction),
+    toHmacValue(obj.id),
+    toHmacValue(obj.integration_id),
+    toHmacValue(obj.is_3d_secure),
+    toHmacValue(obj.is_auth),
+    toHmacValue(obj.is_capture),
+    toHmacValue(obj.is_refunded),
+    toHmacValue(obj.is_standalone_payment),
+    toHmacValue(obj.is_voided),
+    toHmacValue(obj.order?.id),
+    toHmacValue(obj.owner),
+    toHmacValue(obj.pending),
+    toHmacValue(obj.source_data?.pan),
+    toHmacValue(obj.source_data?.sub_type),
+    toHmacValue(obj.source_data?.type),
+    toHmacValue(obj.success)
+  ].join("");
+  return crypto.createHmac("sha512", secret).update(concatenated).digest("hex");
+}
+function verifyHmac(expectedHex, receivedHex) {
+  const a = Buffer.from(expectedHex.toLowerCase(), "utf8");
+  const b = Buffer.from(receivedHex.toLowerCase(), "utf8");
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+async function sendResendEmail(params) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${params.apiKey}`
+    },
+    body: JSON.stringify({
+      from: params.from,
+      to: [params.to],
+      subject: params.subject,
+      html: params.html
+    })
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Resend API error (${res.status}): ${errText}`);
+  }
+}
+const POST = async ({ request }) => {
+  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const hmacSecret = process.env.PAYMOB_HMAC_SECRET;
+  if (!supabaseUrl || !serviceKey || !hmacSecret) {
+    console.error("[paymob-webhook] Missing required server environment variables");
+    return Response.json({ error: "Server misconfigured" }, { status: 500 });
+  }
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const obj = body?.obj;
+  if (!obj || typeof obj.id !== "number") {
+    return Response.json({ error: "Invalid webhook payload" }, { status: 400 });
+  }
+  const url = new URL(request.url);
+  const receivedHmac = (url.searchParams.get("hmac") || body.hmac || "").trim();
+  if (!receivedHmac) {
+    console.warn("[paymob-webhook] Rejected webhook: missing hmac");
+    return Response.json({ error: "Missing signature" }, { status: 401 });
+  }
+  const expectedHmac = computePaymobHmac(obj, hmacSecret);
+  if (!verifyHmac(expectedHmac, receivedHmac)) {
+    console.warn("[paymob-webhook] Rejected webhook: invalid hmac for tx", obj.id);
+    return Response.json({ error: "Invalid signature" }, { status: 401 });
+  }
+  if (obj.pending) {
+    return Response.json({ received: true, status: "pending" });
+  }
+  const supabase = createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false }
+  });
+  const { data: existingTx } = await supabase.from("payments").select("id, status").eq("paymob_transaction_id", obj.id).maybeSingle();
+  if (existingTx && (existingTx.status === "paid" || existingTx.status === "failed")) {
+    return Response.json({ received: true, duplicate: true });
+  }
+  const orderNumber = obj.order?.merchant_order_id || null;
+  const intentionId = obj.payment_key_claims?.extra?.intention_id || null;
+  let order = null;
+  if (orderNumber) {
+    const { data } = await supabase.from("orders").select("id, order_number, customer_name, customer_phone, customer_email, city, shipping_address, total, payment_status").eq("order_number", orderNumber).maybeSingle();
+    order = data;
+  }
+  if (!order && intentionId) {
+    const { data: paymentRow } = await supabase.from("payments").select("order_id").eq("paymob_intention_id", intentionId).maybeSingle();
+    if (paymentRow?.order_id) {
+      const { data } = await supabase.from("orders").select("id, order_number, customer_name, customer_phone, customer_email, city, shipping_address, total, payment_status").eq("id", paymentRow.order_id).maybeSingle();
+      order = data;
+    }
+  }
+  if (!order) {
+    console.error("[paymob-webhook] Order not found for tx", obj.id, "ref:", orderNumber);
+    return Response.json({ error: "Order not found" }, { status: 404 });
+  }
+  if (order.payment_status === "paid") {
+    return Response.json({ received: true, duplicate: true });
+  }
+  const paymentMethod = obj.source_data?.type || null;
+  const paymobOrderId = obj.order?.id ?? null;
+  if (!obj.success) {
+    await supabase.from("orders").update({ payment_status: "failed", status: "cancelled" }).eq("id", order.id);
+    await supabase.from("payments").update({
+      paymob_transaction_id: obj.id,
+      paymob_order_id: paymobOrderId,
+      status: "failed",
+      payment_method: paymentMethod,
+      raw_response: obj
+    }).eq("order_id", order.id);
+    return Response.json({ received: true, status: "failed" });
+  }
+  const expectedCents = Math.round(Number(order.total) * 100);
+  if (obj.amount_cents !== expectedCents) {
+    console.error(
+      `[paymob-webhook] Amount mismatch for order ${order.order_number}: expected ${expectedCents}, got ${obj.amount_cents}`
+    );
+    return Response.json({ error: "Amount mismatch" }, { status: 400 });
+  }
+  const { data: updatedOrder, error: updateOrderError } = await supabase.from("orders").update({ payment_status: "paid", status: "confirmed" }).eq("id", order.id).neq("payment_status", "paid").select("id").maybeSingle();
+  if (updateOrderError) {
+    console.error("[paymob-webhook] Failed to update order:", updateOrderError.message);
+    return Response.json({ error: "Database update failed" }, { status: 500 });
+  }
+  if (!updatedOrder) {
+    return Response.json({ received: true, duplicate: true });
+  }
+  const { error: paymentUpdateError } = await supabase.from("payments").update({
+    paymob_transaction_id: obj.id,
+    paymob_order_id: paymobOrderId,
+    status: "paid",
+    payment_method: paymentMethod,
+    raw_response: obj
+  }).eq("order_id", order.id);
+  if (paymentUpdateError) {
+    console.error("[paymob-webhook] Failed to update payment:", paymentUpdateError.message);
+  }
+  const { data: orderItems, error: itemsError } = await supabase.from("order_items").select("product_id, quantity").eq("order_id", order.id);
+  if (itemsError) {
+    console.error("[paymob-webhook] Failed to fetch order_items for stock:", itemsError.message);
+  } else if (orderItems) {
+    for (const item of orderItems) {
+      if (!item.product_id) continue;
+      const { data: prod } = await supabase.from("products").select("stock").eq("id", item.product_id).maybeSingle();
+      if (prod) {
+        const nextStock = Math.max(0, Number(prod.stock) - item.quantity);
+        const { error: stockErr } = await supabase.from("products").update({ stock: nextStock }).eq("id", item.product_id);
+        if (stockErr) {
+          console.error(`[paymob-webhook] Stock update failed for ${item.product_id}:`, stockErr.message);
+        }
+      }
+    }
+  }
+  const resendKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (resendKey && fromEmail) {
+    const emailTasks = [];
+    if (order.customer_email) {
+      emailTasks.push(
+        sendResendEmail({
+          apiKey: resendKey,
+          from: fromEmail,
+          to: order.customer_email,
+          subject: `تأكيد طلبك من منتجات الحسيني (${order.order_number})`,
+          html: `
+            <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.7;">
+              <h2>شكراً لطلبك من منتجات الحسيني!</h2>
+              <p>مرحباً ${escapeHtml(order.customer_name)}، تم تأكيد الدفع بنجاح.</p>
+              <p><strong>رقم الطلب:</strong> ${escapeHtml(order.order_number)}</p>
+              <p><strong>الإجمالي المدفوع:</strong> ${escapeHtml(order.total)} ج.م.</p>
+              <p><strong>العنوان:</strong> ${escapeHtml(order.city)} — ${escapeHtml(order.shipping_address)}</p>
+              <p>سيتواصل معك فريقنا قريباً لتنسيق التوصيل.</p>
+            </div>
+          `
+        })
+      );
+    }
+    if (adminEmail) {
+      emailTasks.push(
+        sendResendEmail({
+          apiKey: resendKey,
+          from: fromEmail,
+          to: adminEmail,
+          subject: `طلب جديد مدفوع: ${order.order_number} (${order.total} ج.م.)`,
+          html: `
+            <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.7;">
+              <h2>تم استلام طلب جديد مدفوع</h2>
+              <p><strong>رقم الطلب:</strong> ${escapeHtml(order.order_number)}</p>
+              <p><strong>العميل:</strong> ${escapeHtml(order.customer_name)}</p>
+              <p><strong>الهاتف:</strong> ${escapeHtml(order.customer_phone)}</p>
+              <p><strong>العنوان:</strong> ${escapeHtml(order.city)} — ${escapeHtml(order.shipping_address)}</p>
+              <p><strong>الإجمالي:</strong> ${escapeHtml(order.total)} ج.م.</p>
+            </div>
+          `
+        })
+      );
+    }
+    const results = await Promise.allSettled(emailTasks);
+    for (const r of results) {
+      if (r.status === "rejected") {
+        console.error("[paymob-webhook] Resend email error:", r.reason);
+      }
+    }
+  }
+  return Response.json({ received: true, status: "paid", orderNumber: order.order_number });
+};
+
+const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  POST,
+  prerender
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const page = () => _page;
+
+export { page };
