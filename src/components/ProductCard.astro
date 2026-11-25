@@ -1,0 +1,65 @@
+---
+import { Image } from "astro:assets";
+import type { Product } from "../lib/data";
+import { formatPriceEGP } from "../lib/format";
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const inStock = product.stock > 0;
+const searchText = `${product.name} ${product.description} ${product.category}`.toLowerCase();
+---
+
+<article
+  data-product-card
+  data-category-slug={product.category_slug}
+  data-search-text={searchText}
+  class="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:shadow-md transition-shadow"
+>
+  <a href={`/products/${product.slug}`} class="block aspect-square bg-gray-50 overflow-hidden">
+    <Image
+      src={product.image_url}
+      alt={product.name}
+      width={600}
+      height={600}
+      format="webp"
+      quality={80}
+      loading="lazy"
+      decoding="async"
+      class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+    />
+  </a>
+
+  <div class="flex flex-1 flex-col p-4">
+    <span class="text-xs font-medium text-emerald-700 mb-1">{product.category}</span>
+    <a href={`/products/${product.slug}`}>
+      <h3 class="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 hover:text-emerald-700 transition-colors">
+        {product.name}
+      </h3>
+    </a>
+    <p class="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
+      {product.description}
+    </p>
+
+    <div class="flex items-center justify-between gap-2 pt-3 border-t border-gray-100">
+      <span class="text-base sm:text-lg font-bold text-gray-900">
+        {formatPriceEGP(product.price)}
+      </span>
+      <button
+        type="button"
+        disabled={!inStock}
+        data-add-to-cart
+        data-product-id={product.id}
+        data-product-slug={product.slug}
+        data-product-name={product.name}
+        data-product-price={product.price}
+        data-product-image={product.image_url}
+        class="rounded-xl bg-emerald-700 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+      >
+        {inStock ? "أضف للسلة" : "نفدت الكمية"}
+      </button>
+    </div>
+  </div>
+</article>

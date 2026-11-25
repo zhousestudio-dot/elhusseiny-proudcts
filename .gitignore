@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Astro build output & generated types
+dist/
+.astro/
+
+# Environment variables (never commit real secrets)
+.env
+.env.*
+!.env.example
+
+# Netlify local dev
+.netlify/
+
+# Logs & OS
+npm-debug.log*
+.DS_Store

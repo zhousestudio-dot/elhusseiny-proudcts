@@ -1,0 +1,52 @@
+---
+const currentYear = new Date().getFullYear();
+// Replace with your real Egyptian WhatsApp number (format: 201XXXXXXXXX)
+const whatsappNumber = "201000000000";
+const whatsappMessage = encodeURIComponent("مرحباً، أود الاستفسار عن منتجات الحسيني");
+const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+---
+
+<footer class="border-t border-gray-200 bg-gray-50 text-gray-700">
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">منتجات الحسيني</h3>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          متجر إلكتروني مصري يوفر منتجات عالية الجودة بأسعار مناسبة وتوصيل موثوق لجميع المحافظات.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-base font-bold text-gray-900 mb-2">روابط سريعة</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/" class="hover:text-emerald-700 transition-colors">الرئيسية</a></li>
+          <li><a href="/products" class="hover:text-emerald-700 transition-colors">المنتجات</a></li>
+          <li><a href="/cart" class="hover:text-emerald-700 transition-colors">سلة التسوق</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-base font-bold text-gray-900 mb-2">تواصل معنا</h3>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li>الهاتف: <a href="tel:+201000000000" class="hover:text-emerald-700">01000000000</a></li>
+          <li>البريد الإلكتروني: <a href="mailto:support@elhusseiny.com" class="hover:text-emerald-700">support@elhusseiny.com</a></li>
+          <li>العنوان: القاهرة، جمهورية مصر العربية</li>
+          <li class="pt-1">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-800 transition-colors"
+            >
+              <span>تواصل عبر واتساب</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-gray-200 pt-6 text-center text-xs sm:text-sm text-gray-500">
+      © {currentYear} منتجات الحسيني (Elhusseiny Products). جميع الحقوق محفوظة.
+    </div>
+  </div>
+</footer>

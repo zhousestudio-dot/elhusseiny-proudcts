@@ -1,0 +1,284 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const EGYPT_GOVERNORATES = [
+  "القاهرة",
+  "الجيزة",
+  "الإسكندرية",
+  "القليوبية",
+  "الدقهلية",
+  "الشرقية",
+  "الغربية",
+  "المنوفية",
+  "البحيرة",
+  "كفر الشيخ",
+  "دمياط",
+  "بورسعيد",
+  "الإسماعيلية",
+  "السويس",
+  "الفيوم",
+  "بني سويف",
+  "المنيا",
+  "أسيوط",
+  "سوهاج",
+  "قنا",
+  "الأقصر",
+  "أسوان",
+  "البحر الأحمر",
+  "مطروح",
+  "شمال سيناء",
+  "جنوب سيناء",
+  "الوادي الجديد",
+];
+---
+
+<BaseLayout
+  title="إتمام الطلب | منتجات الحسيني"
+  description="أدخل بيانات التوصيل لإتمام طلبك والدفع بأمان عبر Paymob."
+  canonicalPath="/checkout"
+>
+  <section class="mx-auto max-w-5xl px-4 py-10 sm:py-12">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">إتمام الطلب</h1>
+
+    <!-- Empty Cart Guard -->
+    <div
+      id="checkout-empty"
+      class="hidden rounded-2xl border border-gray-200 bg-gray-50 p-10 text-center"
+    >
+      <p class="text-lg font-semibold text-gray-800 mb-2">سلة التسوق فارغة</p>
+      <p class="text-sm text-gray-600 mb-6">أضف منتجات إلى السلة أولاً قبل إتمام الطلب.</p>
+      <a
+        href="/products"
+        class="inline-block rounded-xl bg-emerald-700 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+      >
+        تصفح المنتجات
+      </a>
+    </div>
+
+    <!-- Checkout Grid -->
+    <div id="checkout-content" class="hidden grid grid-cols-1 gap-8 lg:grid-cols-5 items-start">
+      <!-- Shipping Form -->
+      <form
+        id="checkout-form"
+        class="lg:col-span-3 space-y-5 rounded-2xl border border-gray-200 bg-white p-6"
+      >
+        <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
+          بيانات التوصيل
+        </h2>
+
+        <div
+          id="checkout-error"
+          role="alert"
+          class="hidden rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700"
+        ></div>
+
+        <div>
+          <label for="customerName" class="block text-sm font-semibold text-gray-800 mb-1.5">
+            الاسم بالكامل <span class="text-red-600">*</span>
+          </label>
+          <input
+            id="customerName"
+            name="customerName"
+            type="text"
+            required
+            minlength="2"
+            placeholder="مثال: أحمد محمد الحسيني"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="customerPhone" class="block text-sm font-semibold text-gray-800 mb-1.5">
+              رقم الموبايل <span class="text-red-600">*</span>
+            </label>
+            <input
+              id="customerPhone"
+              name="customerPhone"
+              type="tel"
+              required
+              dir="ltr"
+              placeholder="01012345678"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 text-left focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+            />
+          </div>
+
+          <div>
+            <label for="customerEmail" class="block text-sm font-semibold text-gray-800 mb-1.5">
+              البريد الإلكتروني (اختياري)
+            </label>
+            <input
+              id="customerEmail"
+              name="customerEmail"
+              type="email"
+              dir="ltr"
+              placeholder="name@example.com"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 text-left focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="city" class="block text-sm font-semibold text-gray-800 mb-1.5">
+            المحافظة / المدينة <span class="text-red-600">*</span>
+          </label>
+          <select
+            id="city"
+            name="city"
+            required
+            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+          >
+            <option value="">اختر المحافظة</option>
+            {EGYPT_GOVERNORATES.map((gov) => (
+              <option value={gov}>{gov}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label for="shippingAddress" class="block text-sm font-semibold text-gray-800 mb-1.5">
+            العنوان بالتفصيل <span class="text-red-600">*</span>
+          </label>
+          <textarea
+            id="shippingAddress"
+            name="shippingAddress"
+            required
+            minlength="5"
+            rows="3"
+            placeholder="اسم الشارع، رقم العقار، الدور، الشقة، وأقرب علامة مميزة"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+          ></textarea>
+        </div>
+
+        <button
+          id="submit-checkout"
+          type="submit"
+          class="w-full rounded-xl bg-emerald-700 px-6 py-3.5 text-base font-semibold text-white hover:bg-emerald-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          الانتقال للدفع الآمن عبر Paymob
+        </button>
+
+        <p class="text-xs text-gray-500 text-center">
+          سيتم تحويلك إلى صفحة الدفع الآمنة من Paymob (بطاقات بنكية، محافظ إلكترونية، أو تقسيط).
+        </p>
+      </form>
+
+      <!-- Order Summary -->
+      <aside class="lg:col-span-2 rounded-2xl border border-gray-200 bg-gray-50 p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900 border-b border-gray-200 pb-3">
+          ملخص الطلب
+        </h2>
+        <div id="summary-items" class="space-y-3 text-sm"></div>
+        <div class="border-t border-gray-200 pt-4 flex items-center justify-between text-base font-bold text-gray-900">
+          <span>الإجمالي</span>
+          <span id="summary-total" class="text-emerald-700">٠ ج.م.</span>
+        </div>
+        <p class="text-xs text-gray-500">
+          يتم تأكيد الأسعار النهائية وتوفر المخزون تلقائياً من قاعدة البيانات قبل الدفع.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    import { getCart, getCartTotalEGP, syncCartBadge } from "../lib/cart";
+    import { formatPriceEGP } from "../lib/format";
+    import { escapeHtml } from "../lib/sanitize";
+
+    const emptyEl = document.getElementById("checkout-empty");
+    const contentEl = document.getElementById("checkout-content");
+    const summaryItemsEl = document.getElementById("summary-items");
+    const summaryTotalEl = document.getElementById("summary-total");
+    const form = document.getElementById("checkout-form") as HTMLFormElement | null;
+    const errorEl = document.getElementById("checkout-error");
+    const submitBtn = document.getElementById("submit-checkout") as HTMLButtonElement | null;
+
+    const items = getCart();
+    syncCartBadge(items);
+
+    if (!items.length) {
+      emptyEl?.classList.remove("hidden");
+    } else {
+      contentEl?.classList.remove("hidden");
+      if (summaryItemsEl) {
+        summaryItemsEl.innerHTML = items
+          .map(
+            (item) => `
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-gray-700">${escapeHtml(item.name)} × ${item.quantity}</span>
+              <span class="font-semibold text-gray-900 shrink-0">${formatPriceEGP(
+                item.price * item.quantity
+              )}</span>
+            </div>
+          `
+          )
+          .join("");
+      }
+      if (summaryTotalEl) {
+        summaryTotalEl.textContent = formatPriceEGP(getCartTotalEGP(items));
+      }
+    }
+
+    function showError(msg: string) {
+      if (!errorEl) return;
+      errorEl.textContent = msg;
+      errorEl.classList.remove("hidden");
+    }
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      errorEl?.classList.add("hidden");
+
+      const currentItems = getCart();
+      if (!currentItems.length) {
+        showError("سلة التسوق فارغة.");
+        return;
+      }
+
+      const formData = new FormData(form);
+      const payload = {
+        customerName: String(formData.get("customerName") || ""),
+        customerPhone: String(formData.get("customerPhone") || ""),
+        customerEmail: String(formData.get("customerEmail") || ""),
+        city: String(formData.get("city") || ""),
+        shippingAddress: String(formData.get("shippingAddress") || ""),
+        items: currentItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+        })),
+      };
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "جاري تجهيز بوابة الدفع...";
+      }
+
+      try {
+        const res = await fetch("/.netlify/functions/create-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.checkoutUrl) {
+          showError(data.error || "حدث خطأ أثناء تجهيز الطلب.");
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "الانتقال للدفع الآمن عبر Paymob";
+          }
+          return;
+        }
+
+        window.location.href = data.checkoutUrl;
+      } catch {
+        showError("تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى.");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "الانتقال للدفع الآمن عبر Paymob";
+        }
+      }
+    });
+  </script>
+</BaseLayout>

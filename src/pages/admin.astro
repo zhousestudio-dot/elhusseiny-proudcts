@@ -1,0 +1,508 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="لوحة التحكم | منتجات الحسيني"
+  description="لوحة إدارة المنتجات والطلبات."
+  canonicalPath="/admin"
+>
+  <section class="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+    <!-- Login View -->
+    <div id="admin-login-box" class="mx-auto max-w-md rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-xs">
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">دخول الإدارة</h1>
+      <p class="text-sm text-gray-600 mb-6">
+        هذه الصفحة مخصصة لصاحب المتجر فقط عبر Supabase Auth.
+      </p>
+
+      <div id="login-error" class="hidden mb-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700"></div>
+
+      <form id="admin-login-form" class="space-y-4">
+        <div>
+          <label for="admin-email" class="block text-sm font-semibold text-gray-800 mb-1">
+            البريد الإلكتروني
+          </label>
+          <input
+            id="admin-email"
+            type="email"
+            required
+            dir="ltr"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-left focus:border-emerald-600 focus:outline-none"
+          />
+        </div>
+        <div>
+          <label for="admin-password" class="block text-sm font-semibold text-gray-800 mb-1">
+            كلمة المرور
+          </label>
+          <input
+            id="admin-password"
+            type="password"
+            required
+            dir="ltr"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-left focus:border-emerald-600 focus:outline-none"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded-xl bg-emerald-700 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+        >
+          تسجيل الدخول
+        </button>
+      </form>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden space-y-6">
+      <!-- Top Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">لوحة إدارة المتجر</h1>
+          <p id="admin-user-label" class="text-xs text-gray-500 mt-1"></p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            id="btn-rebuild"
+            type="button"
+            class="rounded-xl bg-amber-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+          >
+            تحديث الموقع (Rebuild)
+          </button>
+          <button
+            id="btn-logout"
+            type="button"
+            class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50"
+          >
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+
+      <div id="admin-toast" class="hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"></div>
+
+      <!-- Tabs -->
+      <div class="flex gap-2 border-b border-gray-200 pb-2">
+        <button
+          type="button"
+          data-tab="products"
+          class="tab-btn rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
+        >
+          المنتجات
+        </button>
+        <button
+          type="button"
+          data-tab="orders"
+          class="tab-btn rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700"
+        >
+          الطلبات
+        </button>
+      </div>
+
+      <!-- Products Tab -->
+      <div id="tab-products" class="space-y-6">
+        <!-- Add / Edit Product Form -->
+        <form id="product-form" class="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 id="product-form-title" class="text-lg font-bold text-gray-900">إضافة منتج جديد</h2>
+            <button
+              id="btn-cancel-edit"
+              type="button"
+              class="hidden text-xs font-semibold text-gray-500 hover:text-gray-800"
+            >
+              إلغاء التعديل
+            </button>
+          </div>
+
+          <input type="hidden" id="prod-id" />
+          <input type="hidden" id="prod-slug" />
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">اسم المنتج *</label>
+              <input id="prod-name" type="text" required class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">القسم</label>
+              <select id="prod-category" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">السعر (ج.م.) *</label>
+              <input id="prod-price" type="number" step="0.01" min="0" required class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">المخزون *</label>
+              <input id="prod-stock" type="number" min="0" required class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">الوصف</label>
+            <textarea id="prod-desc" rows="2" class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">رفع صورة المنتج (Supabase Storage)</label>
+              <input id="prod-image-file" type="file" accept="image/*" class="block w-full text-xs text-gray-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">أو رابط الصورة</label>
+              <input id="prod-image-url" type="text" dir="ltr" placeholder="https://..." class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm text-left" />
+            </div>
+          </div>
+
+          <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+            <input id="prod-active" type="checkbox" checked class="rounded border-gray-300" />
+            <span>متاح للعرض في المتجر</span>
+          </label>
+
+          <div>
+            <button
+              id="btn-save-product"
+              type="submit"
+              class="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+            >
+              حفظ المنتج
+            </button>
+          </div>
+        </form>
+
+        <!-- Products List -->
+        <div id="admin-products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div id="tab-orders" class="hidden space-y-4">
+        <div id="admin-orders-list" class="space-y-4"></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { createClient } from "@supabase/supabase-js";
+    import { formatPriceEGP } from "../lib/format";
+    import { escapeHtml, safeImageUrl } from "../lib/sanitize";
+
+    const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+    const loginBox = document.getElementById("admin-login-box");
+    const loginForm = document.getElementById("admin-login-form") as HTMLFormElement | null;
+    const loginError = document.getElementById("login-error");
+    const dashboard = document.getElementById("admin-dashboard");
+    const toast = document.getElementById("admin-toast");
+
+    const productsList = document.getElementById("admin-products-list");
+    const ordersList = document.getElementById("admin-orders-list");
+    const categorySelect = document.getElementById("prod-category") as HTMLSelectElement | null;
+    const productForm = document.getElementById("product-form") as HTMLFormElement | null;
+
+    if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes("your-project-id")) {
+      if (loginError) {
+        loginError.textContent = "يرجى ضبط متغيرات Supabase في ملف .env أولاً.";
+        loginError.classList.remove("hidden");
+      }
+    }
+
+    const supabase =
+      supabaseUrl && supabaseAnonKey && !supabaseUrl.includes("your-project-id")
+        ? createClient(supabaseUrl, supabaseAnonKey)
+        : null;
+
+    let accessToken = "";
+    let cachedProducts: any[] = [];
+
+    function showToast(msg: string, isError = false) {
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.className = isError
+        ? "rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        : "rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800";
+      toast.classList.remove("hidden");
+    }
+
+    async function apiFetch(method: string, body?: unknown) {
+      const res = await fetch("/.netlify/functions/admin-api", {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      return data;
+    }
+
+    async function loadDashboard() {
+      try {
+        const data = await apiFetch("GET");
+        cachedProducts = data.products || [];
+
+        if (categorySelect) {
+          categorySelect.innerHTML = `<option value="">بدون قسم</option>` +
+            (data.categories || [])
+              .map((c: any) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`)
+              .join("");
+        }
+
+        renderProducts(cachedProducts);
+        renderOrders(data.orders || []);
+      } catch (err: any) {
+        showToast(err.message || "تعذر تحميل البيانات — تأكد من صلاحية حساب الإدارة.", true);
+      }
+    }
+
+    function renderProducts(products: any[]) {
+      if (!productsList) return;
+      if (!products.length) {
+        productsList.innerHTML = `<p class="text-sm text-gray-500">لا توجد منتجات بعد.</p>`;
+        return;
+      }
+
+      productsList.innerHTML = products
+        .map(
+          (p) => `
+          <div class="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col justify-between gap-3">
+            <div class="flex gap-3 items-center">
+              <img src="${safeImageUrl(p.image_url)}" alt="${escapeHtml(p.name)}" width="64" height="64" class="h-16 w-16 rounded-xl object-cover bg-gray-50 border" />
+              <div class="min-w-0">
+                <h3 class="text-sm font-bold text-gray-900 truncate">${escapeHtml(p.name)}</h3>
+                <p class="text-xs text-emerald-700 font-semibold">${formatPriceEGP(Number(p.price))}</p>
+                <p class="text-xs text-gray-500">المخزون: ${Number(p.stock)} | ${p.is_active ? "نشط" : "مخفي"}</p>
+              </div>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-gray-100">
+              <button type="button" data-edit-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-gray-300 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50">تعديل</button>
+              <button type="button" data-del-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-red-200 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">حذف</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderOrders(orders: any[]) {
+      if (!ordersList) return;
+      if (!orders.length) {
+        ordersList.innerHTML = `<p class="text-sm text-gray-500">لا توجد طلبات بعد.</p>`;
+        return;
+      }
+
+      ordersList.innerHTML = orders
+        .map((o) => {
+          const isPaid = o.payment_status === "paid";
+          const payBadge = isPaid
+            ? `<span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">مدفوع</span>`
+            : `<span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">${o.payment_status === "failed" ? "فشل الدفع" : "غير مدفوع"}</span>`;
+
+          return `
+            <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-gray-900 text-sm sm:text-base">${escapeHtml(o.order_number)}</span>
+                  ${payBadge}
+                </div>
+                <span class="font-bold text-emerald-700 text-sm sm:text-base">${formatPriceEGP(Number(o.total))}</span>
+              </div>
+
+              <div class="text-xs sm:text-sm text-gray-600 space-y-1">
+                <p><strong>العميل:</strong> ${escapeHtml(o.customer_name)} — <span dir="ltr">${escapeHtml(o.customer_phone)}</span></p>
+                <p><strong>العنوان:</strong> ${escapeHtml(o.city)}، ${escapeHtml(o.shipping_address)}</p>
+              </div>
+
+              <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+                <label class="text-xs font-semibold text-gray-700">حالة الطلب:</label>
+                <select data-order-status="${escapeHtml(o.id)}" class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold">
+                  <option value="pending" ${o.status === "pending" ? "selected" : ""}>قيد الانتظار</option>
+                  <option value="confirmed" ${o.status === "confirmed" ? "selected" : ""}>جاري التجهيز</option>
+                  <option value="shipped" ${o.status === "shipped" ? "selected" : ""}>تم الشحن</option>
+                  <option value="delivered" ${o.status === "delivered" ? "selected" : ""}>تم التوصيل</option>
+                  <option value="cancelled" ${o.status === "cancelled" ? "selected" : ""}>ملغي</option>
+                </select>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    async function checkSession() {
+      if (!supabase) return;
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (session?.access_token) {
+        accessToken = session.access_token;
+        loginBox?.classList.add("hidden");
+        dashboard?.classList.remove("hidden");
+        const label = document.getElementById("admin-user-label");
+        if (label) label.textContent = session.user.email || "";
+        await loadDashboard();
+      }
+    }
+
+    loginForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!supabase) return;
+      loginError?.classList.add("hidden");
+      const email = (document.getElementById("admin-email") as HTMLInputElement).value;
+      const password = (document.getElementById("admin-password") as HTMLInputElement).value;
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        if (loginError) {
+          loginError.textContent = error.message;
+          loginError.classList.remove("hidden");
+        }
+        return;
+      }
+      await checkSession();
+    });
+
+    document.getElementById("btn-logout")?.addEventListener("click", async () => {
+      await supabase?.auth.signOut();
+      window.location.reload();
+    });
+
+    // Tabs switching
+    document.querySelectorAll<HTMLButtonElement>(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.tab;
+        document.getElementById("tab-products")?.classList.toggle("hidden", tab !== "products");
+        document.getElementById("tab-orders")?.classList.toggle("hidden", tab !== "orders");
+        document.querySelectorAll<HTMLButtonElement>(".tab-btn").forEach((b) => {
+          b.className =
+            b.dataset.tab === tab
+              ? "tab-btn rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
+              : "tab-btn rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700";
+        });
+      });
+    });
+
+    // Save product (with optional image upload)
+    productForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("prod-image-file") as HTMLInputElement;
+      const urlInput = document.getElementById("prod-image-url") as HTMLInputElement;
+
+      let imageUrl = urlInput.value.trim();
+
+      try {
+        const file = fileInput.files?.[0];
+        if (file) {
+          const base64Data = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          const uploaded = await apiFetch("POST", {
+            action: "upload_image",
+            fileName: file.name,
+            contentType: file.type,
+            base64Data,
+          });
+          imageUrl = uploaded.imageUrl;
+        }
+
+        await apiFetch("POST", {
+          action: "save_product",
+          id: (document.getElementById("prod-id") as HTMLInputElement).value || null,
+          slug: (document.getElementById("prod-slug") as HTMLInputElement).value || null,
+          name: (document.getElementById("prod-name") as HTMLInputElement).value,
+          category_id: categorySelect?.value || null,
+          price: Number((document.getElementById("prod-price") as HTMLInputElement).value),
+          stock: Number((document.getElementById("prod-stock") as HTMLInputElement).value),
+          description: (document.getElementById("prod-desc") as HTMLTextAreaElement).value,
+          image_url: imageUrl || null,
+          is_active: (document.getElementById("prod-active") as HTMLInputElement).checked,
+        });
+
+        productForm.reset();
+        (document.getElementById("prod-id") as HTMLInputElement).value = "";
+        (document.getElementById("prod-slug") as HTMLInputElement).value = "";
+        document.getElementById("btn-cancel-edit")?.classList.add("hidden");
+        const titleEl = document.getElementById("product-form-title");
+        if (titleEl) titleEl.textContent = "إضافة منتج جديد";
+
+        showToast("تم حفظ المنتج بنجاح! اضغط على (تحديث الموقع) لنشر التغييرات.");
+        await loadDashboard();
+      } catch (err: any) {
+        showToast(err.message || "فشل حفظ المنتج.", true);
+      }
+    });
+
+    // Edit / Delete product buttons
+    productsList?.addEventListener("click", async (e) => {
+      const target = e.target as HTMLElement | null;
+      const editId = target?.closest<HTMLElement>("[data-edit-prod]")?.dataset.editProd;
+      const delId = target?.closest<HTMLElement>("[data-del-prod]")?.dataset.delProd;
+
+      if (editId) {
+        const p = cachedProducts.find((item) => item.id === editId);
+        if (!p) return;
+        (document.getElementById("prod-id") as HTMLInputElement).value = p.id;
+        (document.getElementById("prod-slug") as HTMLInputElement).value = p.slug || "";
+        (document.getElementById("prod-name") as HTMLInputElement).value = p.name;
+        (document.getElementById("prod-price") as HTMLInputElement).value = String(p.price);
+        (document.getElementById("prod-stock") as HTMLInputElement).value = String(p.stock);
+        (document.getElementById("prod-desc") as HTMLTextAreaElement).value = p.description || "";
+        (document.getElementById("prod-image-url") as HTMLInputElement).value = p.image_url || "";
+        (document.getElementById("prod-active") as HTMLInputElement).checked = Boolean(p.is_active);
+        if (categorySelect) categorySelect.value = p.category_id || "";
+        document.getElementById("btn-cancel-edit")?.classList.remove("hidden");
+        const titleEl = document.getElementById("product-form-title");
+        if (titleEl) titleEl.textContent = `تعديل: ${p.name}`;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (delId) {
+        if (!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
+        try {
+          await apiFetch("POST", { action: "delete_product", id: delId });
+          showToast("تم حذف المنتج.");
+          await loadDashboard();
+        } catch (err: any) {
+          showToast(err.message || "فشل حذف المنتج.", true);
+        }
+      }
+    });
+
+    document.getElementById("btn-cancel-edit")?.addEventListener("click", () => {
+      productForm?.reset();
+      (document.getElementById("prod-id") as HTMLInputElement).value = "";
+      (document.getElementById("prod-slug") as HTMLInputElement).value = "";
+      document.getElementById("btn-cancel-edit")?.classList.add("hidden");
+      const titleEl = document.getElementById("product-form-title");
+      if (titleEl) titleEl.textContent = "إضافة منتج جديد";
+    });
+
+    // Change order status
+    ordersList?.addEventListener("change", async (e) => {
+      const select = e.target as HTMLSelectElement | null;
+      const orderId = select?.dataset.orderStatus;
+      if (!orderId || !select) return;
+      try {
+        await apiFetch("POST", {
+          action: "update_order_status",
+          id: orderId,
+          status: select.value,
+        });
+        showToast("تم تحديث حالة الطلب.");
+      } catch (err: any) {
+        showToast(err.message || "فشل تحديث حالة الطلب.", true);
+      }
+    });
+
+    // Trigger Netlify rebuild
+    document.getElementById("btn-rebuild")?.addEventListener("click", async () => {
+      try {
+        await apiFetch("POST", { action: "trigger_rebuild" });
+        showToast("تم إرسال طلب تحديث الموقع إلى Netlify بنجاح!");
+      } catch (err: any) {
+        showToast(err.message || "فشل تشغيل التحديث.", true);
+      }
+    });
+
+    checkSession();
+  </script>
+</BaseLayout>

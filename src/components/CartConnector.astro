@@ -1,0 +1,36 @@
+---
+// Include this component ONLY on pages that display products or need cart badge/add-to-cart
+---
+
+<script>
+  import { addToCart, syncCartBadge } from "../lib/cart";
+
+  // Sync header badge on page load
+  syncCartBadge();
+
+  // Wire all "Add to Cart" buttons on the page
+  document.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement | null;
+    const btn = target?.closest<HTMLButtonElement>("[data-add-to-cart]");
+    if (!btn || btn.disabled) return;
+
+    const id = btn.dataset.productId;
+    const slug = btn.dataset.productSlug || "";
+    const name = btn.dataset.productName || "";
+    const price = Number(btn.dataset.productPrice || 0);
+    const image_url = btn.dataset.productImage || "/images/prod-1.svg";
+
+    if (!id || !name) return;
+
+    addToCart({ id, slug, name, price, image_url }, 1);
+
+    // Brief visual confirmation without blocking the user
+    const originalText = btn.textContent;
+    btn.textContent = "تمت الإضافة ✓";
+    btn.classList.add("bg-emerald-900");
+    window.setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove("bg-emerald-900");
+    }, 1000);
+  });
+</script>

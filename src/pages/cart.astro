@@ -1,0 +1,174 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="سلة التسوق | منتجات الحسيني"
+  description="راجع منتجاتك في سلة التسوق قبل إتمام الطلب."
+  canonicalPath="/cart"
+>
+  <section class="mx-auto max-w-4xl px-4 py-10 sm:py-12">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">سلة التسوق</h1>
+
+    <!-- Empty Cart State -->
+    <div
+      id="cart-empty"
+      class="hidden rounded-2xl border border-gray-200 bg-gray-50 p-10 text-center"
+    >
+      <p class="text-lg font-semibold text-gray-800 mb-2">سلة التسوق فارغة حالياً</p>
+      <p class="text-sm text-gray-600 mb-6">
+        تصفح منتجات الحسيني وأضف ما يناسبك إلى السلة.
+      </p>
+      <a
+        href="/products"
+        class="inline-block rounded-xl bg-emerald-700 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+      >
+        تصفح المنتجات
+      </a>
+    </div>
+
+    <!-- Cart Content -->
+    <div id="cart-content" class="hidden space-y-6">
+      <div id="cart-items" class="divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white"></div>
+
+      <!-- Summary Box -->
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 space-y-4">
+        <div class="flex items-center justify-between text-base sm:text-lg font-bold text-gray-900">
+          <span>الإجمالي التقديري</span>
+          <span id="cart-total" class="text-emerald-700">٠ ج.م.</span>
+        </div>
+        <p class="text-xs text-gray-500">
+          يتم تأكيد الأسعار النهائية وتوفر المخزون تلقائياً من قاعدة البيانات عند إتمام الطلب.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <a
+            href="/checkout"
+            class="flex-1 rounded-xl bg-emerald-700 px-6 py-3.5 text-center text-base font-semibold text-white hover:bg-emerald-800 transition-colors"
+          >
+            إتمام الطلب
+          </a>
+          <a
+            href="/products"
+            class="rounded-xl border border-gray-300 bg-white px-6 py-3.5 text-center text-base font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+          >
+            إضافة منتجات أخرى
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import {
+      getCart,
+      getCartTotalEGP,
+      removeFromCart,
+      syncCartBadge,
+      updateQuantity,
+    } from "../lib/cart";
+    import { formatPriceEGP } from "../lib/format";
+    import { escapeHtml, safeImageUrl } from "../lib/sanitize";
+
+    const emptyEl = document.getElementById("cart-empty");
+    const contentEl = document.getElementById("cart-content");
+    const itemsEl = document.getElementById("cart-items");
+    const totalEl = document.getElementById("cart-total");
+
+    function renderCart() {
+      const items = getCart();
+      syncCartBadge(items);
+
+      if (!items.length) {
+        emptyEl?.classList.remove("hidden");
+        contentEl?.classList.add("hidden");
+        return;
+      }
+
+      emptyEl?.classList.add("hidden");
+      contentEl?.classList.remove("hidden");
+
+      if (itemsEl) {
+        itemsEl.innerHTML = items
+          .map(
+            (item) => `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5" data-cart-row="${escapeHtml(item.id)}">
+            <div class="flex items-center gap-4">
+              <img
+                src="${safeImageUrl(item.image_url)}"
+                alt="${escapeHtml(item.name)}"
+                width="72"
+                height="72"
+                class="h-18 w-18 rounded-xl object-cover border border-gray-100 bg-gray-50 shrink-0"
+              />
+              <div>
+                <a href="/products/${encodeURIComponent(item.slug)}" class="text-sm sm:text-base font-bold text-gray-900 hover:text-emerald-700">
+                  ${escapeHtml(item.name)}
+                </a>
+                <p class="text-sm text-gray-600 mt-1">${formatPriceEGP(item.price)}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end gap-4">
+              <div class="flex items-center rounded-lg border border-gray-300 bg-white">
+                <button
+                  type="button"
+                  data-qty-dec="${escapeHtml(item.id)}"
+                  aria-label="تقليل الكمية"
+                  class="px-3 py-1.5 text-base font-bold text-gray-700 hover:bg-gray-100"
+                >−</button>
+                <span class="px-3 py-1.5 text-sm font-semibold text-gray-900">${item.quantity}</span>
+                <button
+                  type="button"
+                  data-qty-inc="${escapeHtml(item.id)}"
+                  aria-label="زيادة الكمية"
+                  class="px-3 py-1.5 text-base font-bold text-gray-700 hover:bg-gray-100"
+                >+</button>
+              </div>
+
+              <span class="text-sm sm:text-base font-bold text-gray-900 min-w-20 text-left">
+                ${formatPriceEGP(item.price * item.quantity)}
+              </span>
+
+              <button
+                type="button"
+                data-remove-item="${escapeHtml(item.id)}"
+                class="text-xs sm:text-sm font-medium text-red-600 hover:text-red-700"
+              >
+                حذف
+              </button>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      if (totalEl) {
+        totalEl.textContent = formatPriceEGP(getCartTotalEGP(items));
+      }
+    }
+
+    itemsEl?.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement | null;
+      const incId = target?.closest<HTMLElement>("[data-qty-inc]")?.dataset.qtyInc;
+      const decId = target?.closest<HTMLElement>("[data-qty-dec]")?.dataset.qtyDec;
+      const removeId = target?.closest<HTMLElement>("[data-remove-item]")?.dataset.removeItem;
+
+      if (incId) {
+        const current = getCart().find((i) => i.id === incId);
+        if (current) updateQuantity(incId, current.quantity + 1);
+        renderCart();
+      } else if (decId) {
+        const current = getCart().find((i) => i.id === decId);
+        if (current) updateQuantity(decId, current.quantity - 1);
+        renderCart();
+      } else if (removeId) {
+        removeFromCart(removeId);
+        renderCart();
+      }
+    });
+
+    renderCart();
+  </script>
+</BaseLayout>

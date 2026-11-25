@@ -1,0 +1,25 @@
+{
+  "name": "elhusseiny-shop",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@fontsource/cairo": "^5.2.0",
+    "@supabase/supabase-js": "^2.119.2",
+    "@tailwindcss/vite": "^4.1.0",
+    "astro": "^5.7.0",
+    "tailwindcss": "^4.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "@netlify/functions": "^3.1.0",
+    "typescript": "^5.8.0"
+  }
+}

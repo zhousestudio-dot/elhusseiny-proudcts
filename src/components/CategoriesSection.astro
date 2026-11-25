@@ -1,0 +1,33 @@
+---
+import type { Category } from "../lib/data";
+
+interface Props {
+  categories: Category[];
+}
+
+const { categories } = Astro.props;
+---
+
+<section id="categories" class="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl sm:text-2xl font-bold text-gray-900">تصفح حسب القسم</h2>
+    <a href="/products" class="text-sm font-semibold text-emerald-700 hover:underline">
+      عرض الكل
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {categories.map((cat) => (
+      <a
+        href={`/products?category=${cat.slug}`}
+        class="group rounded-2xl border border-gray-200 bg-white p-5 hover:border-emerald-600 hover:shadow-sm transition-all"
+      >
+        <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 font-bold group-hover:bg-emerald-700 group-hover:text-white transition-colors">
+          {cat.name.charAt(0)}
+        </div>
+        <h3 class="text-base font-bold text-gray-900 mb-1">{cat.name}</h3>
+        <p class="text-sm text-gray-600 line-clamp-2">{cat.description}</p>
+      </a>
+    ))}
+  </div>
+</section>
