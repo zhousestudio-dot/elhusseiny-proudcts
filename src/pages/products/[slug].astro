@@ -38,17 +38,17 @@ const description =
 
   <section class="mx-auto max-w-6xl px-4 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <nav aria-label="مسار التنقل" class="mb-6 flex items-center gap-2 text-sm text-gray-500">
-      <a href="/" class="hover:text-emerald-700 transition-colors">الرئيسية</a>
+    <nav aria-label="مسار التنقل" class="mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+      <a href="/" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">الرئيسية</a>
       <span>/</span>
-      <a href="/products" class="hover:text-emerald-700 transition-colors">المنتجات</a>
+      <a href="/products" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">المنتجات</a>
       <span>/</span>
-      <span class="text-gray-900 font-medium truncate">{product.name}</span>
+      <span class="text-gray-900 dark:text-gray-100 font-medium truncate">{product.name}</span>
     </nav>
 
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 items-start">
       <!-- Product Image -->
-      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+      <div class="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
         <Image
           src={product.image_url}
           alt={product.name}
@@ -79,27 +79,27 @@ const description =
             </span>
           )}
 
-          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             {product.name}
           </h1>
         </div>
 
         <div class="flex items-center gap-4">
-          <span class="text-2xl sm:text-3xl font-bold text-emerald-700">
+          <span class="text-2xl sm:text-3xl font-bold text-emerald-700 dark:text-emerald-400">
             {formatPriceEGP(product.price)}
           </span>
           <span
             class={`rounded-full px-3 py-1 text-xs font-semibold ${
-              inStock ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+              inStock ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300" : "bg-red-50 text-red-700"
             }`}
           >
             {inStock ? `متوفر (${product.stock} قطعة)` : "نفدت الكمية"}
           </span>
         </div>
 
-        <div class="border-t border-gray-200 pt-5">
-          <h2 class="text-sm font-bold text-gray-900 mb-2">وصف المنتج</h2>
-          <p class="text-base text-gray-600 leading-relaxed whitespace-pre-line">
+        <div class="border-t border-gray-200 dark:border-gray-800 pt-5">
+          <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-2">وصف المنتج</h2>
+          <p class="text-base text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
             {description}
           </p>
         </div>
@@ -120,13 +120,13 @@ const description =
           </button>
           <a
             href="/products"
-            class="rounded-xl border border-gray-300 bg-white px-6 py-3.5 text-center text-base font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+            class="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-6 py-3.5 text-center text-base font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             متابعة التسوق
           </a>
         </div>
 
-        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4 text-sm text-gray-600 space-y-1">
+        <div class="rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 text-sm text-gray-600 dark:text-gray-300 space-y-1">
           <p>✓ توصيل لجميع محافظات مصر</p>
           <p>✓ دفع إلكتروني آمن عبر Paymob (بطاقات بنكية ومحافظ إلكترونية)</p>
         </div>

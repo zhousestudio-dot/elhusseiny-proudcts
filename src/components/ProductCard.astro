@@ -16,9 +16,9 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
   data-product-card
   data-category-slug={product.category_slug}
   data-search-text={searchText}
-  class="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:shadow-md transition-shadow"
+  class="flex flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-md transition-shadow"
 >
-  <a href={`/products/${product.slug}`} class="block aspect-square bg-gray-50 overflow-hidden">
+  <a href={`/products/${product.slug}`} class="block aspect-square bg-gray-50 dark:bg-gray-800 overflow-hidden">
     <Image
       src={product.image_url}
       alt={product.name}
@@ -33,18 +33,18 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
   </a>
 
   <div class="flex flex-1 flex-col p-4">
-    <span class="text-xs font-medium text-emerald-700 mb-1">{product.category}</span>
+    <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">{product.category}</span>
     <a href={`/products/${product.slug}`}>
-      <h3 class="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 hover:text-emerald-700 transition-colors">
+      <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1.5 line-clamp-2 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
         {product.name}
       </h3>
     </a>
-    <p class="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
+    <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-1">
       {product.description}
     </p>
 
-    <div class="flex items-center justify-between gap-2 pt-3 border-t border-gray-100">
-      <span class="text-base sm:text-lg font-bold text-gray-900">
+    <div class="flex items-center justify-between gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+      <span class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
         {formatPriceEGP(product.price)}
       </span>
       <button
