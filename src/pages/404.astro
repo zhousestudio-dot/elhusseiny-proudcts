@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="الصفحة غير موجودة | منتجات الحسيني"
+  description="عذراً، الصفحة التي تبحث عنها غير موجودة."
+>
+  <section class="mx-auto max-w-2xl px-4 py-20 text-center space-y-5">
+    <p class="text-5xl font-bold text-emerald-800 dark:text-emerald-400">404</p>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">عذراً، هذه الصفحة غير موجودة</h1>
+    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+      ربما تم تغيير رابط المنتج أو حذفه. يمكنك تصفح جميع منتجاتنا الطبيعية من هنا.
+    </p>
+    <div class="pt-2 flex flex-wrap justify-center gap-3">
+      <a
+        href="/"
+        class="rounded-xl bg-emerald-800 px-6 py-3 text-sm font-bold text-white hover:bg-emerald-900 transition-colors"
+      >
+        العودة للرئيسية
+      </a>
+      <a
+        href="/products"
+        class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-6 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-stone-50 dark:hover:bg-gray-800 transition-colors"
+      >
+        تصفح المنتجات
+      </a>
+    </div>
+  </section>
+</BaseLayout>

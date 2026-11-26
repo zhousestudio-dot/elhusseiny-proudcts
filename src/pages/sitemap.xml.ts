@@ -9,6 +9,10 @@ export const GET: APIRoute = async () => {
   const staticPages = [
     { url: `${siteUrl}/`, priority: "1.0", changefreq: "daily" },
     { url: `${siteUrl}/products`, priority: "0.9", changefreq: "daily" },
+    { url: `${siteUrl}/track-order`, priority: "0.6", changefreq: "monthly" },
+    { url: `${siteUrl}/policies/returns`, priority: "0.4", changefreq: "yearly" },
+    { url: `${siteUrl}/policies/privacy`, priority: "0.4", changefreq: "yearly" },
+    { url: `${siteUrl}/policies/terms`, priority: "0.4", changefreq: "yearly" },
   ];
 
   const productPages = products.map((p) => ({

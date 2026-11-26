@@ -81,7 +81,7 @@ export async function getActiveProducts(): Promise<Product[]> {
       description: row.description ?? "",
       price: Number(row.price),
       compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : null,
-      image_url: row.image_url || "/images/prod-1.svg",
+      image_url: row.image_url || "/images/products/product-03.jpg",
       stock: row.stock,
       category: cat?.name ?? "منتجات عامة",
       category_slug: cat?.slug ?? "",
