@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProductCard from "../../components/ProductCard.astro";
 import CartConnector from "../../components/CartConnector.astro";
 import { getActiveProducts } from "../../lib/products";
 import { formatPriceEGP } from "../../lib/format";
@@ -10,18 +11,54 @@ export async function getStaticPaths() {
   const products = await getActiveProducts();
   return products.map((product) => ({
     params: { slug: product.slug },
-    props: { product },
+    props: { product, allProducts: products },
   }));
 }
 
 interface Props {
   product: Product;
+  allProducts: Product[];
 }
 
-const { product } = Astro.props;
+const { product, allProducts } = Astro.props;
 const inStock = product.stock > 0;
 const description =
   product.description || `اشتري ${product.name} من متجر منتجات الحسيني في مصر.`;
+
+// Related products: same category first, then fill up to 4
+const sameCategory = allProducts.filter(
+  (p) => p.id !== product.id && p.category_slug === product.category_slug
+);
+const others = allProducts.filter(
+  (p) => p.id !== product.id && p.category_slug !== product.category_slug
+);
+const relatedProducts = [...sameCategory, ...others].slice(0, 4);
+
+const siteUrl = (import.meta.env.PUBLIC_SITE_URL || "https://elhusseiny-products.vercel.app").replace(/\/$/, "");
+const fullImg = product.image_url.startsWith("http") ? product.image_url : `${siteUrl}${product.image_url}`;
+const whatsappText = encodeURIComponent(
+  `مرحباً، أود طلب: ${product.name} (${formatPriceEGP(product.price)})`
+);
+const whatsappOrderUrl = `https://wa.me/201093452806?text=${whatsappText}`;
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: product.name,
+  image: fullImg,
+  description,
+  brand: {
+    "@type": "Brand",
+    name: "منتجات الحسيني",
+  },
+  offers: {
+    "@type": "Offer",
+    url: `${siteUrl}/products/${product.slug}`,
+    priceCurrency: "EGP",
+    price: product.price,
+    availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+  },
+};
 ---
 
 <BaseLayout
@@ -34,21 +71,22 @@ const description =
   <Fragment slot="head">
     <meta property="product:price:amount" content={String(product.price)} />
     <meta property="product:price:currency" content="EGP" />
+    <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
   </Fragment>
 
   <section class="mx-auto max-w-6xl px-4 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <nav aria-label="مسار التنقل" class="mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-      <a href="/" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">الرئيسية</a>
+    <nav aria-label="مسار التنقل" class="mb-6 flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+      <a href="/" class="hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors">الرئيسية</a>
       <span>/</span>
-      <a href="/products" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">المنتجات</a>
+      <a href="/products" class="hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors">المنتجات</a>
       <span>/</span>
       <span class="text-gray-900 dark:text-gray-100 font-medium truncate">{product.name}</span>
     </nav>
 
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 items-start">
       <!-- Product Image -->
-      <div class="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+      <div class="overflow-hidden rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-2">
         <Image
           src={product.image_url}
           alt={product.name}
@@ -59,7 +97,7 @@ const description =
           loading="eager"
           fetchpriority="high"
           decoding="async"
-          class="aspect-square w-full object-cover"
+          class="aspect-square w-full rounded-xl object-cover"
         />
       </div>
 
@@ -69,70 +107,155 @@ const description =
           {product.category_slug ? (
             <a
               href={`/products?category=${product.category_slug}`}
-              class="inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors mb-3"
+              class="inline-block rounded-full bg-emerald-50 dark:bg-emerald-950 px-3 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 transition-colors mb-3"
             >
               {product.category}
             </a>
           ) : (
-            <span class="inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 mb-3">
+            <span class="inline-block rounded-full bg-emerald-50 dark:bg-emerald-950 px-3 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-3">
               {product.category}
             </span>
           )}
 
-          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-snug">
             {product.name}
           </h1>
         </div>
 
         <div class="flex items-center gap-4">
-          <span class="text-2xl sm:text-3xl font-bold text-emerald-700 dark:text-emerald-400">
+          <span class="text-2xl sm:text-3xl font-bold text-emerald-800 dark:text-emerald-400">
             {formatPriceEGP(product.price)}
           </span>
           <span
             class={`rounded-full px-3 py-1 text-xs font-semibold ${
-              inStock ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300" : "bg-red-50 text-red-700"
+              inStock ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300" : "bg-red-50 text-red-700"
             }`}
           >
             {inStock ? `متوفر (${product.stock} قطعة)` : "نفدت الكمية"}
           </span>
         </div>
 
-        <div class="border-t border-gray-200 dark:border-gray-800 pt-5">
+        <div class="border-t border-stone-200 dark:border-gray-800 pt-5">
           <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-2">وصف المنتج</h2>
-          <p class="text-base text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+          <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
             {description}
           </p>
         </div>
 
-        <div class="pt-2 flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            disabled={!inStock}
-            data-add-to-cart
-            data-product-id={product.id}
-            data-product-slug={product.slug}
-            data-product-name={product.name}
-            data-product-price={product.price}
-            data-product-image={product.image_url}
-            class="flex-1 rounded-xl bg-emerald-700 px-6 py-3.5 text-base font-semibold text-white hover:bg-emerald-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            {inStock ? "أضف إلى السلة" : "غير متوفر حالياً"}
-          </button>
-          <a
-            href="/products"
-            class="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-6 py-3.5 text-center text-base font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            متابعة التسوق
-          </a>
+        <!-- Quantity Selector + Add to Cart -->
+        <div class="pt-2 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+              <button
+                type="button"
+                id="pdp-qty-dec"
+                aria-label="تقليل الكمية"
+                class="px-3.5 py-3 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800 rounded-r-xl"
+              >−</button>
+              <input
+                id="pdp-qty"
+                type="number"
+                min="1"
+                max={Math.max(1, product.stock)}
+                value="1"
+                aria-label="الكمية"
+                class="w-12 bg-transparent text-center text-sm font-bold text-gray-900 dark:text-white focus:outline-none"
+              />
+              <button
+                type="button"
+                id="pdp-qty-inc"
+                aria-label="زيادة الكمية"
+                class="px-3.5 py-3 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800 rounded-l-xl"
+              >+</button>
+            </div>
+
+            <button
+              type="button"
+              disabled={!inStock}
+              data-add-to-cart
+              data-qty-target="pdp-qty"
+              data-product-id={product.id}
+              data-product-slug={product.slug}
+              data-product-name={product.name}
+              data-product-price={product.price}
+              data-product-image={product.image_url}
+              class="flex-1 rounded-xl bg-emerald-800 px-6 py-3.5 text-sm sm:text-base font-bold text-white hover:bg-emerald-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              {inStock ? "أضف إلى السلة" : "غير متوفر حالياً"}
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a
+              href={whatsappOrderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-2 rounded-xl border border-emerald-700/40 bg-emerald-50/70 dark:bg-emerald-950/40 px-5 py-3 text-sm font-bold text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors"
+            >
+              <span>اطلب سريعاً عبر واتساب</span>
+            </a>
+            <a
+              href="/products"
+              class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-3 text-center text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-stone-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              متابعة التسوق
+            </a>
+          </div>
         </div>
 
-        <div class="rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 text-sm text-gray-600 dark:text-gray-300 space-y-1">
-          <p>✓ توصيل لجميع محافظات مصر</p>
-          <p>✓ دفع إلكتروني آمن عبر Paymob (بطاقات بنكية ومحافظ إلكترونية)</p>
+        <div class="rounded-xl bg-white dark:bg-gray-900 border border-stone-200 dark:border-gray-800 p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-2">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>توصيل سريع لجميع محافظات مصر (مجاني فوق ٥٠٠ ج.م. بالقاهرة والجيزة)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>دفع إلكتروني آمن عبر Paymob (فيزا، ماستركارد، فودافون كاش)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>طبيعي ١٠٠٪ بدون مواد حافظة أو إضافات صناعية</span>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Related Products -->
+    {relatedProducts.length > 0 && (
+      <div class="mt-14 pt-10 border-t border-stone-200 dark:border-gray-800">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">منتجات قد تعجبك</h2>
+          <a href="/products" class="text-xs sm:text-sm font-semibold text-emerald-800 dark:text-emerald-400 hover:underline">
+            عرض الكل ←
+          </a>
+        </div>
+        <div class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+          {relatedProducts.map((rel) => (
+            <ProductCard product={rel} />
+          ))}
+        </div>
+      </div>
+    )}
   </section>
+
+  <script>
+    const qtyInput = document.getElementById("pdp-qty") as HTMLInputElement | null;
+    const decBtn = document.getElementById("pdp-qty-dec");
+    const incBtn = document.getElementById("pdp-qty-inc");
+
+    decBtn?.addEventListener("click", () => {
+      if (!qtyInput) return;
+      const val = Math.max(1, Number(qtyInput.value || 1) - 1);
+      qtyInput.value = String(val);
+    });
+
+    incBtn?.addEventListener("click", () => {
+      if (!qtyInput) return;
+      const max = Number(qtyInput.max || 50);
+      const val = Math.min(max, Number(qtyInput.value || 1) + 1);
+      qtyInput.value = String(val);
+    });
+  </script>
 
   <CartConnector />
 </BaseLayout>

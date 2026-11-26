@@ -1,14 +1,12 @@
 ---
-// Include this component ONLY on pages that display products or need cart badge/add-to-cart
+// Include this component on pages with "Add to Cart" buttons
 ---
 
 <script>
   import { addToCart, syncCartBadge } from "../lib/cart";
 
-  // Sync header badge on page load
   syncCartBadge();
 
-  // Wire all "Add to Cart" buttons on the page
   document.addEventListener("click", (event) => {
     const target = event.target as HTMLElement | null;
     const btn = target?.closest<HTMLButtonElement>("[data-add-to-cart]");
@@ -18,19 +16,28 @@
     const slug = btn.dataset.productSlug || "";
     const name = btn.dataset.productName || "";
     const price = Number(btn.dataset.productPrice || 0);
-    const image_url = btn.dataset.productImage || "/images/prod-1.svg";
+    const image_url = btn.dataset.productImage || "/images/products/product-03.jpg";
+    const qtyInputId = btn.dataset.qtyTarget;
+    let qty = 1;
+    if (qtyInputId) {
+      const qtyEl = document.getElementById(qtyInputId) as HTMLInputElement | null;
+      const parsed = Number(qtyEl?.value || 1);
+      if (Number.isFinite(parsed) && parsed > 0) qty = Math.min(50, Math.floor(parsed));
+    }
 
     if (!id || !name) return;
 
-    addToCart({ id, slug, name, price, image_url }, 1);
+    addToCart({ id, slug, name, price, image_url }, qty);
 
-    // Brief visual confirmation without blocking the user
     const originalText = btn.textContent;
     btn.textContent = "تمت الإضافة ✓";
-    btn.classList.add("bg-emerald-900");
+    btn.classList.add("bg-emerald-950");
     window.setTimeout(() => {
       btn.textContent = originalText;
-      btn.classList.remove("bg-emerald-900");
-    }, 1000);
+      btn.classList.remove("bg-emerald-950");
+    }, 900);
+
+    // Open slide-over cart drawer for immediate review/checkout
+    window.dispatchEvent(new CustomEvent("elhusseiny:open-cart"));
   });
 </script>

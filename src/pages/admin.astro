@@ -493,11 +493,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     });
 
-    // Trigger Netlify rebuild
+    // Trigger Vercel rebuild
     document.getElementById("btn-rebuild")?.addEventListener("click", async () => {
       try {
         await apiFetch("POST", { action: "trigger_rebuild" });
-        showToast("تم إرسال طلب تحديث الموقع إلى Netlify بنجاح!");
+        showToast("تم إرسال طلب تحديث الموقع إلى Vercel بنجاح!");
       } catch (err: any) {
         showToast(err.message || "فشل تشغيل التحديث.", true);
       }

@@ -1,9 +1,8 @@
 ---
-// Calm, natural emerald hero with organic honey/blossom background photo
+// Authentic natural emerald hero with warm honey/blossom backdrop and 4-pillar SVG trust bar
 ---
 
 <section class="relative overflow-hidden bg-emerald-950 text-white">
-  <!-- Subtle natural background photo (sunlit honey & blossoms on wood) -->
   <img
     src="/images/products/product-04.jpg"
     alt=""
@@ -13,56 +12,83 @@
     loading="eager"
     fetchpriority="high"
     decoding="async"
-    class="absolute inset-0 h-full w-full object-cover object-center opacity-35"
+    class="absolute inset-0 h-full w-full object-cover object-center opacity-30"
   />
-  <!-- Calm natural emerald gradient overlay -->
   <div
     aria-hidden="true"
-    class="absolute inset-0 bg-gradient-to-l from-emerald-950/90 via-emerald-900/80 to-emerald-950/75"
+    class="absolute inset-0 bg-gradient-to-l from-emerald-950/95 via-emerald-900/85 to-emerald-950/80"
   ></div>
 
   <div class="relative mx-auto max-w-6xl px-4 py-8 sm:py-14">
-    <div class="grid grid-cols-1 items-center gap-6 md:grid-cols-12">
-      <!-- Text Content -->
+    <div class="grid grid-cols-1 items-center gap-7 md:grid-cols-12">
+      <!-- Editorial Copy -->
       <div class="md:col-span-7 text-center md:text-right">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 px-3.5 py-1 text-xs font-semibold text-emerald-100 mb-3">
-          <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span>
-          طبيعي ١٠٠٪ بدون أي إضافات أو مواد حافظة
-        </span>
+        <div class="inline-flex items-center gap-2 rounded-full bg-emerald-900/90 border border-emerald-500/30 px-3.5 py-1 text-xs font-semibold text-emerald-100 mb-3">
+          <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+          <span>من الإنتاج للبيت مباشرة — طبيعي ١٠٠٪</span>
+        </div>
+
         <h1 class="text-2xl sm:text-4xl lg:text-[42px] font-bold leading-snug text-white mb-3">
           منتجات الحسيني{" "}
           <span class="text-amber-300 block sm:inline">طبيعي .. أصيل .. فاخر</span>
         </h1>
-        <p class="text-sm sm:text-base text-emerald-100/90 mb-5 max-w-xl mx-auto md:mx-0 leading-relaxed">
-          طحينة سمسم خام، عسل نحل طبيعي، زبدة فول سوداني، وزيت زيتون بكر ممتاز — من إنتاجنا لباب بيتك في كل محافظات مصر.
+
+        <p class="text-sm sm:text-base text-emerald-100/90 mb-6 max-w-xl mx-auto md:mx-0 leading-relaxed">
+          طحينة سمسم خام على البارد، عسل نحل نقي غير مبستر، زبدة فول سوداني طبيعية، وزيت زيتون بكر ممتاز — توصيل سريع لجميع محافظات مصر.
         </p>
+
         <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
           <a
-            href="#products"
+            href="#offers"
             class="rounded-xl bg-amber-400 px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-emerald-950 hover:bg-amber-300 transition-colors shadow-sm"
           >
-            تسوق الآن
+            تصفح العروض
           </a>
           <a
             href="/products"
+            data-astro-prefetch
             class="rounded-xl border border-emerald-400/40 bg-emerald-900/60 px-5 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white hover:bg-emerald-800/80 transition-colors"
           >
-            كل المنتجات والعروض
+            كل المنتجات
           </a>
         </div>
+
+        <!-- Mobile Search (visible only below md) -->
+        <form action="/products" method="get" class="mt-5 md:hidden max-w-sm mx-auto">
+          <div class="relative">
+            <input
+              type="search"
+              name="q"
+              placeholder="ابحث عن طحينة، عسل، مختوم..."
+              aria-label="ابحث في المتجر"
+              class="w-full rounded-xl border border-emerald-700 bg-emerald-900/70 pr-4 pl-10 py-2.5 text-sm text-white placeholder:text-emerald-200/70 focus:border-amber-300 focus:outline-none"
+            />
+            <button
+              type="submit"
+              aria-label="بحث"
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
+          </div>
+        </form>
       </div>
 
-      <!-- Featured Brand Visual (hidden on very small screens or compact card) -->
+      <!-- Featured Showcase -->
       <div class="md:col-span-5 mx-auto w-full max-w-xs sm:max-w-sm md:max-w-full">
-        <div class="overflow-hidden rounded-2xl border border-emerald-400/25 bg-emerald-900/40 p-1.5 shadow-xl">
+        <div class="overflow-hidden rounded-2xl border border-emerald-400/25 bg-emerald-900/40 p-1.5 shadow-2xl">
           <img
             src="/images/products/product-03.jpg"
             alt="تشكيلة منتجات الحسيني الطبيعية"
             width="800"
             height="800"
             loading="eager"
+            fetchpriority="high"
             decoding="async"
-            class="w-full h-auto rounded-xl object-cover"
+            class="w-full h-auto rounded-xl object-cover aspect-square"
           />
         </div>
       </div>
@@ -70,11 +96,24 @@
   </div>
 </section>
 
-<!-- Compact Trust Strip -->
-<div class="border-b border-emerald-100 dark:border-gray-800 bg-emerald-50/70 dark:bg-gray-900/80">
-  <div class="mx-auto max-w-6xl px-4 py-3 grid grid-cols-3 gap-2 text-center text-[11px] sm:text-sm font-semibold text-emerald-900 dark:text-emerald-200">
-    <div>✓ خامات طبيعية ١٠٠٪</div>
-    <div>✓ توصيل لحد عندك</div>
-    <div>✓ دفع آمن عند الطلب</div>
+<!-- 4-Pillar Trust Bar with crisp SVG icons -->
+<div class="border-b border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900/90">
+  <div class="mx-auto max-w-6xl px-4 py-3.5 grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">
+    <div class="flex items-center justify-center sm:justify-start gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+      <span>خامات طبيعية ١٠٠٪</span>
+    </div>
+    <div class="flex items-center justify-center sm:justify-start gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+      <span>توصيل لجميع المحافظات</span>
+    </div>
+    <div class="flex items-center justify-center sm:justify-start gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+      <span>دفع بالفيزا وفودافون كاش</span>
+    </div>
+    <div class="flex items-center justify-center sm:justify-start gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>ضمان الجودة والنقاء</span>
+    </div>
   </div>
 </div>

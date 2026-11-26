@@ -6,6 +6,10 @@ import vercel from "@astrojs/vercel";
 // https://astro.build/config
 export default defineConfig({
   adapter: vercel(),
+  prefetch: {
+    prefetchAll: false,
+    defaultStrategy: "hover",
+  },
   image: {
     // Allow Astro's <Image /> optimizer to process images from Supabase Storage
     remotePatterns: [

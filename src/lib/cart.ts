@@ -29,11 +29,14 @@ export function getCart(): CartItem[] {
   }
 }
 
-/** Saves cart items to localStorage and updates header badge. */
+/** Saves cart items to localStorage, updates header badge, and notifies listeners. */
 function saveCart(items: CartItem[]): void {
   window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   syncCartBadge(items);
+  window.dispatchEvent(new CustomEvent("elhusseiny:cart-updated", { detail: { items } }));
 }
+
+export const FREE_SHIPPING_THRESHOLD_EGP = 500;
 
 /** Adds a product (or increments its quantity) in the cart. */
 export function addToCart(item: Omit<CartItem, "quantity">, qty = 1): CartItem[] {
