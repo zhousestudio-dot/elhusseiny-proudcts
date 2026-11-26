@@ -21,3 +21,21 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 480px;
 }
+
+/* Fix mobile Chrome/Safari autofill turning text invisible */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: #111827;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill {
+  -webkit-text-fill-color: #f9fafb;
+  -webkit-box-shadow: 0 0 0px 1000px #030712 inset;
+}
