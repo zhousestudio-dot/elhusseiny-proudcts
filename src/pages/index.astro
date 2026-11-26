@@ -7,7 +7,7 @@ import CartConnector from "../components/CartConnector.astro";
 import { getActiveCategories, getActiveProducts } from "../lib/products";
 
 export const prerender = false;
-Astro.response.headers.set("Cache-Control", "public, s-maxage=5, stale-while-revalidate=15");
+Astro.response.headers.set("Cache-Control", "public, s-maxage=15, stale-while-revalidate=60");
 
 const [categories, products] = await Promise.all([
   getActiveCategories(),
@@ -35,6 +35,7 @@ const storeSchema = {
 
 <BaseLayout title="منتجات الحسيني | طحينة وعسل وزبدة فول سوداني طبيعية ١٠٠٪">
   <Fragment slot="head">
+    <link rel="preload" as="image" href="/images/hero-main.webp" fetchpriority="high" />
     <script type="application/ld+json" set:html={JSON.stringify(storeSchema)} />
   </Fragment>
 
