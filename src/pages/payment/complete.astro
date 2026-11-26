@@ -23,16 +23,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           rel="noopener noreferrer"
           class="hidden rounded-xl bg-[#25D366] px-5 py-3 text-sm font-bold text-white hover:bg-[#1ebe5d] transition-colors"
         >
-          إرسال التحويل (01093452806)
-        </a>
-        <a
-          id="wa-receipt-btn-2"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="hidden rounded-xl border border-[#25D366] bg-white dark:bg-gray-900 px-5 py-3 text-sm font-bold text-[#1a9e4b] dark:text-[#25D366] hover:bg-emerald-50 dark:hover:bg-gray-800 transition-colors"
-        >
-          أو واتساب (01010231211)
+          إرسال صورة التحويل على واتساب
         </a>
         <a
           href="/products"
@@ -56,7 +47,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const titleEl = document.getElementById("status-title");
     const descEl = document.getElementById("status-desc");
     const waBtn = document.getElementById("wa-receipt-btn") as HTMLAnchorElement | null;
-    const waBtn2 = document.getElementById("wa-receipt-btn-2") as HTMLAnchorElement | null;
 
     if (success) {
       clearCart();
@@ -71,12 +61,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           `مرحباً، قمت بعمل طلب رقم ${orderRef || ""} بقيمة ${total ? total + " ج.م." : ""} عبر محفظة إلكترونية. مرفق صورة التحويل:`
         );
         if (waBtn) {
-          waBtn.href = `https://wa.me/201093452806?text=${msg}`;
+          waBtn.href = `https://wa.me/201010231211?text=${msg}`;
           waBtn.classList.remove("hidden");
-        }
-        if (waBtn2) {
-          waBtn2.href = `https://wa.me/201010231211?text=${msg}`;
-          waBtn2.classList.remove("hidden");
         }
       } else if (method === "cod") {
         if (titleEl) titleEl.textContent = "تم تأكيد طلبك (الدفع عند الاستلام) ✓";
