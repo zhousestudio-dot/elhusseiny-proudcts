@@ -532,9 +532,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       ordersList.innerHTML = orders
         .map((o) => {
           const isPaid = o.payment_status === "paid";
+          const methodLabel =
+            o.payment_method === "vodafone_cash"
+              ? "فودافون كاش مباشر"
+              : o.payment_method === "cod"
+              ? "الدفع عند الاستلام"
+              : "Paymob";
           const payBadge = isPaid
             ? `<span class="rounded-full bg-emerald-100 dark:bg-emerald-950 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">مدفوع ✓</span>`
-            : `<span class="rounded-full bg-amber-100 dark:bg-amber-950 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-300">${o.payment_status === "failed" ? "فشل الدفع" : "غير مدفوع"}</span>`;
+            : `<span class="rounded-full bg-amber-100 dark:bg-amber-950 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-300">${o.payment_status === "failed" ? "فشل الدفع" : "بانتظار التأكيد"}</span>`;
 
           const itemsHtml = Array.isArray(o.order_items) && o.order_items.length
             ? `<div class="rounded-xl bg-stone-50 dark:bg-gray-950 border border-stone-100 dark:border-gray-800 p-3 space-y-1 text-xs">
@@ -558,6 +564,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-1">
                 <p><strong>العميل:</strong> ${escapeHtml(o.customer_name)} — <a href="tel:${escapeHtml(o.customer_phone)}" dir="ltr" class="underline font-semibold">${escapeHtml(o.customer_phone)}</a></p>
                 <p><strong>العنوان:</strong> ${escapeHtml(o.city)}، ${escapeHtml(o.shipping_address)}</p>
+                <p><strong>طريقة الدفع:</strong> ${escapeHtml(methodLabel)}${o.payment_reference ? ` — <span dir="ltr" class="font-bold text-red-700 dark:text-red-400">محوّل من: ${escapeHtml(o.payment_reference)}</span>` : ""}</p>
               </div>
 
               ${itemsHtml}
@@ -574,14 +581,17 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                   </select>
                 </div>
 
-                <a
-                  href="https://wa.me/${waPhone}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100"
-                >
-                  مراسلة العميل واتساب
-                </a>
+                <div class="flex flex-wrap items-center gap-2">
+                  ${!isPaid ? `<button type="button" data-confirm-pay="${escapeHtml(o.id)}" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-900 cursor-pointer">تأكيد استلام الدفع ✓</button>` : ""}
+                  <a
+                    href="https://wa.me/${waPhone}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100"
+                  >
+                    مراسلة العميل واتساب
+                  </a>
+                </div>
               </div>
             </div>
           `;
@@ -762,6 +772,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     });
 
     document.getElementById("btn-cancel-edit")?.addEventListener("click", resetFormUI);
+
+    // Confirm payment button (Vodafone Cash / COD)
+    ordersList?.addEventListener("click", async (e) => {
+      const target = e.target as HTMLElement | null;
+      const confirmId = target?.closest<HTMLElement>("[data-confirm-pay]")?.dataset.confirmPay;
+      if (!confirmId) return;
+      if (!confirm("هل تأكدت من استلام المبلغ؟ سيتم تأكيد الطلب وخصم المخزون.")) return;
+      try {
+        await apiFetch("POST", { action: "confirm_payment", id: confirmId });
+        showToast("تم تأكيد استلام الدفع وتحديث المخزون ✓");
+        await loadDashboard();
+      } catch (err: any) {
+        showToast(err.message || "فشل تأكيد الدفع.", true);
+      }
+    });
 
     // Change order status
     ordersList?.addEventListener("change", async (e) => {

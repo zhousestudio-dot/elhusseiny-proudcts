@@ -15,6 +15,8 @@ interface CheckoutBody {
   customerEmail?: string;
   shippingAddress?: string;
   city?: string;
+  paymentMethod?: "paymob" | "vodafone_cash" | "cod";
+  walletSenderPhone?: string;
   items?: CheckoutItemInput[];
 }
 
@@ -76,27 +78,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const missingKeys = [
     !supabaseUrl && "PUBLIC_SUPABASE_URL",
     !serviceKey && "SUPABASE_SERVICE_ROLE_KEY",
-    !paymobSecretKey && "PAYMOB_SECRET_KEY",
-    !paymobPublicKey && "PAYMOB_PUBLIC_KEY",
-    !integrationIdsRaw && "PAYMOB_INTEGRATION_IDS",
   ].filter(Boolean) as string[];
 
   if (missingKeys.length > 0) {
     console.error("[create-checkout] Missing env keys:", missingKeys.join(", "));
     return Response.json(
       { error: `إعدادات الخادم غير مكتملة (مفقود: ${missingKeys.join("، ")})` },
-      { status: 500 }
-    );
-  }
-
-  const integrationIds = integrationIdsRaw
-    .split(",")
-    .map((id) => Number(id.trim()))
-    .filter((id) => Number.isInteger(id) && id > 0);
-
-  if (integrationIds.length === 0) {
-    return Response.json(
-      { error: "معرفات الدفع (PAYMOB_INTEGRATION_IDS) غير صالحة." },
       { status: 500 }
     );
   }
@@ -113,6 +100,36 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const customerEmail = (body.customerEmail || "").trim();
   const shippingAddress = (body.shippingAddress || "").trim();
   const city = (body.city || "").trim();
+  const paymentMethod: "paymob" | "vodafone_cash" | "cod" =
+    body.paymentMethod === "vodafone_cash" || body.paymentMethod === "cod"
+      ? body.paymentMethod
+      : "paymob";
+  const walletSenderPhone =
+    paymentMethod === "vodafone_cash" ? normalizeEgyptPhone(body.walletSenderPhone || "") : null;
+
+  if (paymentMethod === "vodafone_cash" && !walletSenderPhone) {
+    return Response.json(
+      { error: "يرجى إدخال رقم الموبايل الذي تم التحويل منه عبر فودافون كاش." },
+      { status: 400 }
+    );
+  }
+
+  let integrationIds: number[] = [];
+  if (paymentMethod === "paymob") {
+    if (!paymobSecretKey || !paymobPublicKey || !integrationIdsRaw) {
+      return Response.json(
+        { error: "الدفع الإلكتروني بالبطاقة قيد التفعيل حالياً. يمكنك الدفع عبر فودافون كاش أو عند الاستلام." },
+        { status: 503 }
+      );
+    }
+    integrationIds = integrationIdsRaw
+      .split(",")
+      .map((id) => Number(id.trim()))
+      .filter((id) => Number.isInteger(id) && id > 0);
+    if (integrationIds.length === 0) {
+      return Response.json({ error: "معرفات الدفع غير صالحة." }, { status: 500 });
+    }
+  }
 
   if (customerName.length < 2 || customerName.length > 100) {
     return Response.json({ error: "يرجى إدخال اسم صحيح (بين ٢ و ١٠٠ حرف)." }, { status: 400 });
@@ -279,7 +296,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       city,
       total: totalEGP,
       status: "pending",
-      payment_status: "pending",
+      payment_status: paymentMethod === "cod" ? "unpaid" : "pending",
+      payment_method: paymentMethod,
+      payment_reference: walletSenderPhone,
     })
     .select("id, order_number")
     .single();
@@ -303,6 +322,45 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     console.error("Order items insert error:", itemsError.message);
     await supabase.from("orders").delete().eq("id", order.id);
     return Response.json({ error: "تعذر حفظ تفاصيل الطلب." }, { status: 500 });
+  }
+
+  // For direct Vodafone Cash or Cash on Delivery, return redirect URL directly without Paymob
+  if (paymentMethod === "vodafone_cash" || paymentMethod === "cod") {
+    const resendKey = getEnv("RESEND_API_KEY");
+    const fromEmail = getEnv("RESEND_FROM_EMAIL");
+    const adminNotify = getEnv("ADMIN_NOTIFICATION_EMAIL");
+    if (resendKey && fromEmail && adminNotify) {
+      const methodLabel = paymentMethod === "vodafone_cash" ? "فودافون كاش مباشر" : "الدفع عند الاستلام";
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${resendKey}`,
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: [adminNotify],
+          subject: `طلب جديد (${methodLabel}): ${order.order_number} — ${totalEGP} ج.م.`,
+          html: `<div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;">
+            <h2>طلب جديد (${methodLabel})</h2>
+            <p><strong>رقم الطلب:</strong> ${order.order_number}</p>
+            <p><strong>العميل:</strong> ${customerName} (${normalizedPhone})</p>
+            ${walletSenderPhone ? `<p><strong>رقم محفظة التحويل:</strong> ${walletSenderPhone}</p>` : ""}
+            <p><strong>العنوان:</strong> ${city} — ${shippingAddress}</p>
+            <p><strong>الإجمالي:</strong> ${totalEGP} ج.م.</p>
+          </div>`,
+        }),
+      }).catch(() => {});
+    }
+
+    const completeUrl = `${siteUrl}/payment/complete?success=true&method=${encodeURIComponent(
+      paymentMethod
+    )}&order=${encodeURIComponent(order.order_number)}&total=${encodeURIComponent(String(totalEGP))}`;
+
+    return Response.json({
+      orderNumber: order.order_number,
+      checkoutUrl: completeUrl,
+    });
   }
 
   const { firstName, lastName } = splitName(customerName);

@@ -98,7 +98,7 @@ export const GET: APIRoute = async ({ request }) => {
       .order("sort_order", { ascending: true }),
     supabase
       .from("orders")
-      .select("id, order_number, customer_name, customer_phone, city, shipping_address, total, status, payment_status, created_at, order_items(product_name, quantity, unit_price)")
+      .select("id, order_number, customer_name, customer_phone, city, shipping_address, total, status, payment_status, payment_method, payment_reference, created_at, order_items(product_name, quantity, unit_price)")
       .order("created_at", { ascending: false })
       .limit(100),
   ]);
@@ -238,6 +238,48 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ ok: true });
+  }
+
+  if (action === "confirm_payment") {
+    const id = String(body.id || "");
+    if (!id) return Response.json({ error: "Missing order id" }, { status: 400 });
+
+    const { data: updated, error: updErr } = await supabase
+      .from("orders")
+      .update({ payment_status: "paid", status: "confirmed" })
+      .eq("id", id)
+      .neq("payment_status", "paid")
+      .select("id")
+      .maybeSingle();
+
+    if (updErr) return Response.json({ error: updErr.message }, { status: 500 });
+
+    // Reduce product stock once when confirming payment
+    if (updated) {
+      const { data: items } = await supabase
+        .from("order_items")
+        .select("product_id, quantity")
+        .eq("order_id", id);
+
+      if (items) {
+        for (const item of items) {
+          if (!item.product_id) continue;
+          const { data: prod } = await supabase
+            .from("products")
+            .select("stock")
+            .eq("id", item.product_id)
+            .maybeSingle();
+          if (prod) {
+            await supabase
+              .from("products")
+              .update({ stock: Math.max(0, Number(prod.stock) - item.quantity) })
+              .eq("id", item.product_id);
+          }
+        }
+      }
+    }
+
     return Response.json({ ok: true });
   }
 
