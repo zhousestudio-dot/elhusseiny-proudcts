@@ -197,6 +197,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     if (error) {
       console.error("[create-checkout] products by id error:", error.message);
+      return Response.json({ error: `خطأ قاعدة البيانات: ${error.message}` }, { status: 500 });
     } else if (data) {
       for (const p of data as DbProduct[]) {
         fetchedById.set(p.id, p);
@@ -214,6 +215,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     if (error) {
       console.error("[create-checkout] products by slug error:", error.message);
+      return Response.json({ error: `خطأ قاعدة البيانات: ${error.message}` }, { status: 500 });
     } else if (data) {
       for (const p of data as DbProduct[]) {
         fetchedById.set(p.id, p);
