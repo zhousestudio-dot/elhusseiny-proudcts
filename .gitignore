@@ -13,6 +13,9 @@ dist/
 # Netlify local dev
 .netlify/
 
+# Vercel build output (let Vercel build on its own servers)
+.vercel/
+
 # Logs & OS
 npm-debug.log*
 .DS_Store
