@@ -109,7 +109,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   if (paymentMethod === "vodafone_cash" && !walletSenderPhone) {
     return Response.json(
-      { error: "يرجى إدخال رقم الموبايل الذي تم التحويل منه عبر فودافون كاش." },
+      { error: "يرجى إدخال رقم المحفظة الإلكترونية الذي تم التحويل منه." },
       { status: 400 }
     );
   }
@@ -118,7 +118,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (paymentMethod === "paymob") {
     if (!paymobSecretKey || !paymobPublicKey || !integrationIdsRaw) {
       return Response.json(
-        { error: "الدفع الإلكتروني بالبطاقة قيد التفعيل حالياً. يمكنك الدفع عبر فودافون كاش أو عند الاستلام." },
+        { error: "الدفع الإلكتروني بالبطاقة قيد التفعيل حالياً. يمكنك الدفع عبر محفظة إلكترونية أو عند الاستلام." },
         { status: 503 }
       );
     }
@@ -330,7 +330,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const fromEmail = getEnv("RESEND_FROM_EMAIL");
     const adminNotify = getEnv("ADMIN_NOTIFICATION_EMAIL");
     if (resendKey && fromEmail && adminNotify) {
-      const methodLabel = paymentMethod === "vodafone_cash" ? "فودافون كاش مباشر" : "الدفع عند الاستلام";
+      const methodLabel = paymentMethod === "vodafone_cash" ? "محفظة إلكترونية (إرسال مباشر)" : "الدفع عند الاستلام";
       await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
