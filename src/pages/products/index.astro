@@ -148,16 +148,28 @@ const [products, categories] = await Promise.all([
       }
     }
 
+    function normalizeArabic(text: string): string {
+      return text
+        .toLowerCase()
+        .replace(/[\u064B-\u065F\u0670]/g, "") // remove Arabic diacritics
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ة/g, "ه")
+        .replace(/ى/g, "ي")
+        .replace(/ؤ/g, "و")
+        .replace(/ئ/g, "ي")
+        .trim();
+    }
+
     function applyFilters() {
-      const query = (searchInput?.value || "").trim().toLowerCase();
+      const query = normalizeArabic(searchInput?.value || "");
       let visibleCount = 0;
 
       for (const card of cards) {
         const cardCat = card.dataset.categorySlug || "";
-        const cardText = card.dataset.searchText || "";
+        const cardText = normalizeArabic(card.dataset.searchText || "");
 
         const matchesCategory = activeCategory === "all" || cardCat === activeCategory;
-        const matchesSearch = !query || cardText.includes(query);
+        const matchesSearch = !query || query.split(/\s+/).every((word) => cardText.includes(word));
 
         const show = matchesCategory && matchesSearch;
         card.classList.toggle("hidden", !show);
