@@ -35,6 +35,7 @@
 - **Performance Audit:** Added immutable `/_astro/*` and `/images/*` caching headers in `netlify.toml`, trimmed unused Cairo `500` font weight, enforced `webp` image optimization, and added `idx_orders_created_at_desc` index.
 - **Media & Branding Imported:** Copied 32 real product photos from `Elhussainy/media` into `public/images/products/`, updated `Header.astro`, `Hero.astro`, `Footer.astro` (real WhatsApp/phones: `01093452806`, `01010231211`), `src/lib/data.ts` (16 real products & offers from the official menu), and created `supabase/seed.sql`.
 - **Night & Light Mode:** Added Tailwind v4 `dark` class variant, FOUC-free inline theme script in `BaseLayout.astro`, theme toggle button in `Header.astro` (`localStorage` + `prefers-color-scheme`), and dark mode styles across components and pages.
+- **Vercel Build Fix:** Ignored `.vercel/` in `.gitignore` and pinned Node `22.x` in `package.json` for clean Vercel Serverless builds.
 
 ## What Is Next
 - Import your real product photos and info from `media/` (once added to the workspace), deploy to Netlify, and run a live PageSpeed + end-to-end test.
