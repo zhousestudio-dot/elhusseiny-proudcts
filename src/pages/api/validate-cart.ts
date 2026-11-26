@@ -13,8 +13,11 @@ interface CartRequestItem {
  * NEVER trusts prices sent from the browser — always reads real prices & stock from Supabase.
  */
 export const POST: APIRoute = async ({ request }) => {
-  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const env = import.meta.env as Record<string, string | undefined>;
+  const getEnv = (key: string) => (process.env[key] || env[key] || "").trim();
+
+  const supabaseUrl = getEnv("PUBLIC_SUPABASE_URL") || getEnv("SUPABASE_URL");
+  const serviceKey = getEnv("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!supabaseUrl || !serviceKey || supabaseUrl.includes("your-project-id")) {
     return Response.json(

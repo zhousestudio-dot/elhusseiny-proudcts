@@ -17,9 +17,12 @@ function slugify(text: string): string {
 async function authenticateAdmin(request: Request): Promise<
   { supabase: SupabaseClient; error?: undefined } | { supabase?: undefined; error: Response }
 > {
-  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const adminEmail = (process.env.ADMIN_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL || "").trim().toLowerCase();
+  const env = import.meta.env as Record<string, string | undefined>;
+  const getEnv = (key: string) => (process.env[key] || env[key] || "").trim();
+
+  const supabaseUrl = getEnv("PUBLIC_SUPABASE_URL") || getEnv("SUPABASE_URL");
+  const serviceKey = getEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const adminEmail = (getEnv("ADMIN_EMAIL") || getEnv("ADMIN_NOTIFICATION_EMAIL")).toLowerCase();
 
   if (!supabaseUrl || !serviceKey || !adminEmail) {
     return {

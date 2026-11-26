@@ -62,22 +62,28 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     );
   }
 
-  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const paymobSecretKey = process.env.PAYMOB_SECRET_KEY;
-  const paymobPublicKey = process.env.PAYMOB_PUBLIC_KEY;
-  const integrationIdsRaw = process.env.PAYMOB_INTEGRATION_IDS;
-  const siteUrl = (process.env.PUBLIC_SITE_URL || "http://localhost:4321").replace(/\/$/, "");
+  const env = import.meta.env as Record<string, string | undefined>;
+  const getEnv = (key: string) => (process.env[key] || env[key] || "").trim();
 
-  if (
-    !supabaseUrl ||
-    !serviceKey ||
-    !paymobSecretKey ||
-    !paymobPublicKey ||
-    !integrationIdsRaw
-  ) {
+  const supabaseUrl = getEnv("PUBLIC_SUPABASE_URL") || getEnv("SUPABASE_URL");
+  const serviceKey = getEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const paymobSecretKey = getEnv("PAYMOB_SECRET_KEY");
+  const paymobPublicKey = getEnv("PAYMOB_PUBLIC_KEY");
+  const integrationIdsRaw = getEnv("PAYMOB_INTEGRATION_IDS");
+  const siteUrl = (getEnv("PUBLIC_SITE_URL") || "http://localhost:4321").replace(/\/$/, "");
+
+  const missingKeys = [
+    !supabaseUrl && "PUBLIC_SUPABASE_URL",
+    !serviceKey && "SUPABASE_SERVICE_ROLE_KEY",
+    !paymobSecretKey && "PAYMOB_SECRET_KEY",
+    !paymobPublicKey && "PAYMOB_PUBLIC_KEY",
+    !integrationIdsRaw && "PAYMOB_INTEGRATION_IDS",
+  ].filter(Boolean) as string[];
+
+  if (missingKeys.length > 0) {
+    console.error("[create-checkout] Missing env keys:", missingKeys.join(", "));
     return Response.json(
-      { error: "إعدادات الخادم غير مكتملة (متغيرات البيئة مفقودة)." },
+      { error: `إعدادات الخادم غير مكتملة (مفقود: ${missingKeys.join("، ")})` },
       { status: 500 }
     );
   }

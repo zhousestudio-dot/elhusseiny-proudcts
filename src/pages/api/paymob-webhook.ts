@@ -117,9 +117,12 @@ async function sendResendEmail(params: {
  * POST /api/paymob-webhook?hmac=...
  */
 export const POST: APIRoute = async ({ request }) => {
-  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const hmacSecret = process.env.PAYMOB_HMAC_SECRET;
+  const env = import.meta.env as Record<string, string | undefined>;
+  const getEnv = (key: string) => (process.env[key] || env[key] || "").trim();
+
+  const supabaseUrl = getEnv("PUBLIC_SUPABASE_URL") || getEnv("SUPABASE_URL");
+  const serviceKey = getEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const hmacSecret = getEnv("PAYMOB_HMAC_SECRET");
 
   if (!supabaseUrl || !serviceKey || !hmacSecret) {
     console.error("[paymob-webhook] Missing required server environment variables");
