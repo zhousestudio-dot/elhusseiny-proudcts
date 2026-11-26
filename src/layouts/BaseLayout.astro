@@ -56,18 +56,8 @@ const fullOgImage = ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}
     <slot name="head" />
     <title>{title}</title>
 
-    <!-- Prevent flash of wrong theme before first paint -->
-    <script is:inline>
-      (function () {
-        try {
-          var saved = localStorage.getItem("elhusseiny_theme");
-          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          if (saved === "dark" || (!saved && prefersDark)) {
-            document.documentElement.classList.add("dark");
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <!-- Prevent flash of wrong theme before first paint (external script for strict CSP) -->
+    <script is:inline src="/scripts/theme-init.js"></script>
   </head>
   <body class="min-h-screen flex flex-col bg-[#FAF9F5] text-gray-900 dark:bg-gray-950 dark:text-gray-100 font-sans transition-colors duration-200">
     <Header />
