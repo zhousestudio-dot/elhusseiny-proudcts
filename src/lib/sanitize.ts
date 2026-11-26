@@ -8,10 +8,10 @@ export function escapeHtml(value: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
-/** Allows only safe http(s) URLs or local /images/ paths for <img> src. */
-export function safeImageUrl(url: unknown, fallback = "/images/prod-1.svg"): string {
+/** Allows only safe https:// URLs or local /images/ paths for <img> src. */
+export function safeImageUrl(url: unknown, fallback = "/images/products/product-03.jpg"): string {
   const raw = String(url ?? "").trim();
-  if (raw.startsWith("/images/") || raw.startsWith("https://") || raw.startsWith("http://")) {
+  if (raw.startsWith("/images/") || raw.startsWith("https://")) {
     return escapeHtml(raw);
   }
   return fallback;

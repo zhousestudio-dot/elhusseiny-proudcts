@@ -5,6 +5,38 @@ export const prerender = false;
 
 const STORAGE_BUCKET = "product-images";
 
+/** Checks real file magic bytes so malicious files cannot masquerade as images. */
+function isValidImageMagicBytes(buf: Buffer): boolean {
+  if (buf.byteLength < 12) return false;
+  // JPEG: FF D8 FF
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return true;
+  // PNG: 89 50 4E 47
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return true;
+  // WebP: RIFF....WEBP
+  if (
+    buf.subarray(0, 4).toString("ascii") === "RIFF" &&
+    buf.subarray(8, 12).toString("ascii") === "WEBP"
+  ) {
+    return true;
+  }
+  // AVIF: ....ftypavif / ....ftypavis
+  const ftyp = buf.subarray(4, 12).toString("ascii");
+  if (ftyp.startsWith("ftypavif") || ftyp.startsWith("ftypavis")) return true;
+  return false;
+}
+
+function isSameOriginRequest(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return true;
+  const host = request.headers.get("host");
+  if (!host) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
 function slugify(text: string): string {
   const base = text
     .trim()
@@ -79,6 +111,9 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
+  if (!isSameOriginRequest(request)) {
+    return Response.json({ error: "Forbidden: Cross-origin request blocked" }, { status: 403 });
+  }
   const auth = await authenticateAdmin(request);
   if (auth.error) return auth.error;
   const supabase = auth.supabase;
@@ -111,6 +146,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (buffer.byteLength > 5 * 1024 * 1024) {
       return Response.json({ error: "حجم الصورة يتجاوز ٥ ميجابايت." }, { status: 400 });
     }
+    if (!isValidImageMagicBytes(buffer)) {
+      return Response.json({ error: "الملف المرفوع ليس صورة صالحة." }, { status: 400 });
+    }
 
     const path = `products/${Date.now()}-${fileName}`;
     const { error: uploadError } = await supabase.storage
@@ -142,7 +180,7 @@ export const POST: APIRoute = async ({ request }) => {
         : null;
     const isActive = body.is_active !== false;
 
-    if (!name || !Number.isFinite(price) || price < 0) {
+    if (!name || name.length > 150 || description.length > 2000 || !Number.isFinite(price) || price < 0 || price > 100000) {
       return Response.json({ error: "بيانات المنتج غير صالحة." }, { status: 400 });
     }
 
