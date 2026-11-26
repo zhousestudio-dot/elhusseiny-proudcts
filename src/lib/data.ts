@@ -46,7 +46,7 @@ export const FEATURED_CATEGORIES: Category[] = [
   },
 ];
 
-// Real products & prices (in EGP) from Elhusseiny Products media & menu
+// Real products & prices (in EGP) — each item matched to its accurate solo or offer photo
 export const FEATURED_PRODUCTS: Product[] = [
   {
     id: "prod-1",
@@ -94,7 +94,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "خلطة طبيعية لزيادة الوزن والطاقة: تمر، عسل نحل، طحينة، سمسم، زيت زيتون، وخل طبيعي. متوفر نصف كيلو (٢٥٠ ج) وربع كيلو (١٢٥ ج).",
     price: 500,
-    image_url: "/images/products/product-22.jpg",
+    image_url: "/images/products/makhtoum-solo.jpg",
     stock: 15,
     category: "عروض وخلطات خاصة",
     category_slug: "special-offers",
@@ -107,7 +107,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "زبدة فول سوداني طبيعية ١٠٠٪ بدون زيوت مهدرجة. متوفر نصف كيلو (٨٠ ج) وربع كيلو (٤٠ ج).",
     price: 160,
-    image_url: "/images/products/product-03.jpg",
+    image_url: "/images/products/peanut-butter-solo.jpg",
     stock: 25,
     category: "منتجات أساسية",
     category_slug: "basic-products",
@@ -120,7 +120,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "زبدة فول سوداني طبيعية ممزوجة بالشوكولاتة الغنية. متوفر نصف كيلو (١٠٠ ج) وربع كيلو (٥٠ ج).",
     price: 200,
-    image_url: "/images/products/product-03.jpg",
+    image_url: "/images/products/peanut-butter-solo.jpg",
     stock: 20,
     category: "منتجات أساسية",
     category_slug: "basic-products",
@@ -133,7 +133,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "عسل حبة البركة طبيعي ١٠٠٪ غني بالفوائد للمناعة والصحة. متوفر أيضاً نصف كيلو (١٢٠ ج).",
     price: 240,
-    image_url: "/images/products/product-04.jpg",
+    image_url: "/images/products/black-seed-honey-solo.jpg",
     stock: 22,
     category: "عسل ومنتجات النحل",
     category_slug: "honey-products",
@@ -185,7 +185,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "حلاوة طحينية تقليدية من السمسم الصافي. متوفر نصف كيلو (٦٥ ج) وربع كيلو (٣٥ ج).",
     price: 130,
-    image_url: "/images/products/product-08.jpg",
+    image_url: "/images/products/halawa-plain-solo.jpg",
     stock: 25,
     category: "الحلاوة وزيت الزيتون",
     category_slug: "halawa-olive-oil",
@@ -198,7 +198,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "حلاوة طحينية بالشوكولاتة الفاخرة. متوفر نصف كيلو (٧٠ ج) وربع كيلو (٤٠ ج).",
     price: 140,
-    image_url: "/images/products/product-08.jpg",
+    image_url: "/images/products/halawa-plain-solo.jpg",
     stock: 20,
     category: "الحلاوة وزيت الزيتون",
     category_slug: "halawa-olive-oil",
@@ -252,6 +252,19 @@ export const FEATURED_PRODUCTS: Product[] = [
     price: 250,
     image_url: "/images/products/product-22.jpg",
     stock: 12,
+    category: "عروض وخلطات خاصة",
+    category_slug: "special-offers",
+    is_active: true,
+  },
+  {
+    id: "prod-17",
+    name: "عرض التوفير: ¼ طحينة + ¼ زبدة فول + ¼ زيت زيتون",
+    slug: "offer-saving-trio",
+    description:
+      "ربع كيلو طحينة + ربع كيلو زبدة فول سوداني + ربع كيلو زيت زيتون بكر ممتاز بسعر ١٢٠ جنيه بدلاً من ١٥٠ جنيه.",
+    price: 120,
+    image_url: "/images/products/product-31.jpg",
+    stock: 20,
     category: "عروض وخلطات خاصة",
     category_slug: "special-offers",
     is_active: true,
