@@ -4,6 +4,9 @@ import ProductCard from "../../components/ProductCard.astro";
 import CartConnector from "../../components/CartConnector.astro";
 import { getActiveCategories, getActiveProducts } from "../../lib/products";
 
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
+
 const [products, categories] = await Promise.all([
   getActiveProducts(),
   getActiveCategories(),

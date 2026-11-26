@@ -3,23 +3,23 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
-  title="لوحة التحكم | منتجات الحسيني"
-  description="لوحة إدارة المنتجات والطلبات."
+  title="إدارة المتجر | منتجات الحسيني"
+  description="لوحة إدارة المنتجات والعروض والطلبات لمتجر منتجات الحسيني."
   canonicalPath="/admin"
 >
   <section class="mx-auto max-w-6xl px-4 py-8 sm:py-10">
     <!-- Login View -->
-    <div id="admin-login-box" class="mx-auto max-w-md rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-xs">
-      <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">دخول الإدارة</h1>
-      <p class="text-sm text-gray-600 mb-6">
-        هذه الصفحة مخصصة لصاحب المتجر فقط عبر Supabase Auth.
+    <div id="admin-login-box" class="mx-auto max-w-md rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-xs">
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">دخول صاحب المتجر</h1>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        سجّل دخولك لإضافة المنتجات والعروض ومتابعة طلبات العملاء.
       </p>
 
-      <div id="login-error" class="hidden mb-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700"></div>
+      <div id="login-error" class="hidden mb-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 p-3 text-sm text-red-700 dark:text-red-300"></div>
 
       <form id="admin-login-form" class="space-y-4">
         <div>
-          <label for="admin-email" class="block text-sm font-semibold text-gray-800 mb-1">
+          <label for="admin-email" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
             البريد الإلكتروني
           </label>
           <input
@@ -27,11 +27,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             type="email"
             required
             dir="ltr"
-            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-left focus:border-emerald-600 focus:outline-none"
+            placeholder="name@example.com"
+            class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
           />
         </div>
         <div>
-          <label for="admin-password" class="block text-sm font-semibold text-gray-800 mb-1">
+          <label for="admin-password" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
             كلمة المرور
           </label>
           <input
@@ -39,12 +40,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             type="password"
             required
             dir="ltr"
-            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-left focus:border-emerald-600 focus:outline-none"
+            class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
           />
         </div>
         <button
           type="submit"
-          class="w-full rounded-xl bg-emerald-700 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+          class="w-full rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white hover:bg-emerald-900 transition-colors cursor-pointer"
         >
           تسجيل الدخول
         </button>
@@ -54,60 +55,79 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <!-- Admin Dashboard -->
     <div id="admin-dashboard" class="hidden space-y-6">
       <!-- Top Bar -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 dark:border-gray-800 pb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">لوحة إدارة المتجر</h1>
-          <p id="admin-user-label" class="text-xs text-gray-500 mt-1"></p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">إدارة متجر الحسيني</h1>
+          <p id="admin-user-label" class="text-xs text-gray-500 dark:text-gray-400 mt-1"></p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <button
-            id="btn-rebuild"
-            type="button"
-            class="rounded-xl bg-amber-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+          <a
+            href="/"
+            target="_blank"
+            class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-gray-800"
           >
-            تحديث الموقع (Rebuild)
-          </button>
+            معاينة المتجر ↗
+          </a>
           <button
             id="btn-logout"
             type="button"
-            class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-xs sm:text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
           >
             تسجيل الخروج
           </button>
         </div>
       </div>
 
-      <div id="admin-toast" class="hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"></div>
+      <!-- Quick Summary Cards -->
+      <div class="grid grid-cols-3 gap-3 sm:gap-4">
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+          <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">المنتجات المعروضة</p>
+          <p id="stat-products" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">0</p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+          <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">الطلبات المدفوعة</p>
+          <p id="stat-paid-orders" class="text-xl sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1">0</p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+          <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">إجمالي المبيعات</p>
+          <p id="stat-revenue" class="text-lg sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">٠ ج.م.</p>
+        </div>
+      </div>
+
+      <div id="admin-toast" class="hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm font-semibold text-emerald-900"></div>
 
       <!-- Tabs -->
-      <div class="flex gap-2 border-b border-gray-200 pb-2">
+      <div class="flex gap-2 border-b border-stone-200 dark:border-gray-800 pb-3">
         <button
           type="button"
           data-tab="products"
-          class="tab-btn rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
+          class="tab-btn rounded-xl bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white cursor-pointer"
         >
-          المنتجات
+          المنتجات والعروض
         </button>
         <button
           type="button"
           data-tab="orders"
-          class="tab-btn rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700"
+          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
         >
-          الطلبات
+          طلبات العملاء
         </button>
       </div>
 
       <!-- Products Tab -->
-      <div id="tab-products" class="space-y-6">
-        <!-- Add / Edit Product Form -->
-        <form id="product-form" class="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 id="product-form-title" class="text-lg font-bold text-gray-900">إضافة منتج جديد</h2>
+      <div id="tab-products" class="space-y-8">
+        <!-- Simple, Non-Technical Add / Edit Product Form -->
+        <form id="product-form" class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6 space-y-5 shadow-xs">
+          <div class="flex items-center justify-between border-b border-stone-100 dark:border-gray-800 pb-3">
+            <div>
+              <h2 id="product-form-title" class="text-lg font-bold text-gray-900 dark:text-white">إضافة منتج أو عرض جديد</h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">املأ البيانات التالية واضغط حفظ — سيظهر في المتجر فوراً.</p>
+            </div>
             <button
               id="btn-cancel-edit"
               type="button"
-              class="hidden text-xs font-semibold text-gray-500 hover:text-gray-800"
+              class="hidden rounded-lg border border-stone-300 dark:border-gray-700 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-stone-100 dark:hover:bg-gray-800 cursor-pointer"
             >
               إلغاء التعديل
             </button>
@@ -116,59 +136,161 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <input type="hidden" id="prod-id" />
           <input type="hidden" id="prod-slug" />
 
+          <!-- Step 1: Image Upload with Instant Preview -->
+          <div class="rounded-2xl border-2 border-dashed border-stone-300 dark:border-gray-700 bg-stone-50/70 dark:bg-gray-950/60 p-4">
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+              <div class="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-center">
+                <img
+                  id="prod-image-preview"
+                  src="/images/products/product-03.jpg"
+                  alt="معاينة الصورة"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+
+              <div class="flex-1 text-center sm:text-right space-y-2">
+                <p class="text-sm font-bold text-gray-900 dark:text-white">صورة المنتج</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  اختر صورة واضحة من الموبايل أو الكمبيوتر (JPG أو PNG أو WebP).
+                </p>
+                <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-800 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-900 transition-colors">
+                  <span>اختر صورة من جهازك</span>
+                  <input id="prod-image-file" type="file" accept="image/*" class="hidden" />
+                </label>
+                <p id="prod-file-name" class="text-xs text-emerald-700 dark:text-emerald-400 font-medium hidden"></p>
+              </div>
+            </div>
+
+            <!-- Optional URL input tucked neatly -->
+            <details class="mt-3 pt-2 border-t border-stone-200/70 dark:border-gray-800">
+              <summary class="cursor-pointer text-[11px] text-gray-500 dark:text-gray-400 hover:text-gray-700">
+                أو وضع رابط صورة جاهز (اختياري)
+              </summary>
+              <input
+                id="prod-image-url"
+                type="text"
+                dir="ltr"
+                placeholder="https://... أو /images/products/..."
+                class="mt-2 w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-xs text-gray-900 dark:text-white text-left"
+              />
+            </details>
+          </div>
+
+          <!-- Step 2: Is this an Offer? -->
+          <div class="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/70 dark:bg-amber-950/20 p-4">
+            <p class="text-sm font-bold text-gray-900 dark:text-white mb-2.5">هل هذا المنتج عرض توفير؟</p>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center gap-2.5 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 cursor-pointer">
+                <input type="radio" name="is-offer" value="no" checked class="text-emerald-700 focus:ring-emerald-700" />
+                <span class="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">لا، منتج عادي</span>
+              </label>
+              <label class="flex items-center gap-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-white dark:bg-gray-900 p-3 cursor-pointer">
+                <input type="radio" name="is-offer" value="yes" class="text-amber-600 focus:ring-amber-600" />
+                <span class="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300">نعم، ده عرض توفير 🔥</span>
+              </label>
+            </div>
+            <p id="offer-hint" class="hidden mt-2 text-xs font-medium text-amber-800 dark:text-amber-300">
+              سيتم وضعه تلقائياً في قسم (عروض وخلطات خاصة) مع شارة "عرض توفير".
+            </p>
+          </div>
+
+          <!-- Step 3: Name, Category, Price, Stock -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">اسم المنتج *</label>
-              <input id="prod-name" type="text" required class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+              <label for="prod-name" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                اسم المنتج *
+              </label>
+              <input
+                id="prod-name"
+                type="text"
+                required
+                placeholder="مثال: طحينة سمسم خام ١ كيلو"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">القسم</label>
-              <select id="prod-category" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm"></select>
+
+            <div id="category-wrapper">
+              <label for="prod-category" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                القسم *
+              </label>
+              <select
+                id="prod-category"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              ></select>
             </div>
+
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">السعر (ج.م.) *</label>
-              <input id="prod-price" type="number" step="0.01" min="0" required class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+              <label for="prod-price" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                السعر (بالجنيه المصري) *
+              </label>
+              <input
+                id="prod-price"
+                type="number"
+                step="1"
+                min="1"
+                required
+                placeholder="150"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
             </div>
+
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">المخزون *</label>
-              <input id="prod-stock" type="number" min="0" required class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+              <label for="prod-stock" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                الكمية المتوفرة في المخزن *
+              </label>
+              <input
+                id="prod-stock"
+                type="number"
+                min="0"
+                value="20"
+                required
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
             </div>
           </div>
 
+          <!-- Step 4: Description -->
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">الوصف</label>
-            <textarea id="prod-desc" rows="2" class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"></textarea>
+            <label for="prod-desc" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+              وصف المنتج (المكونات أو الوزن)
+            </label>
+            <textarea
+              id="prod-desc"
+              rows="2"
+              placeholder="مثال: طحينة سمسم طبيعية ١٠٠٪ بدون أي إضافات أو مواد حافظة."
+              class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+            ></textarea>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">رفع صورة المنتج (Supabase Storage)</label>
-              <input id="prod-image-file" type="file" accept="image/*" class="block w-full text-xs text-gray-600" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">أو رابط الصورة</label>
-              <input id="prod-image-url" type="text" dir="ltr" placeholder="https://..." class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm text-left" />
-            </div>
-          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <label class="inline-flex items-center gap-2.5 text-sm font-semibold text-gray-800 dark:text-gray-200 cursor-pointer">
+              <input id="prod-active" type="checkbox" checked class="h-4 w-4 rounded border-stone-300 text-emerald-700 focus:ring-emerald-700" />
+              <span>ظاهر للعملاء في المتجر</span>
+            </label>
 
-          <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-            <input id="prod-active" type="checkbox" checked class="rounded border-gray-300" />
-            <span>متاح للعرض في المتجر</span>
-          </label>
-
-          <div>
             <button
               id="btn-save-product"
               type="submit"
-              class="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+              class="rounded-xl bg-emerald-800 px-8 py-3 text-sm sm:text-base font-bold text-white hover:bg-emerald-900 transition-colors cursor-pointer"
             >
-              حفظ المنتج
+              حفظ ونشر المنتج
             </button>
           </div>
         </form>
 
-        <!-- Products List -->
-        <div id="admin-products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <!-- Existing Products List -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">المنتجات الموجودة حالياً</h3>
+            <input
+              id="admin-prod-search"
+              type="search"
+              placeholder="ابحث في منتجاتك..."
+              class="w-full sm:w-64 rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-gray-900 dark:text-white"
+            />
+          </div>
+          <div id="admin-products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
       </div>
 
       <!-- Orders Tab -->
@@ -196,10 +318,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const ordersList = document.getElementById("admin-orders-list");
     const categorySelect = document.getElementById("prod-category") as HTMLSelectElement | null;
     const productForm = document.getElementById("product-form") as HTMLFormElement | null;
+    const saveBtn = document.getElementById("btn-save-product") as HTMLButtonElement | null;
+
+    const fileInput = document.getElementById("prod-image-file") as HTMLInputElement | null;
+    const urlInput = document.getElementById("prod-image-url") as HTMLInputElement | null;
+    const previewImg = document.getElementById("prod-image-preview") as HTMLImageElement | null;
+    const fileNameLabel = document.getElementById("prod-file-name");
+    const offerRadios = document.querySelectorAll<HTMLInputElement>('input[name="is-offer"]');
+    const offerHint = document.getElementById("offer-hint");
+    const adminSearch = document.getElementById("admin-prod-search") as HTMLInputElement | null;
 
     if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes("your-project-id")) {
       if (loginError) {
-        loginError.textContent = "يرجى ضبط متغيرات Supabase في ملف .env أولاً.";
+        loginError.textContent = "يرجى ضبط متغيرات Supabase أولاً.";
         loginError.classList.remove("hidden");
       }
     }
@@ -211,14 +342,17 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     let accessToken = "";
     let cachedProducts: any[] = [];
+    let cachedCategories: any[] = [];
+    let specialOffersCategoryId = "";
 
     function showToast(msg: string, isError = false) {
       if (!toast) return;
       toast.textContent = msg;
       toast.className = isError
-        ? "rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
-        : "rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800";
+        ? "rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 p-3.5 text-sm font-semibold text-red-700 dark:text-red-300"
+        : "rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 p-3.5 text-sm font-semibold text-emerald-900 dark:text-emerald-200";
       toast.classList.remove("hidden");
+      window.setTimeout(() => toast.classList.add("hidden"), 5000);
     }
 
     async function apiFetch(method: string, body?: unknown) {
@@ -235,20 +369,71 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       return data;
     }
 
+    // Live image preview when picking a file from phone/PC
+    fileInput?.addEventListener("change", () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      if (fileNameLabel) {
+        fileNameLabel.textContent = `تم اختيار: ${file.name}`;
+        fileNameLabel.classList.remove("hidden");
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (previewImg && reader.result) {
+          previewImg.src = String(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    urlInput?.addEventListener("input", () => {
+      const val = urlInput.value.trim();
+      if (val && previewImg) {
+        previewImg.src = safeImageUrl(val);
+      }
+    });
+
+    // Offer radio toggle auto-selects special-offers category
+    offerRadios.forEach((radio) => {
+      radio.addEventListener("change", () => {
+        const isOffer = radio.value === "yes" && radio.checked;
+        offerHint?.classList.toggle("hidden", !isOffer);
+        if (isOffer && specialOffersCategoryId && categorySelect) {
+          categorySelect.value = specialOffersCategoryId;
+        }
+      });
+    });
+
     async function loadDashboard() {
       try {
         const data = await apiFetch("GET");
         cachedProducts = data.products || [];
+        cachedCategories = data.categories || [];
+        const orders = data.orders || [];
+
+        const offerCat = cachedCategories.find((c: any) => c.slug === "special-offers");
+        specialOffersCategoryId = offerCat?.id || "";
 
         if (categorySelect) {
-          categorySelect.innerHTML = `<option value="">بدون قسم</option>` +
-            (data.categories || [])
-              .map((c: any) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`)
-              .join("");
+          categorySelect.innerHTML = cachedCategories
+            .map((c: any) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`)
+            .join("");
         }
 
+        // Update quick stats
+        const activeCount = cachedProducts.filter((p) => p.is_active).length;
+        const paidOrders = orders.filter((o: any) => o.payment_status === "paid");
+        const revenue = paidOrders.reduce((sum: number, o: any) => sum + Number(o.total || 0), 0);
+
+        const statProds = document.getElementById("stat-products");
+        const statPaid = document.getElementById("stat-paid-orders");
+        const statRev = document.getElementById("stat-revenue");
+        if (statProds) statProds.textContent = String(activeCount);
+        if (statPaid) statPaid.textContent = String(paidOrders.length);
+        if (statRev) statRev.textContent = formatPriceEGP(revenue);
+
         renderProducts(cachedProducts);
-        renderOrders(data.orders || []);
+        renderOrders(orders);
       } catch (err: any) {
         showToast(err.message || "تعذر تحميل البيانات — تأكد من صلاحية حساب الإدارة.", true);
       }
@@ -256,37 +441,48 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     function renderProducts(products: any[]) {
       if (!productsList) return;
-      if (!products.length) {
-        productsList.innerHTML = `<p class="text-sm text-gray-500">لا توجد منتجات بعد.</p>`;
+      const q = (adminSearch?.value || "").trim().toLowerCase();
+      const filtered = q
+        ? products.filter((p) => String(p.name || "").toLowerCase().includes(q))
+        : products;
+
+      if (!filtered.length) {
+        productsList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400">لا توجد منتجات مطابقة.</p>`;
         return;
       }
 
-      productsList.innerHTML = products
-        .map(
-          (p) => `
-          <div class="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col justify-between gap-3">
+      productsList.innerHTML = filtered
+        .map((p) => {
+          const isOffer = p.category_id && p.category_id === specialOffersCategoryId;
+          return `
+          <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col justify-between gap-3">
             <div class="flex gap-3 items-center">
-              <img src="${safeImageUrl(p.image_url)}" alt="${escapeHtml(p.name)}" width="64" height="64" class="h-16 w-16 rounded-xl object-cover bg-gray-50 border" />
-              <div class="min-w-0">
-                <h3 class="text-sm font-bold text-gray-900 truncate">${escapeHtml(p.name)}</h3>
-                <p class="text-xs text-emerald-700 font-semibold">${formatPriceEGP(Number(p.price))}</p>
-                <p class="text-xs text-gray-500">المخزون: ${Number(p.stock)} | ${p.is_active ? "نشط" : "مخفي"}</p>
+              <img src="${safeImageUrl(p.image_url)}" alt="${escapeHtml(p.name)}" width="64" height="64" class="h-16 w-16 shrink-0 rounded-xl object-cover bg-stone-50 border border-stone-100 dark:border-gray-800" />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(p.name)}</h4>
+                  ${isOffer ? `<span class="shrink-0 rounded bg-amber-100 dark:bg-amber-950 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">عرض</span>` : ""}
+                </div>
+                <p class="text-xs text-emerald-800 dark:text-emerald-400 font-bold mt-0.5">${formatPriceEGP(Number(p.price))}</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400">المتوفر: ${Number(p.stock)} | ${p.is_active ? "ظاهر للعملاء" : "مخفي"}</p>
               </div>
             </div>
-            <div class="flex gap-2 pt-2 border-t border-gray-100">
-              <button type="button" data-edit-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-gray-300 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50">تعديل</button>
-              <button type="button" data-del-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-red-200 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">حذف</button>
+            <div class="flex gap-2 pt-2 border-t border-stone-100 dark:border-gray-800">
+              <button type="button" data-edit-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-stone-300 dark:border-gray-700 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-gray-800 cursor-pointer">تعديل</button>
+              <button type="button" data-del-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-red-200 dark:border-red-900/50 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer">حذف</button>
             </div>
           </div>
-        `
-        )
+        `;
+        })
         .join("");
     }
+
+    adminSearch?.addEventListener("input", () => renderProducts(cachedProducts));
 
     function renderOrders(orders: any[]) {
       if (!ordersList) return;
       if (!orders.length) {
-        ordersList.innerHTML = `<p class="text-sm text-gray-500">لا توجد طلبات بعد.</p>`;
+        ordersList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400">لا توجد طلبات بعد.</p>`;
         return;
       }
 
@@ -294,33 +490,55 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         .map((o) => {
           const isPaid = o.payment_status === "paid";
           const payBadge = isPaid
-            ? `<span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">مدفوع</span>`
-            : `<span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">${o.payment_status === "failed" ? "فشل الدفع" : "غير مدفوع"}</span>`;
+            ? `<span class="rounded-full bg-emerald-100 dark:bg-emerald-950 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">مدفوع ✓</span>`
+            : `<span class="rounded-full bg-amber-100 dark:bg-amber-950 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-300">${o.payment_status === "failed" ? "فشل الدفع" : "غير مدفوع"}</span>`;
+
+          const itemsHtml = Array.isArray(o.order_items) && o.order_items.length
+            ? `<div class="rounded-xl bg-stone-50 dark:bg-gray-950 border border-stone-100 dark:border-gray-800 p-3 space-y-1 text-xs">
+                ${o.order_items.map((it: any) => `<div class="flex justify-between"><span>${escapeHtml(it.product_name)} × ${it.quantity}</span><span class="font-semibold">${formatPriceEGP(Number(it.unit_price) * Number(it.quantity))}</span></div>`).join("")}
+              </div>`
+            : "";
+
+          const cleanPhone = String(o.customer_phone || "").replace(/[^0-9]/g, "");
+          const waPhone = cleanPhone.startsWith("20") ? cleanPhone : `2${cleanPhone}`;
 
           return `
-            <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 space-y-3">
+            <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-5 space-y-3">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="font-bold text-gray-900 text-sm sm:text-base">${escapeHtml(o.order_number)}</span>
+                  <span class="font-bold text-gray-900 dark:text-white text-sm sm:text-base">${escapeHtml(o.order_number)}</span>
                   ${payBadge}
                 </div>
-                <span class="font-bold text-emerald-700 text-sm sm:text-base">${formatPriceEGP(Number(o.total))}</span>
+                <span class="font-bold text-emerald-800 dark:text-emerald-400 text-sm sm:text-base">${formatPriceEGP(Number(o.total))}</span>
               </div>
 
-              <div class="text-xs sm:text-sm text-gray-600 space-y-1">
-                <p><strong>العميل:</strong> ${escapeHtml(o.customer_name)} — <span dir="ltr">${escapeHtml(o.customer_phone)}</span></p>
+              <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                <p><strong>العميل:</strong> ${escapeHtml(o.customer_name)} — <a href="tel:${escapeHtml(o.customer_phone)}" dir="ltr" class="underline font-semibold">${escapeHtml(o.customer_phone)}</a></p>
                 <p><strong>العنوان:</strong> ${escapeHtml(o.city)}، ${escapeHtml(o.shipping_address)}</p>
               </div>
 
-              <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-                <label class="text-xs font-semibold text-gray-700">حالة الطلب:</label>
-                <select data-order-status="${escapeHtml(o.id)}" class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold">
-                  <option value="pending" ${o.status === "pending" ? "selected" : ""}>قيد الانتظار</option>
-                  <option value="confirmed" ${o.status === "confirmed" ? "selected" : ""}>جاري التجهيز</option>
-                  <option value="shipped" ${o.status === "shipped" ? "selected" : ""}>تم الشحن</option>
-                  <option value="delivered" ${o.status === "delivered" ? "selected" : ""}>تم التوصيل</option>
-                  <option value="cancelled" ${o.status === "cancelled" ? "selected" : ""}>ملغي</option>
-                </select>
+              ${itemsHtml}
+
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-stone-100 dark:border-gray-800">
+                <div class="flex items-center gap-2">
+                  <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">حالة الطلب:</label>
+                  <select data-order-status="${escapeHtml(o.id)}" class="rounded-lg border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-1.5 text-xs font-semibold text-gray-900 dark:text-white">
+                    <option value="pending" ${o.status === "pending" ? "selected" : ""}>قيد الانتظار</option>
+                    <option value="confirmed" ${o.status === "confirmed" ? "selected" : ""}>جاري التجهيز</option>
+                    <option value="shipped" ${o.status === "shipped" ? "selected" : ""}>تم الشحن</option>
+                    <option value="delivered" ${o.status === "delivered" ? "selected" : ""}>تم التوصيل</option>
+                    <option value="cancelled" ${o.status === "cancelled" ? "selected" : ""}>ملغي</option>
+                  </select>
+                </div>
+
+                <a
+                  href="https://wa.me/${waPhone}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100"
+                >
+                  مراسلة العميل واتساب
+                </a>
               </div>
             </div>
           `;
@@ -352,7 +570,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         if (loginError) {
-          loginError.textContent = error.message;
+          loginError.textContent = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
           loginError.classList.remove("hidden");
         }
         return;
@@ -374,22 +592,37 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         document.querySelectorAll<HTMLButtonElement>(".tab-btn").forEach((b) => {
           b.className =
             b.dataset.tab === tab
-              ? "tab-btn rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
-              : "tab-btn rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700";
+              ? "tab-btn rounded-xl bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white cursor-pointer"
+              : "tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer";
         });
       });
     });
 
-    // Save product (with optional image upload)
+    function resetFormUI() {
+      productForm?.reset();
+      (document.getElementById("prod-id") as HTMLInputElement).value = "";
+      (document.getElementById("prod-slug") as HTMLInputElement).value = "";
+      (document.getElementById("prod-stock") as HTMLInputElement).value = "20";
+      if (previewImg) previewImg.src = "/images/products/product-03.jpg";
+      fileNameLabel?.classList.add("hidden");
+      offerHint?.classList.add("hidden");
+      document.getElementById("btn-cancel-edit")?.classList.add("hidden");
+      const titleEl = document.getElementById("product-form-title");
+      if (titleEl) titleEl.textContent = "إضافة منتج أو عرض جديد";
+    }
+
+    // Save product (uploads image first if chosen)
     productForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fileInput = document.getElementById("prod-image-file") as HTMLInputElement;
-      const urlInput = document.getElementById("prod-image-url") as HTMLInputElement;
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = "جاري الحفظ والنشر...";
+      }
 
-      let imageUrl = urlInput.value.trim();
+      let imageUrl = urlInput?.value.trim() || "";
 
       try {
-        const file = fileInput.files?.[0];
+        const file = fileInput?.files?.[0];
         if (file) {
           const base64Data = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
@@ -406,30 +639,34 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           imageUrl = uploaded.imageUrl;
         }
 
+        const isOfferChecked = (document.querySelector('input[name="is-offer"]:checked') as HTMLInputElement | null)?.value === "yes";
+        const selectedCategory = isOfferChecked && specialOffersCategoryId
+          ? specialOffersCategoryId
+          : (categorySelect?.value || null);
+
         await apiFetch("POST", {
           action: "save_product",
           id: (document.getElementById("prod-id") as HTMLInputElement).value || null,
           slug: (document.getElementById("prod-slug") as HTMLInputElement).value || null,
           name: (document.getElementById("prod-name") as HTMLInputElement).value,
-          category_id: categorySelect?.value || null,
+          category_id: selectedCategory,
           price: Number((document.getElementById("prod-price") as HTMLInputElement).value),
           stock: Number((document.getElementById("prod-stock") as HTMLInputElement).value),
           description: (document.getElementById("prod-desc") as HTMLTextAreaElement).value,
-          image_url: imageUrl || null,
+          image_url: imageUrl || "/images/products/product-03.jpg",
           is_active: (document.getElementById("prod-active") as HTMLInputElement).checked,
         });
 
-        productForm.reset();
-        (document.getElementById("prod-id") as HTMLInputElement).value = "";
-        (document.getElementById("prod-slug") as HTMLInputElement).value = "";
-        document.getElementById("btn-cancel-edit")?.classList.add("hidden");
-        const titleEl = document.getElementById("product-form-title");
-        if (titleEl) titleEl.textContent = "إضافة منتج جديد";
-
-        showToast("تم حفظ المنتج بنجاح! اضغط على (تحديث الموقع) لنشر التغييرات.");
+        resetFormUI();
+        showToast("تم حفظ المنتج بنجاح! سيظهر الآن في المتجر فوراً.");
         await loadDashboard();
       } catch (err: any) {
         showToast(err.message || "فشل حفظ المنتج.", true);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "حفظ ونشر المنتج";
+        }
       }
     });
 
@@ -448,15 +685,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         (document.getElementById("prod-price") as HTMLInputElement).value = String(p.price);
         (document.getElementById("prod-stock") as HTMLInputElement).value = String(p.stock);
         (document.getElementById("prod-desc") as HTMLTextAreaElement).value = p.description || "";
-        (document.getElementById("prod-image-url") as HTMLInputElement).value = p.image_url || "";
+        if (urlInput) urlInput.value = p.image_url || "";
+        if (previewImg) previewImg.src = safeImageUrl(p.image_url);
         (document.getElementById("prod-active") as HTMLInputElement).checked = Boolean(p.is_active);
         if (categorySelect) categorySelect.value = p.category_id || "";
+
+        const isOffer = Boolean(specialOffersCategoryId && p.category_id === specialOffersCategoryId);
+        const radioToCheck = document.querySelector<HTMLInputElement>(`input[name="is-offer"][value="${isOffer ? "yes" : "no"}"]`);
+        if (radioToCheck) radioToCheck.checked = true;
+        offerHint?.classList.toggle("hidden", !isOffer);
+
         document.getElementById("btn-cancel-edit")?.classList.remove("hidden");
         const titleEl = document.getElementById("product-form-title");
         if (titleEl) titleEl.textContent = `تعديل: ${p.name}`;
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else if (delId) {
-        if (!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
+        if (!confirm("هل أنت متأكد من حذف هذا المنتج نهائياً؟")) return;
         try {
           await apiFetch("POST", { action: "delete_product", id: delId });
           showToast("تم حذف المنتج.");
@@ -467,14 +711,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     });
 
-    document.getElementById("btn-cancel-edit")?.addEventListener("click", () => {
-      productForm?.reset();
-      (document.getElementById("prod-id") as HTMLInputElement).value = "";
-      (document.getElementById("prod-slug") as HTMLInputElement).value = "";
-      document.getElementById("btn-cancel-edit")?.classList.add("hidden");
-      const titleEl = document.getElementById("product-form-title");
-      if (titleEl) titleEl.textContent = "إضافة منتج جديد";
-    });
+    document.getElementById("btn-cancel-edit")?.addEventListener("click", resetFormUI);
 
     // Change order status
     ordersList?.addEventListener("change", async (e) => {
@@ -490,16 +727,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         showToast("تم تحديث حالة الطلب.");
       } catch (err: any) {
         showToast(err.message || "فشل تحديث حالة الطلب.", true);
-      }
-    });
-
-    // Trigger Vercel rebuild
-    document.getElementById("btn-rebuild")?.addEventListener("click", async () => {
-      try {
-        await apiFetch("POST", { action: "trigger_rebuild" });
-        showToast("تم إرسال طلب تحديث الموقع إلى Vercel بنجاح!");
-      } catch (err: any) {
-        showToast(err.message || "فشل تشغيل التحديث.", true);
       }
     });
 

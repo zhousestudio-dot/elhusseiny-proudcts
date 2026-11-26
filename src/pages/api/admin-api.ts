@@ -66,7 +66,7 @@ export const GET: APIRoute = async ({ request }) => {
       .order("sort_order", { ascending: true }),
     supabase
       .from("orders")
-      .select("id, order_number, customer_name, customer_phone, city, shipping_address, total, status, payment_status, created_at")
+      .select("id, order_number, customer_name, customer_phone, city, shipping_address, total, status, payment_status, created_at, order_items(product_name, quantity, unit_price)")
       .order("created_at", { ascending: false })
       .limit(100),
   ]);

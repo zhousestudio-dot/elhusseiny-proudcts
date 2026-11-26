@@ -5,22 +5,18 @@ import ProductCard from "../../components/ProductCard.astro";
 import CartConnector from "../../components/CartConnector.astro";
 import { getActiveProducts } from "../../lib/products";
 import { formatPriceEGP } from "../../lib/format";
-import type { Product } from "../../lib/data";
 
-export async function getStaticPaths() {
-  const products = await getActiveProducts();
-  return products.map((product) => ({
-    params: { slug: product.slug },
-    props: { product, allProducts: products },
-  }));
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
+
+const { slug } = Astro.params;
+const allProducts = await getActiveProducts();
+const product = allProducts.find((p) => p.slug === slug);
+
+if (!product) {
+  return Astro.redirect("/products");
 }
 
-interface Props {
-  product: Product;
-  allProducts: Product[];
-}
-
-const { product, allProducts } = Astro.props;
 const inStock = product.stock > 0;
 const description =
   product.description || `اشتري ${product.name} من متجر منتجات الحسيني في مصر.`;
