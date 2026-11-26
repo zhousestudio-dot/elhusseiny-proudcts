@@ -56,8 +56,8 @@ const [products, categories] = await Promise.all([
       </div>
     </div>
 
-    <!-- Pre-rendered Products Grid -->
-    <div id="products-grid" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- Pre-rendered Products Grid (Noon-style 2 cols on mobile, 4 cols on desktop) -->
+    <div id="products-grid" class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
       {products.map((product) => (
         <ProductCard product={product} />
       ))}

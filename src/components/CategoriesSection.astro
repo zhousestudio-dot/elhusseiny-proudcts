@@ -6,28 +6,52 @@ interface Props {
 }
 
 const { categories } = Astro.props;
+
+// Real product thumbnail for each category (replaces single-letter circles)
+const categoryImages: Record<string, string> = {
+  "basic-products": "/images/products/product-12.jpg",
+  "honey-products": "/images/products/product-04.jpg",
+  "halawa-olive-oil": "/images/products/product-18.jpg",
+  "special-offers": "/images/products/product-22.jpg",
+};
 ---
 
-<section id="categories" class="mx-auto max-w-6xl px-4 py-10 sm:py-14">
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">تصفح حسب القسم</h2>
-    <a href="/products" class="text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">
+<section id="categories" class="mx-auto max-w-6xl px-4 py-7 sm:py-10">
+  <div class="flex items-center justify-between mb-4 sm:mb-6">
+    <h2 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">الأقسام</h2>
+    <a href="/products" class="text-xs sm:text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">
       عرض الكل
     </a>
   </div>
 
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    {categories.map((cat) => (
-      <a
-        href={`/products?category=${cat.slug}`}
-        class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-emerald-600 hover:shadow-sm transition-all"
-      >
-        <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold group-hover:bg-emerald-700 group-hover:text-white transition-colors">
-          {cat.name.charAt(0)}
-        </div>
-        <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1">{cat.name}</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{cat.description}</p>
-      </a>
-    ))}
+  <!-- Noon-style clean image category cards: 2x2 on mobile, 4-col on desktop -->
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    {categories.map((cat) => {
+      const thumb = categoryImages[cat.slug] || "/images/products/product-03.jpg";
+      return (
+        <a
+          href={`/products?category=${cat.slug}`}
+          class="group flex items-center gap-3 rounded-2xl border border-emerald-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2.5 sm:p-3.5 hover:border-emerald-600 hover:shadow-sm transition-all"
+        >
+          <img
+            src={thumb}
+            alt={cat.name}
+            width="80"
+            height="80"
+            loading="lazy"
+            decoding="async"
+            class="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl object-cover bg-emerald-50 dark:bg-gray-800 group-hover:scale-105 transition-transform"
+          />
+          <div class="min-w-0">
+            <h3 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-snug">
+              {cat.name}
+            </h3>
+            <p class="hidden sm:block text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
+              {cat.description}
+            </p>
+          </div>
+        </a>
+      );
+    })}
   </div>
 </section>

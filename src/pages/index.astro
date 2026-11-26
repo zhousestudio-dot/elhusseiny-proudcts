@@ -11,7 +11,7 @@ const [categories, products] = await Promise.all([
   getActiveProducts(),
 ]);
 
-const featuredProducts = products.slice(0, 4);
+const featuredProducts = products.slice(0, 8);
 ---
 
 <BaseLayout title="منتجات الحسيني | Elhusseiny Products">
@@ -19,16 +19,16 @@ const featuredProducts = products.slice(0, 4);
 
   <CategoriesSection categories={categories} />
 
-  <!-- Featured Products Grid -->
-  <section id="products" class="mx-auto max-w-6xl px-4 pb-14">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">المنتجات المميزة</h2>
-      <a href="/products" class="text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">
-        جميع المنتجات
+  <!-- Featured Products Grid (Noon-style 2 cols on mobile, 4 cols on desktop) -->
+  <section id="products" class="mx-auto max-w-6xl px-4 pb-12 sm:pb-16">
+    <div class="flex items-center justify-between mb-4 sm:mb-6">
+      <h2 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">أشهر المنتجات والعروض</h2>
+      <a href="/products" class="text-xs sm:text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">
+        عرض الكل ({products.length})
       </a>
     </div>
 
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
       {featuredProducts.map((product) => (
         <ProductCard product={product} />
       ))}
