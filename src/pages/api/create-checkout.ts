@@ -4,7 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 export const prerender = false;
 
 interface CheckoutItemInput {
-  productId: string;
+  productId?: string;
+  slug?: string;
   quantity: number;
 }
 
@@ -132,16 +133,26 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return Response.json({ error: "البريد الإلكتروني غير صحيح." }, { status: 400 });
   }
 
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const rawItems = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
   const qtyById = new Map<string, number>();
+  const qtyBySlug = new Map<string, number>();
+
   for (const item of rawItems) {
-    if (typeof item?.productId !== "string" || !item.productId.trim()) continue;
-    const qty = Math.floor(Number(item.quantity));
+    const qty = Math.floor(Number(item?.quantity));
     if (!Number.isFinite(qty) || qty <= 0 || qty > 100) continue;
-    qtyById.set(item.productId, (qtyById.get(item.productId) ?? 0) + qty);
+
+    const id = typeof item?.productId === "string" ? item.productId.trim() : "";
+    const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
+
+    if (id && UUID_RE.test(id)) {
+      qtyById.set(id, (qtyById.get(id) ?? 0) + qty);
+    } else if (slug) {
+      qtyBySlug.set(slug, (qtyBySlug.get(slug) ?? 0) + qty);
+    }
   }
 
-  if (qtyById.size === 0) {
+  if (qtyById.size === 0 && qtyBySlug.size === 0) {
     return Response.json({ error: "سلة التسوق فارغة." }, { status: 400 });
   }
 
@@ -164,15 +175,57 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     );
   }
 
-  const { data: products, error: productsError } = await supabase
-    .from("products")
-    .select("id, name, description, price, stock, is_active")
-    .in("id", Array.from(qtyById.keys()))
-    .eq("is_active", true);
+  type DbProduct = {
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    price: number | string;
+    stock: number;
+    is_active: boolean;
+  };
 
-  if (productsError || !products || products.length === 0) {
+  const fetchedById = new Map<string, DbProduct>();
+  const requestedQtyByDbId = new Map<string, number>();
+
+  if (qtyById.size > 0) {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, slug, name, description, price, stock, is_active")
+      .in("id", Array.from(qtyById.keys()))
+      .eq("is_active", true);
+
+    if (error) {
+      console.error("[create-checkout] products by id error:", error.message);
+    } else if (data) {
+      for (const p of data as DbProduct[]) {
+        fetchedById.set(p.id, p);
+        requestedQtyByDbId.set(p.id, (requestedQtyByDbId.get(p.id) ?? 0) + (qtyById.get(p.id) ?? 0));
+      }
+    }
+  }
+
+  if (qtyBySlug.size > 0) {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, slug, name, description, price, stock, is_active")
+      .in("slug", Array.from(qtyBySlug.keys()))
+      .eq("is_active", true);
+
+    if (error) {
+      console.error("[create-checkout] products by slug error:", error.message);
+    } else if (data) {
+      for (const p of data as DbProduct[]) {
+        fetchedById.set(p.id, p);
+        requestedQtyByDbId.set(p.id, (requestedQtyByDbId.get(p.id) ?? 0) + (qtyBySlug.get(p.slug) ?? 0));
+      }
+    }
+  }
+
+  const products = Array.from(fetchedById.values());
+  if (products.length === 0) {
     return Response.json(
-      { error: "تعذر التحقق من المنتجات من قاعدة البيانات." },
+      { error: "المنتجات غير موجودة في قاعدة البيانات (تأكد من تشغيل seed.sql في Supabase)." },
       { status: 400 }
     );
   }
@@ -187,7 +240,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   let totalEGP = 0;
 
   for (const product of products) {
-    const qty = qtyById.get(product.id) ?? 0;
+    const qty = requestedQtyByDbId.get(product.id) ?? 0;
     if (qty <= 0) continue;
 
     if (product.stock < qty) {

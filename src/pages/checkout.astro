@@ -244,6 +244,7 @@ const EGYPT_GOVERNORATES = [
         shippingAddress: String(formData.get("shippingAddress") || ""),
         items: currentItems.map((item) => ({
           productId: item.id,
+          slug: item.slug,
           quantity: item.quantity,
         })),
       };
