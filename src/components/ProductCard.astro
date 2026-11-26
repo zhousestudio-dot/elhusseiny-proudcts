@@ -9,6 +9,8 @@ interface Props {
 const { product } = Astro.props;
 const inStock = product.stock > 0;
 const isOffer = product.category_slug === "special-offers";
+const comparePrice = product.compare_at_price && product.compare_at_price > product.price ? product.compare_at_price : null;
+const discountPct = comparePrice ? Math.round(((comparePrice - product.price) / comparePrice) * 100) : 0;
 const searchText = `${product.name} ${product.description} ${product.category}`.toLowerCase();
 ---
 
@@ -31,9 +33,9 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
       decoding="async"
       class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
     />
-    {isOffer && inStock && (
+    {(isOffer || comparePrice) && inStock && (
       <span class="absolute top-2.5 right-2.5 rounded-lg bg-amber-400 px-2.5 py-0.5 text-[11px] font-bold text-emerald-950 shadow-xs">
-        عرض توفير
+        {discountPct > 0 ? `وفر ${discountPct}٪` : "عرض توفير"}
       </span>
     )}
     {!inStock && (
@@ -57,10 +59,17 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
     </p>
 
     <div class="mt-auto pt-2.5 border-t border-stone-100 dark:border-gray-800 space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
-          {formatPriceEGP(product.price)}
-        </span>
+      <div class="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+        <div class="flex flex-wrap items-baseline gap-1.5">
+          <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
+            {formatPriceEGP(product.price)}
+          </span>
+          {comparePrice && (
+            <span class="text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">
+              بدلاً من <del class="line-through font-medium">{formatPriceEGP(comparePrice)}</del>
+            </span>
+          )}
+        </div>
         {inStock && product.stock <= 5 && (
           <span class="text-[10px] font-semibold text-amber-700 dark:text-amber-400">
             متبقي {product.stock} فقط

@@ -19,6 +19,7 @@ interface RawProductRow {
   slug: string;
   description: string | null;
   price: number | string;
+  compare_at_price: number | string | null;
   image_url: string | null;
   stock: number;
   is_active: boolean;
@@ -62,7 +63,7 @@ export async function getActiveProducts(): Promise<Product[]> {
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, slug, description, price, image_url, stock, is_active, categories(name, slug)")
+    .select("id, name, slug, description, price, compare_at_price, image_url, stock, is_active, categories(name, slug)")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
@@ -79,6 +80,7 @@ export async function getActiveProducts(): Promise<Product[]> {
       slug: row.slug,
       description: row.description ?? "",
       price: Number(row.price),
+      compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : null,
       image_url: row.image_url || "/images/prod-1.svg",
       stock: row.stock,
       category: cat?.name ?? "منتجات عامة",

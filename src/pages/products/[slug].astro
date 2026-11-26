@@ -17,6 +17,8 @@ if (!product) {
 }
 
 const inStock = product.stock > 0;
+const comparePrice = product.compare_at_price && product.compare_at_price > product.price ? product.compare_at_price : null;
+const discountPct = comparePrice ? Math.round(((comparePrice - product.price) / comparePrice) * 100) : 0;
 const description =
   product.description || `اشتري ${product.name} من متجر منتجات الحسيني في مصر.`;
 
@@ -115,10 +117,20 @@ const productSchema = {
           </h1>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-baseline gap-3">
           <span class="text-2xl sm:text-3xl font-bold text-emerald-800 dark:text-emerald-400">
             {formatPriceEGP(product.price)}
           </span>
+          {comparePrice && (
+            <span class="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+              بدلاً من <del class="line-through font-semibold">{formatPriceEGP(comparePrice)}</del>
+            </span>
+          )}
+          {discountPct > 0 && (
+            <span class="rounded-full bg-amber-100 dark:bg-amber-950 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300">
+              وفر {discountPct}٪
+            </span>
+          )}
           <span
             class={`rounded-full px-3 py-1 text-xs font-semibold ${
               inStock ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300" : "bg-red-50 text-red-700"

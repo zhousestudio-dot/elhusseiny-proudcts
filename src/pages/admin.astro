@@ -190,8 +190,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               </label>
             </div>
             <p id="offer-hint" class="hidden mt-2 text-xs font-medium text-amber-800 dark:text-amber-300">
-              سيتم وضعه تلقائياً في قسم (عروض وخلطات خاصة) مع شارة "عرض توفير".
+              سيتم وضعه تلقائياً في قسم (عروض وخلطات خاصة) مع شارة الخصم والسعر المشطوب.
             </p>
+
+            <div id="compare-price-box" class="hidden mt-3 pt-3 border-t border-amber-200/80 dark:border-amber-900/50 space-y-2">
+              <label for="prod-compare-price" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
+                السعر قبل الخصم (بدلاً من) — بالجنيه
+              </label>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2.5">
+                <input
+                  id="prod-compare-price"
+                  type="number"
+                  step="1"
+                  min="0"
+                  placeholder="مثال: 150 (بينما سعر العرض 120)"
+                  class="w-full sm:w-64 rounded-xl border border-amber-300 dark:border-amber-800 bg-white dark:bg-gray-950 px-3.5 py-2 text-sm text-gray-900 dark:text-white focus:border-amber-600 focus:outline-none"
+                />
+                <span id="discount-preview" class="text-xs font-bold text-emerald-800 dark:text-emerald-300"></span>
+              </div>
+            </div>
           </div>
 
           <!-- Step 3: Name, Category, Price, Stock -->
@@ -326,7 +343,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const fileNameLabel = document.getElementById("prod-file-name");
     const offerRadios = document.querySelectorAll<HTMLInputElement>('input[name="is-offer"]');
     const offerHint = document.getElementById("offer-hint");
+    const comparePriceBox = document.getElementById("compare-price-box");
+    const comparePriceInput = document.getElementById("prod-compare-price") as HTMLInputElement | null;
+    const priceInput = document.getElementById("prod-price") as HTMLInputElement | null;
+    const discountPreview = document.getElementById("discount-preview");
     const adminSearch = document.getElementById("admin-prod-search") as HTMLInputElement | null;
+
+    function updateDiscountPreview() {
+      if (!discountPreview) return;
+      const price = Number(priceInput?.value || 0);
+      const compare = Number(comparePriceInput?.value || 0);
+      if (compare > price && price > 0) {
+        const pct = Math.round(((compare - price) / compare) * 100);
+        const saved = compare - price;
+        discountPreview.textContent = `خصم ${pct}٪ — العميل يوفر ${saved} ج.م.`;
+      } else {
+        discountPreview.textContent = "";
+      }
+    }
+
+    priceInput?.addEventListener("input", updateDiscountPreview);
+    comparePriceInput?.addEventListener("input", updateDiscountPreview);
 
     if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes("your-project-id")) {
       if (loginError) {
@@ -394,14 +431,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     });
 
-    // Offer radio toggle auto-selects special-offers category
+    // Offer radio toggle auto-selects special-offers category & shows compare price box
     offerRadios.forEach((radio) => {
       radio.addEventListener("change", () => {
         const isOffer = radio.value === "yes" && radio.checked;
         offerHint?.classList.toggle("hidden", !isOffer);
+        comparePriceBox?.classList.toggle("hidden", !isOffer);
         if (isOffer && specialOffersCategoryId && categorySelect) {
           categorySelect.value = specialOffersCategoryId;
         }
+        updateDiscountPreview();
       });
     });
 
@@ -464,7 +503,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                   <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(p.name)}</h4>
                   ${isOffer ? `<span class="shrink-0 rounded bg-amber-100 dark:bg-amber-950 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">عرض</span>` : ""}
                 </div>
-                <p class="text-xs text-emerald-800 dark:text-emerald-400 font-bold mt-0.5">${formatPriceEGP(Number(p.price))}</p>
+                <p class="text-xs text-emerald-800 dark:text-emerald-400 font-bold mt-0.5">
+                  ${formatPriceEGP(Number(p.price))}
+                  ${p.compare_at_price && Number(p.compare_at_price) > Number(p.price) ? `<span class="text-gray-400 font-normal mr-1">بدلاً من <del>${formatPriceEGP(Number(p.compare_at_price))}</del></span>` : ""}
+                </p>
                 <p class="text-[11px] text-gray-500 dark:text-gray-400">المتوفر: ${Number(p.stock)} | ${p.is_active ? "ظاهر للعملاء" : "مخفي"}</p>
               </div>
             </div>
@@ -607,6 +649,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       if (previewImg) previewImg.src = "/images/products/product-03.jpg";
       fileNameLabel?.classList.add("hidden");
       offerHint?.classList.add("hidden");
+      comparePriceBox?.classList.add("hidden");
+      if (discountPreview) discountPreview.textContent = "";
       document.getElementById("btn-cancel-edit")?.classList.add("hidden");
       const titleEl = document.getElementById("product-form-title");
       if (titleEl) titleEl.textContent = "إضافة منتج أو عرض جديد";
@@ -653,6 +697,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           name: (document.getElementById("prod-name") as HTMLInputElement).value,
           category_id: selectedCategory,
           price: Number((document.getElementById("prod-price") as HTMLInputElement).value),
+          compare_at_price: isOfferChecked && comparePriceInput?.value ? Number(comparePriceInput.value) : null,
           stock: Number((document.getElementById("prod-stock") as HTMLInputElement).value),
           description: (document.getElementById("prod-desc") as HTMLTextAreaElement).value,
           image_url: imageUrl || "/images/products/product-03.jpg",
@@ -692,10 +737,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         (document.getElementById("prod-active") as HTMLInputElement).checked = Boolean(p.is_active);
         if (categorySelect) categorySelect.value = p.category_id || "";
 
-        const isOffer = Boolean(specialOffersCategoryId && p.category_id === specialOffersCategoryId);
+        const isOffer = Boolean((specialOffersCategoryId && p.category_id === specialOffersCategoryId) || (p.compare_at_price && Number(p.compare_at_price) > Number(p.price)));
         const radioToCheck = document.querySelector<HTMLInputElement>(`input[name="is-offer"][value="${isOffer ? "yes" : "no"}"]`);
         if (radioToCheck) radioToCheck.checked = true;
         offerHint?.classList.toggle("hidden", !isOffer);
+        comparePriceBox?.classList.toggle("hidden", !isOffer);
+        if (comparePriceInput) comparePriceInput.value = p.compare_at_price ? String(p.compare_at_price) : "";
+        updateDiscountPreview();
 
         document.getElementById("btn-cancel-edit")?.classList.remove("hidden");
         const titleEl = document.getElementById("product-form-title");

@@ -90,7 +90,7 @@ export const GET: APIRoute = async ({ request }) => {
   const [productsRes, categoriesRes, ordersRes] = await Promise.all([
     supabase
       .from("products")
-      .select("id, name, slug, description, price, image_url, stock, category_id, is_active, created_at")
+      .select("id, name, slug, description, price, compare_at_price, image_url, stock, category_id, is_active, created_at")
       .order("created_at", { ascending: false }),
     supabase
       .from("categories")
@@ -171,6 +171,13 @@ export const POST: APIRoute = async ({ request }) => {
     const name = String(body.name || "").trim();
     const description = String(body.description || "").trim();
     const price = Number(body.price);
+    const compareRaw = body.compare_at_price !== null && body.compare_at_price !== undefined && body.compare_at_price !== ""
+      ? Number(body.compare_at_price)
+      : null;
+    const compareAtPrice =
+      compareRaw !== null && Number.isFinite(compareRaw) && compareRaw > price && compareRaw <= 100000
+        ? compareRaw
+        : null;
     const stock = Math.max(0, Math.floor(Number(body.stock || 0)));
     const categoryId = body.category_id ? String(body.category_id) : null;
     const imageUrlRaw = body.image_url ? String(body.image_url).trim() : null;
@@ -189,6 +196,7 @@ export const POST: APIRoute = async ({ request }) => {
       slug: body.slug ? String(body.slug).trim() : `${slugify(name)}-${Date.now().toString().slice(-4)}`,
       description,
       price,
+      compare_at_price: compareAtPrice,
       stock,
       category_id: categoryId,
       image_url: imageUrl,
