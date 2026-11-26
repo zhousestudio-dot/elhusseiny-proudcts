@@ -1,7 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const env = import.meta.env as Record<string, string | undefined>;
+const supabaseUrl = (process.env.PUBLIC_SUPABASE_URL || env.PUBLIC_SUPABASE_URL || "").trim();
+const supabaseAnonKey = (process.env.PUBLIC_SUPABASE_ANON_KEY || env.PUBLIC_SUPABASE_ANON_KEY || "").trim();
 
 const isConfigured =
   Boolean(supabaseUrl) &&

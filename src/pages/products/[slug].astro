@@ -1,5 +1,4 @@
 ---
-import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import CartConnector from "../../components/CartConnector.astro";
@@ -7,7 +6,7 @@ import { getActiveProducts } from "../../lib/products";
 import { formatPriceEGP } from "../../lib/format";
 
 export const prerender = false;
-Astro.response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
+Astro.response.headers.set("Cache-Control", "public, s-maxage=5, stale-while-revalidate=15");
 
 const { slug } = Astro.params;
 const allProducts = await getActiveProducts();
@@ -83,13 +82,11 @@ const productSchema = {
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 items-start">
       <!-- Product Image -->
       <div class="overflow-hidden rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-2">
-        <Image
+        <img
           src={product.image_url}
           alt={product.name}
-          width={800}
-          height={800}
-          format="webp"
-          quality={82}
+          width="800"
+          height="800"
           loading="eager"
           fetchpriority="high"
           decoding="async"
