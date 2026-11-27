@@ -80,7 +80,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
 
       <!-- Quick Summary Cards -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
         <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
           <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">المنتجات المعروضة</p>
           <p id="stat-products" class="text-base sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">0</p>
@@ -93,6 +93,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">إجمالي المبيعات</p>
           <p id="stat-revenue" class="text-sm sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1 truncate">٠ ج.م.</p>
         </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
+          <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">زيارات المتجر</p>
+          <div class="flex items-baseline gap-2 mt-1">
+            <p id="stat-visits" class="text-base sm:text-2xl font-bold text-gray-900 dark:text-white">0</p>
+            <span id="stat-visits-today" class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtle Supabase Free Tier Indicator -->
+      <div id="supabase-health-bar" class="hidden flex-wrap items-center justify-between gap-2 rounded-xl border border-stone-200 dark:border-gray-800 bg-stone-50/70 dark:bg-gray-900/60 px-3.5 py-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span id="sb-health-dot" class="h-2 w-2 rounded-full bg-emerald-600 shrink-0"></span>
+          <span id="sb-health-text" class="text-gray-700 dark:text-gray-300 font-medium"></span>
+        </div>
+        <span id="sb-health-badge" class="rounded-full bg-emerald-100 dark:bg-emerald-950 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300"></span>
       </div>
 
       <div id="admin-toast" class="hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm font-semibold text-emerald-900"></div>
@@ -806,9 +822,40 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         const statProds = document.getElementById("stat-products");
         const statPaid = document.getElementById("stat-paid-orders");
         const statRev = document.getElementById("stat-revenue");
+        const statVisits = document.getElementById("stat-visits");
+        const statVisitsToday = document.getElementById("stat-visits-today");
         if (statProds) statProds.textContent = String(activeCount);
         if (statPaid) statPaid.textContent = String(paidOrders.length);
         if (statRev) statRev.textContent = formatPriceEGP(revenue);
+
+        if (data.stats) {
+          if (statVisits) statVisits.textContent = String(data.stats.total_visits ?? 0);
+          if (statVisitsToday) statVisitsToday.textContent = `(اليوم: ${data.stats.today_visits ?? 0})`;
+
+          const healthBar = document.getElementById("supabase-health-bar");
+          const healthDot = document.getElementById("sb-health-dot");
+          const healthText = document.getElementById("sb-health-text");
+          const healthBadge = document.getElementById("sb-health-badge");
+          const dbMb = Number(data.stats.db_size_mb || 0);
+          const dbLimit = Number(data.stats.db_limit_mb || 500);
+          const dbPct = Number(data.stats.db_percent || 0);
+          const isWarning = dbPct >= 75 || Number(data.stats.today_visits || 0) >= 1500;
+
+          if (healthBar && healthText && healthBadge && healthDot) {
+            healthBar.classList.remove("hidden");
+            healthBar.classList.add("flex");
+            if (isWarning) {
+              healthBar.className = "flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-3.5 py-2 text-xs";
+              healthDot.className = "h-2 w-2 rounded-full bg-amber-500 shrink-0";
+              healthText.textContent = `تنبيه سوبابيز: المساحة المستخدمة ${dbMb} / ${dbLimit} MB (${dbPct}%) — قريب من حد الباقة المجانية`;
+              healthBadge.className = "rounded-full bg-amber-200 dark:bg-amber-900 px-2.5 py-0.5 text-[11px] font-bold text-amber-900 dark:text-amber-200";
+              healthBadge.textContent = "اقترب من الحد";
+            } else {
+              healthText.textContent = `حالة سوبابيز (الباقة المجانية): المساحة ${dbMb} / ${dbLimit} MB (${dbPct}%)`;
+              healthBadge.textContent = "ضمن الحد المجاني ✓";
+            }
+          }
+        }
 
         renderProducts(cachedProducts);
         renderCategories(cachedCategories);

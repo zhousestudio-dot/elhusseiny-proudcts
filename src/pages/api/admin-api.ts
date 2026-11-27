@@ -87,7 +87,7 @@ export const GET: APIRoute = async ({ request }) => {
   if (auth.error) return auth.error;
   const supabase = auth.supabase;
 
-  const [productsRes, categoriesRes, ordersRes, settingsRes] = await Promise.all([
+  const [productsRes, categoriesRes, ordersRes, settingsRes, statsRes, dbSizeRes] = await Promise.all([
     supabase
       .from("products")
       .select("id, name, slug, description, price, compare_at_price, image_url, stock, category_id, is_active, created_at")
@@ -106,12 +106,33 @@ export const GET: APIRoute = async ({ request }) => {
       .select("free_shipping_threshold, wallet_phone_1, wallet_phone_2, whatsapp_phone_1, whatsapp_phone_2, shipping_qalag_fee, shipping_marg_fee, shipping_cairo_giza_fee, shipping_other_gov_fee")
       .eq("id", 1)
       .maybeSingle(),
+    supabase
+      .from("site_stats")
+      .select("total_visits, today_visits, today_date")
+      .eq("id", 1)
+      .maybeSingle(),
+    supabase.rpc("get_db_size_bytes"),
   ]);
+
+  const dbBytes = Number(dbSizeRes.data || 0);
+  const dbSizeMb = Math.round((dbBytes / (1024 * 1024)) * 10) / 10;
+  const dbLimitMb = 500;
+  const dbPercent = Math.min(100, Math.round((dbSizeMb / dbLimitMb) * 100));
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayVisits =
+    statsRes.data?.today_date === todayStr ? Number(statsRes.data?.today_visits || 0) : 0;
 
   return Response.json({
     products: productsRes.data || [],
     categories: categoriesRes.data || [],
     orders: ordersRes.data || [],
+    stats: {
+      total_visits: Number(statsRes.data?.total_visits || 0),
+      today_visits: todayVisits,
+      db_size_mb: dbSizeMb,
+      db_limit_mb: dbLimitMb,
+      db_percent: dbPercent,
+    },
     settings: settingsRes.data || {
       free_shipping_threshold: 2500,
       wallet_phone_1: "01010231211",
