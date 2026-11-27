@@ -4,12 +4,16 @@ import ProductCard from "../../components/ProductCard.astro";
 import CartConnector from "../../components/CartConnector.astro";
 import { getActiveProducts } from "../../lib/products";
 import { formatPriceEGP } from "../../lib/format";
+import { getStoreSettings, toWhatsAppIntl } from "../../lib/settings";
 
 export const prerender = false;
-Astro.response.headers.set("Cache-Control", "public, s-maxage=5, stale-while-revalidate=15");
+Astro.response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=86400");
 
 const { slug } = Astro.params;
-const allProducts = await getActiveProducts();
+const [allProducts, settings] = await Promise.all([
+  getActiveProducts(),
+  getStoreSettings(),
+]);
 const product = allProducts.find((p) => p.slug === slug);
 
 if (!product) {
@@ -36,7 +40,7 @@ const fullImg = product.image_url.startsWith("http") ? product.image_url : `${si
 const whatsappText = encodeURIComponent(
   `مرحباً، أود طلب: ${product.name} (${formatPriceEGP(product.price)})`
 );
-const whatsappOrderUrl = `https://wa.me/201010231211?text=${whatsappText}`;
+const whatsappOrderUrl = `https://wa.me/${toWhatsAppIntl(settings.whatsapp_phone_1)}?text=${whatsappText}`;
 
 const productSchema = {
   "@context": "https://schema.org",
@@ -204,7 +208,7 @@ const productSchema = {
         <div class="rounded-xl bg-white dark:bg-gray-900 border border-stone-200 dark:border-gray-800 p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-2">
           <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>توصيل سريع لجميع محافظات مصر (مجاني فوق ٥٠٠ ج.م. بالقاهرة والجيزة)</span>
+            <span>يوجد شحن</span>
           </div>
           <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 text-emerald-700 dark:text-emerald-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>

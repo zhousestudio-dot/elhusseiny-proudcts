@@ -1,11 +1,19 @@
 ---
-// Brand header with announcement bar, integrated search, theme toggle, and slide-over cart trigger
+// Brand header with dynamic announcement bar, integrated search, theme toggle, and slide-over cart trigger
+interface Props {
+  freeShippingThreshold?: number;
+}
+const { freeShippingThreshold = 0 } = Astro.props;
 ---
 
 <!-- Top Announcement Bar -->
 <div class="bg-emerald-950 text-emerald-50 text-[11px] sm:text-xs font-medium py-2 px-4 text-center border-b border-emerald-900">
   <div class="mx-auto max-w-6xl flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-    <span>شحن مجاني للطلبات فوق ٥٠٠ ج.م. داخل القاهرة والجيزة</span>
+    <span>
+      {freeShippingThreshold > 0
+        ? `يوجد شحن • شحن مجاني للطلبات فوق ${freeShippingThreshold} ج.م.`
+        : "يوجد شحن"}
+    </span>
     <span class="hidden sm:inline text-emerald-500">•</span>
     <span class="hidden sm:inline text-amber-300 font-semibold">دفع آمن بالفيزا أو المحافظ الإلكترونية</span>
   </div>

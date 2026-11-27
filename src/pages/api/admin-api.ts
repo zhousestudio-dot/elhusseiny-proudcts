@@ -87,7 +87,7 @@ export const GET: APIRoute = async ({ request }) => {
   if (auth.error) return auth.error;
   const supabase = auth.supabase;
 
-  const [productsRes, categoriesRes, ordersRes] = await Promise.all([
+  const [productsRes, categoriesRes, ordersRes, settingsRes] = await Promise.all([
     supabase
       .from("products")
       .select("id, name, slug, description, price, compare_at_price, image_url, stock, category_id, is_active, created_at")
@@ -101,12 +101,24 @@ export const GET: APIRoute = async ({ request }) => {
       .select("id, order_number, customer_name, customer_phone, city, shipping_address, total, status, payment_status, payment_method, payment_reference, created_at, order_items(product_name, quantity, unit_price)")
       .order("created_at", { ascending: false })
       .limit(100),
+    supabase
+      .from("store_settings")
+      .select("free_shipping_threshold, wallet_phone_1, wallet_phone_2, whatsapp_phone_1, whatsapp_phone_2")
+      .eq("id", 1)
+      .maybeSingle(),
   ]);
 
   return Response.json({
     products: productsRes.data || [],
     categories: categoriesRes.data || [],
     orders: ordersRes.data || [],
+    settings: settingsRes.data || {
+      free_shipping_threshold: 2500,
+      wallet_phone_1: "01010231211",
+      wallet_phone_2: "",
+      whatsapp_phone_1: "01010231211",
+      whatsapp_phone_2: "",
+    },
   });
 };
 
@@ -296,6 +308,33 @@ export const POST: APIRoute = async ({ request }) => {
     if (!hookRes.ok) {
       return Response.json({ error: "فشل تشغيل إعادة البناء على Vercel." }, { status: 502 });
     }
+    return Response.json({ ok: true });
+  }
+
+  if (action === "save_settings") {
+    const threshold = Math.max(0, Math.min(100000, Math.floor(Number(body.free_shipping_threshold || 0))));
+    const wallet1 = String(body.wallet_phone_1 || "").trim();
+    const wallet2 = String(body.wallet_phone_2 || "").trim();
+    const wa1 = String(body.whatsapp_phone_1 || "").trim();
+    const wa2 = String(body.whatsapp_phone_2 || "").trim();
+
+    if (!wallet1 || !wa1) {
+      return Response.json({ error: "يرجى إدخال رقم المحفظة الأساسي ورقم الواتساب الأساسي." }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from("store_settings")
+      .upsert({
+        id: 1,
+        free_shipping_threshold: threshold,
+        wallet_phone_1: wallet1,
+        wallet_phone_2: wallet2,
+        whatsapp_phone_1: wa1,
+        whatsapp_phone_2: wa2,
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ ok: true });
   }
 

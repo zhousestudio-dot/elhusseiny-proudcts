@@ -98,7 +98,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <div id="admin-toast" class="hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm font-semibold text-emerald-900"></div>
 
       <!-- Tabs -->
-      <div class="flex gap-2 border-b border-stone-200 dark:border-gray-800 pb-3">
+      <div class="flex flex-wrap gap-2 border-b border-stone-200 dark:border-gray-800 pb-3">
         <button
           type="button"
           data-tab="products"
@@ -112,6 +112,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
         >
           طلبات العملاء
+        </button>
+        <button
+          type="button"
+          data-tab="settings"
+          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
+        >
+          إعدادات المتجر
         </button>
       </div>
 
@@ -314,6 +321,99 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <div id="tab-orders" class="hidden space-y-4">
         <div id="admin-orders-list" class="space-y-4"></div>
       </div>
+
+      <!-- Store Settings Tab -->
+      <div id="tab-settings" class="hidden">
+        <form id="settings-form" class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6 space-y-5 shadow-xs max-w-2xl">
+          <div class="border-b border-stone-100 dark:border-gray-800 pb-3">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">إعدادات الشحن والأرقام</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              عدّل حد الشحن المجاني أو أضف أرقام محفظة وواتساب إضافية — التغيير بيظهر في المتجر خلال ثواني.
+            </p>
+          </div>
+
+          <div>
+            <label for="set-free-shipping" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+              الحد الأدنى للشحن المجاني (بالجنيه)
+            </label>
+            <input
+              id="set-free-shipping"
+              type="number"
+              min="0"
+              step="10"
+              placeholder="2500"
+              class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+            />
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+              مثلاً اكتب 2000 أو 2500، أو اكتب 0 لإخفاء عرض الشحن المجاني من المتجر تماماً.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-stone-100 dark:border-gray-800">
+            <div>
+              <label for="set-wallet-1" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                رقم المحفظة الإلكترونية الأساسي *
+              </label>
+              <input
+                id="set-wallet-1"
+                type="tel"
+                required
+                dir="ltr"
+                placeholder="01010231211"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="set-wallet-2" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                رقم محفظة إلكترونية تاني (اختياري)
+              </label>
+              <input
+                id="set-wallet-2"
+                type="tel"
+                dir="ltr"
+                placeholder="اتركه فارغاً لو رقم واحد فقط"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="set-wa-1" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                رقم الواتساب الأساسي *
+              </label>
+              <input
+                id="set-wa-1"
+                type="tel"
+                required
+                dir="ltr"
+                placeholder="01010231211"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="set-wa-2" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                رقم واتساب تاني (اختياري)
+              </label>
+              <input
+                id="set-wa-2"
+                type="tel"
+                dir="ltr"
+                placeholder="اتركه فارغاً لو رقم واحد فقط"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <button
+            id="btn-save-settings"
+            type="submit"
+            class="rounded-xl bg-emerald-800 px-8 py-3 text-sm sm:text-base font-bold text-white hover:bg-emerald-900 transition-colors cursor-pointer"
+          >
+            حفظ الإعدادات
+          </button>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -474,6 +574,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
         renderProducts(cachedProducts);
         renderOrders(orders);
+
+        // Populate store settings form
+        if (data.settings) {
+          const s = data.settings;
+          const fsInput = document.getElementById("set-free-shipping") as HTMLInputElement | null;
+          const w1Input = document.getElementById("set-wallet-1") as HTMLInputElement | null;
+          const w2Input = document.getElementById("set-wallet-2") as HTMLInputElement | null;
+          const wa1Input = document.getElementById("set-wa-1") as HTMLInputElement | null;
+          const wa2Input = document.getElementById("set-wa-2") as HTMLInputElement | null;
+          if (fsInput) fsInput.value = String(s.free_shipping_threshold ?? 2500);
+          if (w1Input) w1Input.value = s.wallet_phone_1 || "";
+          if (w2Input) w2Input.value = s.wallet_phone_2 || "";
+          if (wa1Input) wa1Input.value = s.whatsapp_phone_1 || "";
+          if (wa2Input) wa2Input.value = s.whatsapp_phone_2 || "";
+        }
       } catch (err: any) {
         showToast(err.message || "تعذر تحميل البيانات — تأكد من صلاحية حساب الإدارة.", true);
       }
@@ -642,6 +757,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         const tab = btn.dataset.tab;
         document.getElementById("tab-products")?.classList.toggle("hidden", tab !== "products");
         document.getElementById("tab-orders")?.classList.toggle("hidden", tab !== "orders");
+        document.getElementById("tab-settings")?.classList.toggle("hidden", tab !== "settings");
         document.querySelectorAll<HTMLButtonElement>(".tab-btn").forEach((b) => {
           b.className =
             b.dataset.tab === tab
@@ -649,6 +765,34 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               : "tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer";
         });
       });
+    });
+
+    // Save Store Settings
+    document.getElementById("settings-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const saveSetBtn = document.getElementById("btn-save-settings") as HTMLButtonElement | null;
+      if (saveSetBtn) {
+        saveSetBtn.disabled = true;
+        saveSetBtn.textContent = "جاري الحفظ...";
+      }
+      try {
+        await apiFetch("POST", {
+          action: "save_settings",
+          free_shipping_threshold: Number((document.getElementById("set-free-shipping") as HTMLInputElement).value || 0),
+          wallet_phone_1: (document.getElementById("set-wallet-1") as HTMLInputElement).value,
+          wallet_phone_2: (document.getElementById("set-wallet-2") as HTMLInputElement).value,
+          whatsapp_phone_1: (document.getElementById("set-wa-1") as HTMLInputElement).value,
+          whatsapp_phone_2: (document.getElementById("set-wa-2") as HTMLInputElement).value,
+        });
+        showToast("تم حفظ إعدادات المتجر بنجاح! ستظهر في الموقع خلال ثواني.");
+      } catch (err: any) {
+        showToast(err.message || "فشل حفظ الإعدادات.", true);
+      } finally {
+        if (saveSetBtn) {
+          saveSetBtn.disabled = false;
+          saveSetBtn.textContent = "حفظ الإعدادات";
+        }
+      }
     });
 
     function resetFormUI() {
