@@ -162,13 +162,13 @@ const productSchema = {
                 type="button"
                 id="pdp-qty-dec"
                 aria-label="تقليل الكمية"
-                class="px-3.5 py-3 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800 rounded-r-xl"
+                class="px-3.5 py-3 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800 rounded-r-xl cursor-pointer select-none"
               >−</button>
               <input
                 id="pdp-qty"
                 type="number"
                 min="1"
-                max={Math.max(1, product.stock)}
+                max="50"
                 value="1"
                 aria-label="الكمية"
                 class="w-12 bg-transparent text-center text-sm font-bold text-gray-900 dark:text-white focus:outline-none"
@@ -177,7 +177,7 @@ const productSchema = {
                 type="button"
                 id="pdp-qty-inc"
                 aria-label="زيادة الكمية"
-                class="px-3.5 py-3 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800 rounded-l-xl"
+                class="px-3.5 py-3 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800 rounded-l-xl cursor-pointer select-none"
               >+</button>
             </div>
 
@@ -251,21 +251,19 @@ const productSchema = {
   </section>
 
   <script>
-    const qtyInput = document.getElementById("pdp-qty") as HTMLInputElement | null;
-    const decBtn = document.getElementById("pdp-qty-dec");
-    const incBtn = document.getElementById("pdp-qty-inc");
-
-    decBtn?.addEventListener("click", () => {
+    document.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement | null;
+      const qtyInput = document.getElementById("pdp-qty") as HTMLInputElement | null;
       if (!qtyInput) return;
-      const val = Math.max(1, Number(qtyInput.value || 1) - 1);
-      qtyInput.value = String(val);
-    });
 
-    incBtn?.addEventListener("click", () => {
-      if (!qtyInput) return;
-      const max = Number(qtyInput.max || 50);
-      const val = Math.min(max, Number(qtyInput.value || 1) + 1);
-      qtyInput.value = String(val);
+      if (target?.closest("#pdp-qty-dec")) {
+        const val = Math.max(1, Number(qtyInput.value || 1) - 1);
+        qtyInput.value = String(val);
+      } else if (target?.closest("#pdp-qty-inc")) {
+        const max = Number(qtyInput.max || 50);
+        const val = Math.min(max, Number(qtyInput.value || 1) + 1);
+        qtyInput.value = String(val);
+      }
     });
   </script>
 
