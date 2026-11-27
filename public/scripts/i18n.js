@@ -73,7 +73,7 @@
     "الاسم: أ - ي": "Name: A - Z",
     "منتجات أساسية": "Core Products",
     "عسل ومنتجات النحل": "Honey & Bee Products",
-    "الحلاوة وزيت الزيتون": "Halawa & Olive Oil",
+    "زيت الزيتون والزيوت": "Olive Oil & Natural Oils",
     "عروض وخلطات خاصة": "Special Offers & Blends",
     "طحينة سمسم خام ١٠٠٪ (١ كيلو)": "100% Raw Sesame Tahina (1 kg)",
     "زيت زيتون بكر ممتاز (١ كيلو)": "Extra Virgin Olive Oil (1 kg)",

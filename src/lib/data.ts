@@ -27,7 +27,7 @@ export const FEATURED_CATEGORIES: Category[] = [
     id: "cat-1",
     name: "منتجات أساسية",
     slug: "basic-products",
-    description: "طحينة سمسم خام وزبدة فول سوداني طبيعي وبالشوكولاتة ١٠٠٪",
+    description: "طحينة سمسم خام، حلاوة طحينية، وزبدة فول سوداني طبيعي وبالشوكولاتة ١٠٠٪",
   },
   {
     id: "cat-2",
@@ -37,9 +37,9 @@ export const FEATURED_CATEGORIES: Category[] = [
   },
   {
     id: "cat-3",
-    name: "الحلاوة وزيت الزيتون",
+    name: "زيت الزيتون والزيوت",
     slug: "halawa-olive-oil",
-    description: "حلاوة طحينية سادة وبالشوكولاتة وزيت زيتون بكر ممتاز",
+    description: "زيت زيتون بكر ممتاز وزيوت طبيعية معصورة على البارد ١٠٠٪",
   },
   {
     id: "cat-4",
@@ -73,7 +73,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     price: 250,
     image_url: "/images/products/product-18.jpg",
     stock: 20,
-    category: "الحلاوة وزيت الزيتون",
+    category: "زيت الزيتون والزيوت",
     category_slug: "halawa-olive-oil",
     is_active: true,
   },
@@ -190,8 +190,8 @@ export const FEATURED_PRODUCTS: Product[] = [
     price: 130,
     image_url: "/images/products/halawa-plain-solo.jpg",
     stock: 25,
-    category: "الحلاوة وزيت الزيتون",
-    category_slug: "halawa-olive-oil",
+    category: "منتجات أساسية",
+    category_slug: "basic-products",
     is_active: true,
   },
   {
@@ -203,8 +203,8 @@ export const FEATURED_PRODUCTS: Product[] = [
     price: 140,
     image_url: "/images/products/chocolate-halawa-solo.jpg",
     stock: 20,
-    category: "الحلاوة وزيت الزيتون",
-    category_slug: "halawa-olive-oil",
+    category: "منتجات أساسية",
+    category_slug: "basic-products",
     is_active: true,
   },
   {
