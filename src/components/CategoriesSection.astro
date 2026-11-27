@@ -27,7 +27,7 @@ const categoryImages: Record<string, string> = {
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-7 text-center">
     {categories.map((cat) => {
       const rawThumb = cat.image_url || categoryImages[cat.slug] || "/images/products/product-03.jpg";
-      const thumb = rawThumb.startsWith("/images/products/") && !rawThumb.includes("?") ? `${rawThumb}?v=20261127` : rawThumb;
+      const thumb = rawThumb.startsWith("/images/products/") && !rawThumb.includes("?") ? `${rawThumb}?v=20261127b` : rawThumb;
       const color = cat.accent_color && /^#[0-9a-fA-F]{6}$/.test(cat.accent_color) ? cat.accent_color : "#065f46";
       return (
         <a

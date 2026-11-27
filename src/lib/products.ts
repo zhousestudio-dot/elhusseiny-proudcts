@@ -79,7 +79,7 @@ export async function getActiveProducts(): Promise<Product[]> {
 
 function withCacheBust(url: string): string {
   if (url.startsWith("/images/products/") && !url.includes("?")) {
-    return `${url}?v=20261127`;
+    return `${url}?v=20261127b`;
   }
   return url;
 }
