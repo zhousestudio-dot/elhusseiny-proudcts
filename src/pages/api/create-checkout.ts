@@ -20,12 +20,16 @@ interface CheckoutBody {
   items?: CheckoutItemInput[];
 }
 
-function normalizePhone(raw: string): string | null {
+function normalizeEgyptPhone(raw: string): string | null {
   const cleaned = raw.replace(/[\s\-()]/g, "");
-  // If local Egyptian 11-digit mobile starting with 01, normalize to +20
   const egMatch = cleaned.match(/^(?:\+?20|0)?(1[0125][0-9]{8})$/);
-  if (egMatch) return `+20${egMatch[1]}`;
-  // Otherwise accept any valid international phone (7 to 15 digits, optional leading +)
+  return egMatch ? `+20${egMatch[1]}` : null;
+}
+
+function normalizePhone(raw: string): string | null {
+  const eg = normalizeEgyptPhone(raw);
+  if (eg) return eg;
+  const cleaned = raw.replace(/[\s\-()]/g, "");
   const intlMatch = cleaned.match(/^\+?([0-9]{7,15})$/);
   return intlMatch ? `+${intlMatch[1]}` : null;
 }
@@ -109,7 +113,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       ? body.paymentMethod
       : "paymob";
   const walletSenderPhone =
-    paymentMethod === "vodafone_cash" ? normalizePhone(body.walletSenderPhone || "") : null;
+    paymentMethod === "vodafone_cash" ? normalizeEgyptPhone(body.walletSenderPhone || "") : null;
 
   if (paymentMethod === "vodafone_cash" && !walletSenderPhone) {
     return Response.json(

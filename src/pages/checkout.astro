@@ -1,5 +1,19 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { allCountries } from "country-telephone-data";
+
+function iso2ToFlag(iso2: string): string {
+  return iso2
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+}
+
+// Put Egypt first as default, then all remaining countries
+const egyptCountry = allCountries.find((c) => c.iso2 === "eg");
+const otherCountries = allCountries
+  .filter((c) => c.iso2 !== "eg")
+  .sort((a, b) => a.name.localeCompare(b.name));
+const orderedCountries = egyptCountry ? [egyptCountry, ...otherCountries] : otherCountries;
 
 const EGYPT_GOVERNORATES = [
   "القاهرة",
@@ -97,17 +111,13 @@ const EGYPT_GOVERNORATES = [
               <select
                 id="phoneCountryCode"
                 aria-label="كود الدولة"
-                class="w-28 shrink-0 rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2.5 py-2.5 text-xs sm:text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+                class="w-32 shrink-0 rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-2.5 text-xs sm:text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
               >
-                <option value="+20">🇪🇬 +20</option>
-                <option value="+966">🇸🇦 +966</option>
-                <option value="+971">🇦🇪 +971</option>
-                <option value="+965">🇰🇼 +965</option>
-                <option value="+974">🇶🇦 +974</option>
-                <option value="+973">🇧🇭 +973</option>
-                <option value="+968">🇴🇲 +968</option>
-                <option value="+962">🇯🇴 +962</option>
-                <option value="">🌍 أخرى</option>
+                {orderedCountries.map((c) => (
+                  <option value={`+${c.dialCode}`} selected={c.iso2 === "eg"}>
+                    {iso2ToFlag(c.iso2)} +{c.dialCode} ({c.name.split("(")[0].trim()})
+                  </option>
+                ))}
               </select>
               <input
                 id="customerPhone"
@@ -221,32 +231,18 @@ const EGYPT_GOVERNORATES = [
             </div>
             <div>
               <label for="walletSenderPhone" class="block text-xs font-bold text-gray-800 dark:text-gray-200 mb-1">
-                رقم المحفظة الإلكترونية الذي حوّلت منه <span class="text-red-600">*</span>
+                رقم المحفظة الإلكترونية الذي حوّلت منه (مصر فقط) <span class="text-red-600">*</span>
               </label>
-              <div class="flex gap-2" dir="ltr">
-                <select
-                  id="walletCountryCode"
-                  aria-label="كود الدولة للمحفظة"
-                  class="w-24 shrink-0 rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-2 text-xs text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
-                >
-                  <option value="+20">🇪🇬 +20</option>
-                  <option value="+966">🇸🇦 +966</option>
-                  <option value="+971">🇦🇪 +971</option>
-                  <option value="+965">🇰🇼 +965</option>
-                  <option value="+974">🇶🇦 +974</option>
-                  <option value="">🌍 أخرى</option>
-                </select>
-                <input
-                  id="walletSenderPhone"
-                  name="walletSenderPhone"
-                  type="tel"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  dir="ltr"
-                  placeholder="1012345678"
-                  class="flex-1 min-w-0 rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
-                />
-              </div>
+              <input
+                id="walletSenderPhone"
+                name="walletSenderPhone"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="off"
+                dir="ltr"
+                placeholder="01012345678"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2 text-sm text-gray-900 dark:text-white text-left focus:border-emerald-700 focus:outline-none"
+              />
             </div>
           </div>
         </div>
@@ -374,6 +370,11 @@ const EGYPT_GOVERNORATES = [
       return digits.length >= 7 && digits.length <= 15;
     }
 
+    function isValidEgyptWallet(raw: string): boolean {
+      const cleaned = raw.replace(/[\s\-()]/g, "");
+      return /^(?:\+?20|0)?1[0125][0-9]{8}$/.test(cleaned);
+    }
+
     function clearFieldErrors() {
       form?.querySelectorAll("[data-field-error]").forEach((el) => el.remove());
       form?.querySelectorAll("input, select, textarea").forEach((el) => {
@@ -419,8 +420,7 @@ const EGYPT_GOVERNORATES = [
       }
 
       const formData = new FormData(form);
-      const phoneCode = (document.getElementById("phoneCountryCode") as HTMLSelectElement | null)?.value || "";
-      const walletCode = (document.getElementById("walletCountryCode") as HTMLSelectElement | null)?.value || "";
+      const phoneCode = (document.getElementById("phoneCountryCode") as HTMLSelectElement | null)?.value || "+20";
       const customerName = String(formData.get("customerName") || "").trim();
       const rawCustomerPhone = String(formData.get("customerPhone") || "").trim();
       const customerPhone = combinePhoneWithCode(rawCustomerPhone, phoneCode);
@@ -428,8 +428,7 @@ const EGYPT_GOVERNORATES = [
       const city = String(formData.get("city") || "").trim();
       const shippingAddress = String(formData.get("shippingAddress") || "").trim();
       const selectedMethod = String(formData.get("paymentMethod") || "vodafone_cash");
-      const rawWalletPhone = String(formData.get("walletSenderPhone") || "").trim();
-      const walletSenderPhone = combinePhoneWithCode(rawWalletPhone, walletCode);
+      const walletSenderPhone = String(formData.get("walletSenderPhone") || "").trim();
 
       if (customerName.length < 2) {
         flagFieldError("customerName", "يرجى كتابة الاسم بالكامل (حرفين على الأقل).");
@@ -451,8 +450,8 @@ const EGYPT_GOVERNORATES = [
         flagFieldError("shippingAddress", "يرجى كتابة العنوان بالتفصيل (اسم الشارع ورقم العقار).");
         return;
       }
-      if (selectedMethod === "vodafone_cash" && !isValidPhone(walletSenderPhone)) {
-        flagFieldError("walletSenderPhone", "يرجى إدخال رقم المحفظة الصحيح الذي حوّلت منه.");
+      if (selectedMethod === "vodafone_cash" && !isValidEgyptWallet(walletSenderPhone)) {
+        flagFieldError("walletSenderPhone", "يرجى إدخال رقم المحفظة الإلكترونية المصري الصحيح (١١ رقم).");
         return;
       }
 
