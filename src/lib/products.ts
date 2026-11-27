@@ -76,6 +76,13 @@ export async function getActiveProducts(): Promise<Product[]> {
     return [];
   }
 
+function withCacheBust(url: string): string {
+  if (url.startsWith("/images/products/") && !url.includes("?")) {
+    return `${url}?v=20261127`;
+  }
+  return url;
+}
+
   return (data as RawProductRow[]).map((row) => {
     const cat = Array.isArray(row.categories) ? row.categories[0] : row.categories;
     return {
@@ -85,7 +92,7 @@ export async function getActiveProducts(): Promise<Product[]> {
       description: row.description ?? "",
       price: Number(row.price),
       compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : null,
-      image_url: row.image_url || "/images/products/product-03.jpg",
+      image_url: withCacheBust(row.image_url || "/images/products/product-03.jpg"),
       stock: row.stock,
       category: cat?.name ?? "منتجات عامة",
       category_slug: cat?.slug ?? "",
