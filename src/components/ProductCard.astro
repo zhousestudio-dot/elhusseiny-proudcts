@@ -34,7 +34,7 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
       height="520"
       loading="lazy"
       decoding="async"
-      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      class={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${!inStock ? "opacity-75 grayscale-[20%]" : ""}`}
     />
     {(isOffer || comparePrice) && inStock && (
       <span class="absolute top-3 right-3 rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-bold text-emerald-950 shadow-xs">
@@ -43,7 +43,7 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
     )}
     {!inStock && (
       <span class="absolute top-3 right-3 rounded-full bg-red-600 px-3 py-0.5 text-[11px] font-bold text-white shadow-xs">
-        نفدت الكمية
+        غير متوفر
       </span>
     )}
   </a>
