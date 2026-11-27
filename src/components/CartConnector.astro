@@ -2,10 +2,49 @@
 // Include this component on pages with "Add to Cart" buttons
 ---
 
+<div
+  id="cart-mini-toast"
+  role="status"
+  aria-live="polite"
+  class="pointer-events-none fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 translate-y-4 items-center gap-3 rounded-full bg-emerald-950 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white opacity-0 shadow-xl transition-all duration-200 border border-emerald-700/60"
+>
+  <span class="flex items-center gap-1.5 whitespace-nowrap">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-4 w-4 text-emerald-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
+    <span>تم الإضافة إلى السلة</span>
+  </span>
+  <button
+    type="button"
+    id="toast-open-cart"
+    class="pointer-events-auto rounded-full bg-amber-400 px-2.5 py-0.5 text-[11px] font-bold text-emerald-950 hover:bg-amber-300 transition-colors cursor-pointer whitespace-nowrap"
+  >
+    عرض السلة
+  </button>
+</div>
+
 <script>
   import { addToCart, syncCartBadge } from "../lib/cart";
 
   syncCartBadge();
+
+  const miniToast = document.getElementById("cart-mini-toast");
+  const toastOpenBtn = document.getElementById("toast-open-cart");
+  let toastTimer: number | undefined;
+
+  function showMiniToast() {
+    if (!miniToast) return;
+    miniToast.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+    miniToast.classList.add("opacity-100", "translate-y-0");
+    if (toastTimer) window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      miniToast.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+      miniToast.classList.remove("opacity-100", "translate-y-0");
+    }, 2200);
+  }
+
+  toastOpenBtn?.addEventListener("click", () => {
+    miniToast?.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+    window.dispatchEvent(new CustomEvent("elhusseiny:open-cart"));
+  });
 
   document.addEventListener("click", (event) => {
     const target = event.target as HTMLElement | null;
@@ -28,6 +67,7 @@
     if (!id || !name) return;
 
     addToCart({ id, slug, name, price, image_url }, qty);
+    showMiniToast();
 
     const originalText = btn.textContent;
     btn.textContent = "تمت الإضافة ✓";

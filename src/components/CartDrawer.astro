@@ -220,6 +220,40 @@
     }
   });
 
+  // Mobile touch swipe-left to close drawer smoothly
+  let touchStartX = 0;
+  let touchDeltaX = 0;
+  let isSwiping = false;
+
+  drawer?.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchDeltaX = 0;
+    isSwiping = true;
+    drawer.style.transition = "none";
+  }, { passive: true });
+
+  drawer?.addEventListener("touchmove", (e) => {
+    if (!isSwiping || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    // Drawer sits on the left edge, so swiping left (dx < 0) slides it closed
+    if (dx < 0) {
+      touchDeltaX = dx;
+      drawer.style.transform = `translateX(${dx}px)`;
+    }
+  }, { passive: true });
+
+  drawer?.addEventListener("touchend", () => {
+    if (!isSwiping) return;
+    isSwiping = false;
+    drawer.style.transition = "";
+    drawer.style.transform = "";
+    if (touchDeltaX < -65) {
+      closeDrawer();
+    }
+    touchDeltaX = 0;
+  });
+
   // Trigger open from header cart button or custom event
   document.getElementById("header-cart-trigger")?.addEventListener("click", (e) => {
     e.preventDefault();
