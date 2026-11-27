@@ -462,7 +462,7 @@ const citiesByGovJson = JSON.stringify(citiesByGovId);
       }
 
       citySelect?.addEventListener("change", () => {
-        const selectedOption = citySelect.selectedOptions?.[0];
+        const selectedOption = citySelect.options[citySelect.selectedIndex];
         const govId = selectedOption?.dataset.govId || "";
         loadAreasForGovernorate(govId);
       });

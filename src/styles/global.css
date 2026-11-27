@@ -9,6 +9,23 @@
 html {
   scroll-behavior: smooth;
   color-scheme: light;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+label,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+button,
+[role="button"] {
+  cursor: pointer;
 }
 
 html.dark {

@@ -36,6 +36,7 @@
 
   document.addEventListener("click", function (event) {
     var target = event.target;
+    if (target && target.nodeType === 3) target = target.parentElement;
     if (!target || !qtyInput) return;
 
     if (target.closest && target.closest("#pdp-qty-dec")) {
