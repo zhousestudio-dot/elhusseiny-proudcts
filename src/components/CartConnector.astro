@@ -7,37 +7,63 @@
 
   syncCartBadge();
 
-  let popTimer: number | undefined;
-  let pulseTimer: number | undefined;
+  function flyToCart(sourceBtn: HTMLButtonElement, imageUrl: string) {
+    const targetCart = document.getElementById("header-cart-trigger");
+    if (!targetCart) return;
 
-  function animateHeaderCart(qty: number) {
-    const trigger = document.getElementById("header-cart-trigger");
-    const countBadge = document.getElementById("cart-count");
-    const addedPop = document.getElementById("cart-added-pop");
+    const cardImg =
+      sourceBtn.closest("article")?.querySelector<HTMLImageElement>("img") ||
+      document.querySelector<HTMLImageElement>("main img");
+    const startRect = (cardImg || sourceBtn).getBoundingClientRect();
+    const endRect = targetCart.getBoundingClientRect();
 
-    if (trigger) {
-      trigger.classList.add("scale-110", "ring-2", "ring-emerald-500", "border-emerald-600");
-      if (pulseTimer) window.clearTimeout(pulseTimer);
-      pulseTimer = window.setTimeout(() => {
-        trigger.classList.remove("scale-110", "ring-2", "ring-emerald-500", "border-emerald-600");
-      }, 450);
-    }
+    const size = 48;
+    const startX = startRect.left + startRect.width / 2 - size / 2;
+    const startY = startRect.top + startRect.height / 2 - size / 2;
+    const endX = endRect.left + endRect.width / 2 - size / 2;
+    const endY = endRect.top + endRect.height / 2 - size / 2;
 
-    if (countBadge) {
-      countBadge.classList.add("scale-125");
-      window.setTimeout(() => countBadge.classList.remove("scale-125"), 350);
-    }
+    const flyer = document.createElement("img");
+    flyer.src = imageUrl;
+    flyer.alt = "";
+    flyer.setAttribute("aria-hidden", "true");
+    flyer.style.position = "fixed";
+    flyer.style.left = `${startX}px`;
+    flyer.style.top = `${startY}px`;
+    flyer.style.width = `${size}px`;
+    flyer.style.height = `${size}px`;
+    flyer.style.objectFit = "cover";
+    flyer.style.borderRadius = "9999px";
+    flyer.style.zIndex = "9999";
+    flyer.style.pointerEvents = "none";
+    flyer.style.boxShadow = "0 10px 25px rgba(6, 95, 70, 0.35)";
+    flyer.style.border = "2px solid #059669";
+    flyer.style.transform = "translate3d(0, 0, 0) scale(1)";
+    flyer.style.opacity = "0.95";
+    flyer.style.transition =
+      "transform 480ms cubic-bezier(0.22, 1, 0.36, 1), opacity 480ms ease-in";
 
-    if (addedPop) {
-      addedPop.textContent = `+${qty} ✓`;
-      addedPop.classList.remove("opacity-0", "scale-75");
-      addedPop.classList.add("opacity-100", "scale-100", "translate-y-1");
-      if (popTimer) window.clearTimeout(popTimer);
-      popTimer = window.setTimeout(() => {
-        addedPop.classList.add("opacity-0", "scale-75");
-        addedPop.classList.remove("opacity-100", "scale-100", "translate-y-1");
-      }, 1200);
-    }
+    document.body.appendChild(flyer);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const dx = endX - startX;
+        const dy = endY - startY;
+        flyer.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(0.28)`;
+        flyer.style.opacity = "0.2";
+      });
+    });
+
+    window.setTimeout(() => {
+      flyer.remove();
+      const countBadge = document.getElementById("cart-count");
+      targetCart.classList.add("scale-110", "ring-2", "ring-emerald-500");
+      countBadge?.classList.add("scale-125");
+      window.setTimeout(() => {
+        targetCart.classList.remove("scale-110", "ring-2", "ring-emerald-500");
+        countBadge?.classList.remove("scale-125");
+      }, 220);
+    }, 480);
   }
 
   document.addEventListener("click", (event) => {
@@ -61,7 +87,7 @@
     if (!id || !name) return;
 
     addToCart({ id, slug, name, price, image_url }, qty);
-    animateHeaderCart(qty);
+    flyToCart(btn, image_url);
 
     const originalText = btn.textContent;
     btn.textContent = "تمت الإضافة ✓";
