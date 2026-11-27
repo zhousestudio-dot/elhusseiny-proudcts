@@ -123,7 +123,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "زبدة فول سوداني طبيعية ممزوجة بالشوكولاتة الغنية. متوفر نصف كيلو (١٠٠ ج) وربع كيلو (٥٠ ج).",
     price: 200,
-    image_url: "/images/products/peanut-butter-solo.jpg",
+    image_url: "/images/products/chocolate-peanut-butter-solo.jpg",
     stock: 20,
     category: "منتجات أساسية",
     category_slug: "basic-products",
@@ -201,7 +201,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     description:
       "حلاوة طحينية بالشوكولاتة الفاخرة. متوفر نصف كيلو (٧٠ ج) وربع كيلو (٤٠ ج).",
     price: 140,
-    image_url: "/images/products/halawa-plain-solo.jpg",
+    image_url: "/images/products/chocolate-halawa-solo.jpg",
     stock: 20,
     category: "الحلاوة وزيت الزيتون",
     category_slug: "halawa-olive-oil",
