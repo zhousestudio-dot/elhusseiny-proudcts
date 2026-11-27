@@ -1,5 +1,5 @@
 ---
-// Wide Noon-style brand header with integrated search, language/theme toggles, and cart trigger
+// Balanced Header: Brand on Right, Search in Center, Controls & Cart on Left (RTL)
 interface Props {
   freeShippingThreshold?: number;
 }
@@ -7,70 +7,71 @@ const { freeShippingThreshold: _unused = 0 } = Astro.props;
 ---
 
 <header class="sticky top-0 z-40 border-b border-stone-200 dark:border-gray-800 bg-[#FAF9F5]/95 dark:bg-gray-950/95 backdrop-blur-md">
-  <div class="mx-auto flex h-16 sm:h-[70px] max-w-7xl items-center justify-between gap-3 sm:gap-5 px-3 sm:px-6">
-    <!-- Brand Logo (comfortable spacing, never cramped) -->
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:px-4">
+    <!-- Right (RTL start): Brand Logo -->
     <a
       href="/"
-      class="flex items-center gap-2.5 text-sm sm:text-xl font-bold text-gray-900 dark:text-white shrink-0"
+      class="flex items-center gap-2 text-sm sm:text-lg font-bold text-gray-900 dark:text-white shrink-0"
     >
       <img
         src="/images/products/product-11.jpg"
         alt="شعار منتجات الحسيني"
-        width="42"
-        height="42"
-        class="h-9 w-9 sm:h-11 sm:w-11 shrink-0 rounded-full object-cover border border-emerald-700/30 dark:border-emerald-700"
+        width="40"
+        height="40"
+        class="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full object-cover border border-emerald-700/30 dark:border-emerald-700"
       />
       <div class="leading-tight whitespace-nowrap">
         <span class="block">منتجات الحسيني</span>
-        <span class="hidden sm:block text-[11px] font-medium text-emerald-800 dark:text-emerald-400">طبيعي .. أصيل .. فاخر</span>
+        <span class="hidden sm:block text-[10px] font-medium text-emerald-800 dark:text-emerald-400">طبيعي .. أصيل .. فاخر</span>
       </div>
     </a>
 
-    <!-- Wide Noon-style Desktop Search Bar -->
-    <form action="/products" method="get" class="hidden md:flex flex-1 max-w-2xl">
-      <div class="relative w-full">
-        <input
-          type="search"
-          name="q"
-          placeholder="ابحث عن طحينة، عسل، زبدة فول سوداني..."
-          aria-label="ابحث في المتجر"
-          class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 pr-4 pl-10 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15"
-        />
-        <button
-          type="submit"
-          aria-label="بحث"
-          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-400"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
-        </button>
-      </div>
-    </form>
-
-    <!-- Navigation & Actions -->
-    <nav aria-label="التنقل الرئيسي" class="flex items-center gap-1.5 sm:gap-3.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 shrink-0">
-      <a href="/" class="hidden lg:inline-block hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors">
-        الرئيسية
-      </a>
-      <a href="/products" data-astro-prefetch class="px-1.5 py-1 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors">
-        المنتجات
-      </a>
-      <a href="/products?category=special-offers" data-astro-prefetch class="hidden lg:inline-block text-amber-700 dark:text-amber-400 font-semibold hover:underline">
-        العروض
-      </a>
-
-      <!-- Mobile Search Link -->
+    <!-- Center: Mobile Search Icon + Desktop Search & Nav -->
+    <div class="flex flex-1 items-center justify-center gap-4 px-1">
+      <!-- Mobile Center Search Button -->
       <a
         href="/products#product-search"
         aria-label="بحث عن منتج"
+        title="بحث"
         class="flex md:hidden h-9 w-9 items-center justify-center rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:border-emerald-700 transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
         </svg>
+      </a>
+
+      <!-- Desktop Search Bar -->
+      <form action="/products" method="get" class="hidden md:flex w-full max-w-md">
+        <div class="relative w-full">
+          <input
+            type="search"
+            name="q"
+            placeholder="ابحث عن طحينة، عسل، زبدة فول سوداني..."
+            aria-label="ابحث في المتجر"
+            class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 pr-4 pl-10 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15"
+          />
+          <button
+            type="submit"
+            aria-label="بحث"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-400"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Left (RTL end): Nav Links (Desktop) + Language + Theme + Cart -->
+    <nav aria-label="التنقل الرئيسي" class="flex items-center gap-1.5 sm:gap-2.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 shrink-0">
+      <a href="/products" data-astro-prefetch class="hidden md:inline-block px-2 py-1 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors">
+        المنتجات
+      </a>
+      <a href="/products?category=special-offers" data-astro-prefetch class="hidden lg:inline-block px-1 text-amber-700 dark:text-amber-400 font-semibold hover:underline">
+        العروض
       </a>
 
       <!-- Language Switcher (AR / EN, default AR) -->
@@ -106,7 +107,7 @@ const { freeShippingThreshold: _unused = 0 } = Astro.props;
         id="header-cart-trigger"
         href="/cart"
         aria-label="سلة التسوق"
-        class="flex items-center gap-1.5 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-gray-800 dark:text-gray-100 hover:border-emerald-700 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors"
+        class="flex items-center gap-1 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-800 dark:text-gray-100 hover:border-emerald-700 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
