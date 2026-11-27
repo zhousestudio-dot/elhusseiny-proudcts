@@ -74,6 +74,31 @@ const { freeShippingThreshold: _unused = 0 } = Astro.props;
         العروض
       </a>
 
+      <!-- Hidden Admin Button (revealed ONLY when /api/me verifies admin JWT) -->
+      <a
+        id="header-admin-link"
+        href="/admin"
+        aria-label="لوحة التحكم"
+        class="hidden items-center gap-1 rounded-xl bg-emerald-800 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-emerald-900 transition-colors"
+      >
+        <span>الإدارة</span>
+      </a>
+
+      <!-- Account / Orders Link -->
+      <a
+        id="header-account-link"
+        href="/account"
+        aria-label="حسابي وطلباتي"
+        title="حسابي وطلباتي"
+        class="flex h-9 items-center gap-1 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 sm:px-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:border-emerald-700 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0" aria-hidden="true">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span id="header-account-label" class="hidden sm:inline max-w-[72px] truncate">حسابي</span>
+      </a>
+
       <!-- Language Switcher (AR / EN, default AR) -->
       <button
         id="lang-toggle"
@@ -137,3 +162,35 @@ const { freeShippingThreshold: _unused = 0 } = Astro.props;
 </header>
 
 <script is:inline src="/scripts/theme-toggle.js" defer></script>
+<script>
+  import { createClient } from "@supabase/supabase-js";
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseAnonKey && !supabaseUrl.includes("your-project-id")) {
+    const sb = createClient(supabaseUrl, supabaseAnonKey);
+    sb.auth.getSession().then(async ({ data }) => {
+      const token = data.session?.access_token;
+      if (!token) return;
+      try {
+        const res = await fetch("/api/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const me = await res.json();
+        if (!me?.authenticated) return;
+        const label = document.getElementById("header-account-label");
+        if (label && me.name) {
+          label.textContent = String(me.name).split(" ")[0] || "حسابي";
+        }
+        if (me.isAdmin) {
+          const adminLink = document.getElementById("header-admin-link");
+          if (adminLink) {
+            adminLink.classList.remove("hidden");
+            adminLink.classList.add("flex");
+          }
+        }
+      } catch {}
+    });
+  }
+</script>

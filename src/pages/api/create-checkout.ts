@@ -195,6 +195,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     auth: { persistSession: false },
   });
 
+  let verifiedUserId: string | null = null;
+  const authHeader = request.headers.get("authorization") || "";
+  const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  if (bearerToken) {
+    try {
+      const { data: authData } = await supabase.auth.getUser(bearerToken);
+      if (authData?.user?.id) verifiedUserId = authData.user.id;
+    } catch {}
+  }
+
   const tenMinutesAgo = new Date(Date.now() - 10 * 60_000).toISOString();
   const { count: recentPhoneOrders } = await supabase
     .from("orders")
@@ -321,6 +331,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
+      user_id: verifiedUserId,
       customer_name: customerName,
       customer_phone: normalizedPhone,
       customer_email: customerEmail || null,
