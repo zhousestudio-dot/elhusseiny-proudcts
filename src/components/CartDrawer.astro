@@ -80,19 +80,28 @@
       <span>الإجمالي التقديري</span>
       <span id="drawer-total" class="text-lg text-emerald-800 dark:text-emerald-400">٠ ج.م.</span>
     </div>
-    <div class="grid grid-cols-2 gap-2.5">
+    <div class="space-y-2">
       <a
         href="/checkout"
-        class="rounded-xl bg-emerald-800 py-3 text-center text-sm font-bold text-white hover:bg-emerald-900 transition-colors"
+        class="block w-full rounded-xl bg-emerald-800 py-3 text-center text-sm font-bold text-white hover:bg-emerald-900 transition-colors"
       >
         إتمام الطلب
       </a>
-      <a
-        href="/cart"
-        class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 text-center text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-stone-50 dark:hover:bg-gray-700 transition-colors"
-      >
-        عرض السلة
-      </a>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button
+          id="drawer-continue-shopping"
+          type="button"
+          class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2.5 text-center text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-stone-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+        >
+          متابعة التسوق
+        </button>
+        <a
+          href="/cart"
+          class="rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2.5 text-center text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-stone-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          عرض السلة
+        </a>
+      </div>
     </div>
   </div>
 </aside>
@@ -213,6 +222,7 @@
   }
 
   closeBtn?.addEventListener("click", closeDrawer);
+  document.getElementById("drawer-continue-shopping")?.addEventListener("click", closeDrawer);
   backdrop?.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !drawer?.classList.contains("-translate-x-full")) {
