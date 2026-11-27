@@ -1096,37 +1096,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                   <strong>العميل:</strong>
                   <span>${escapeHtml(o.customer_name)}</span>
                   <span>—</span>
-                  <span class="relative inline-block">
-                    <button
-                      type="button"
-                      data-phone-menu-toggle="${escapeHtml(o.id)}"
-                      dir="ltr"
-                      class="underline font-bold text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-emerald-200 cursor-pointer"
-                    >
-                      ${escapeHtml(o.customer_phone)}
-                    </button>
-                    <span
-                      data-phone-menu="${escapeHtml(o.id)}"
-                      class="hidden absolute right-0 top-full mt-1.5 z-20 min-w-[140px] rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-950 p-1.5 shadow-lg space-y-1"
-                    >
-                      <a
-                        href="https://wa.me/${waPhone}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/60"
-                      >
-                        <span>واتساب</span>
-                        <span aria-hidden="true">↗</span>
-                      </a>
-                      <a
-                        href="tel:${escapeHtml(telHref)}"
-                        class="flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-bold text-gray-800 dark:text-gray-200 hover:bg-stone-100 dark:hover:bg-gray-800"
-                      >
-                        <span>اتصال</span>
-                        <span aria-hidden="true">📞</span>
-                      </a>
-                    </span>
-                  </span>
+                  <a
+                    href="tel:${escapeHtml(telHref)}"
+                    dir="ltr"
+                    class="underline font-bold text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-emerald-200"
+                  >
+                    ${escapeHtml(o.customer_phone)}
+                  </a>
                 </p>
                 <p><strong>العنوان:</strong> ${escapeHtml(o.city)}، ${escapeHtml(o.shipping_address)}</p>
                 <p><strong>طريقة الدفع:</strong> ${escapeHtml(methodLabel)}${o.payment_reference ? ` — <span dir="ltr" class="font-bold text-red-700 dark:text-red-400">محوّل من: ${escapeHtml(o.payment_reference)}</span>` : ""}</p>
@@ -1591,22 +1567,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     document.getElementById("btn-cancel-edit")?.addEventListener("click", resetFormUI);
 
-    // Confirm payment button (Vodafone Cash / COD) + customer phone menu toggle
+    // Confirm payment button (Vodafone Cash / COD)
     ordersList?.addEventListener("click", async (e) => {
       const target = e.target as HTMLElement | null;
-      const phoneToggleId = target?.closest<HTMLElement>("[data-phone-menu-toggle]")?.dataset.phoneMenuToggle;
-      if (phoneToggleId) {
-        e.stopPropagation();
-        document.querySelectorAll<HTMLElement>("[data-phone-menu]").forEach((menu) => {
-          if (menu.dataset.phoneMenu === phoneToggleId) {
-            menu.classList.toggle("hidden");
-          } else {
-            menu.classList.add("hidden");
-          }
-        });
-        return;
-      }
-
       const confirmId = target?.closest<HTMLElement>("[data-confirm-pay]")?.dataset.confirmPay;
       if (!confirmId) return;
       if (!confirm("هل تأكدت من استلام المبلغ؟ سيتم تأكيد الطلب.")) return;
@@ -1617,12 +1580,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       } catch (err: any) {
         showToast(err.message || "فشل تأكيد الدفع.", true);
       }
-    });
-
-    document.addEventListener("click", () => {
-      document.querySelectorAll<HTMLElement>("[data-phone-menu]").forEach((menu) => {
-        menu.classList.add("hidden");
-      });
     });
 
     // Change order status
