@@ -25,6 +25,7 @@ interface RawProductRow {
   image_url: string | null;
   stock: number;
   is_active: boolean;
+  weight_options?: Array<{ label?: string; price?: number | string }> | null;
   categories: { name: string; slug: string } | { name: string; slug: string }[] | null;
 }
 
@@ -67,7 +68,7 @@ export async function getActiveProducts(): Promise<Product[]> {
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, slug, description, price, compare_at_price, image_url, stock, is_active, categories(name, slug)")
+    .select("id, name, slug, description, price, compare_at_price, image_url, stock, is_active, weight_options, categories(name, slug)")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
@@ -85,6 +86,11 @@ function withCacheBust(url: string): string {
 
   return (data as RawProductRow[]).map((row) => {
     const cat = Array.isArray(row.categories) ? row.categories[0] : row.categories;
+    const weights = Array.isArray(row.weight_options)
+      ? row.weight_options
+          .filter((w) => w && typeof w.label === "string" && Number(w.price) > 0)
+          .map((w) => ({ label: String(w.label), price: Number(w.price) }))
+      : null;
     return {
       id: row.id,
       name: row.name,
@@ -97,6 +103,7 @@ function withCacheBust(url: string): string {
       category: cat?.name ?? "منتجات عامة",
       category_slug: cat?.slug ?? "",
       is_active: row.is_active,
+      weight_options: weights && weights.length > 0 ? weights : null,
     };
   });
 }

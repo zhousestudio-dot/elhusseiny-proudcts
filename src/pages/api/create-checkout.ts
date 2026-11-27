@@ -165,24 +165,29 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const rawItems = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
-  const qtyById = new Map<string, number>();
-  const qtyBySlug = new Map<string, number>();
+  const requestedLines: Array<{ id: string; slug: string; variantLabel: string; quantity: number }> = [];
+  const uniqueIds = new Set<string>();
+  const uniqueSlugs = new Set<string>();
 
   for (const item of rawItems) {
     const qty = Math.floor(Number(item?.quantity));
     if (!Number.isFinite(qty) || qty <= 0 || qty > 100) continue;
 
-    const id = typeof item?.productId === "string" ? item.productId.trim() : "";
+    const rawId = typeof item?.productId === "string" ? item.productId.trim() : "";
+    const [baseId, variantFromId] = rawId.split("::");
     const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
+    const variantLabel = (variantFromId || "").trim();
 
-    if (id && UUID_RE.test(id)) {
-      qtyById.set(id, (qtyById.get(id) ?? 0) + qty);
+    if (baseId && UUID_RE.test(baseId)) {
+      uniqueIds.add(baseId);
+      requestedLines.push({ id: baseId, slug, variantLabel, quantity: qty });
     } else if (slug) {
-      qtyBySlug.set(slug, (qtyBySlug.get(slug) ?? 0) + qty);
+      uniqueSlugs.add(slug);
+      requestedLines.push({ id: "", slug, variantLabel, quantity: qty });
     }
   }
 
-  if (qtyById.size === 0 && qtyBySlug.size === 0) {
+  if (requestedLines.length === 0) {
     return Response.json({ error: "سلة التسوق فارغة." }, { status: 400 });
   }
 
@@ -213,16 +218,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     price: number | string;
     stock: number;
     is_active: boolean;
+    weight_options?: Array<{ label?: string; price?: number | string }> | null;
   };
 
   const fetchedById = new Map<string, DbProduct>();
-  const requestedQtyByDbId = new Map<string, number>();
+  const fetchedBySlug = new Map<string, DbProduct>();
 
-  if (qtyById.size > 0) {
+  if (uniqueIds.size > 0) {
     const { data, error } = await supabase
       .from("products")
-      .select("id, slug, name, description, price, stock, is_active")
-      .in("id", Array.from(qtyById.keys()))
+      .select("id, slug, name, description, price, stock, is_active, weight_options")
+      .in("id", Array.from(uniqueIds))
       .eq("is_active", true);
 
     if (error) {
@@ -231,16 +237,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     } else if (data) {
       for (const p of data as DbProduct[]) {
         fetchedById.set(p.id, p);
-        requestedQtyByDbId.set(p.id, (requestedQtyByDbId.get(p.id) ?? 0) + (qtyById.get(p.id) ?? 0));
+        fetchedBySlug.set(p.slug, p);
       }
     }
   }
 
-  if (qtyBySlug.size > 0) {
+  if (uniqueSlugs.size > 0) {
     const { data, error } = await supabase
       .from("products")
-      .select("id, slug, name, description, price, stock, is_active")
-      .in("slug", Array.from(qtyBySlug.keys()))
+      .select("id, slug, name, description, price, stock, is_active, weight_options")
+      .in("slug", Array.from(uniqueSlugs))
       .eq("is_active", true);
 
     if (error) {
@@ -249,13 +255,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     } else if (data) {
       for (const p of data as DbProduct[]) {
         fetchedById.set(p.id, p);
-        requestedQtyByDbId.set(p.id, (requestedQtyByDbId.get(p.id) ?? 0) + (qtyBySlug.get(p.slug) ?? 0));
+        fetchedBySlug.set(p.slug, p);
       }
     }
   }
 
-  const products = Array.from(fetchedById.values());
-  if (products.length === 0) {
+  if (fetchedById.size === 0) {
     return Response.json(
       { error: "المنتجات غير موجودة في قاعدة البيانات (تأكد من تشغيل seed.sql في Supabase)." },
       { status: 400 }
@@ -271,9 +276,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }> = [];
   let totalEGP = 0;
 
-  for (const product of products) {
-    const qty = requestedQtyByDbId.get(product.id) ?? 0;
-    if (qty <= 0) continue;
+  for (const line of requestedLines) {
+    const product = (line.id ? fetchedById.get(line.id) : undefined) || (line.slug ? fetchedBySlug.get(line.slug) : undefined);
+    if (!product) continue;
 
     if (product.stock <= 0) {
       return Response.json(
@@ -282,14 +287,24 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       );
     }
 
-    const unitPrice = Number(product.price);
-    totalEGP += unitPrice * qty;
+    let unitPrice = Number(product.price);
+    let itemName = product.name;
+    if (line.variantLabel && Array.isArray(product.weight_options)) {
+      const matched = product.weight_options.find((w) => w && w.label === line.variantLabel && Number(w.price) > 0);
+      if (matched) {
+        unitPrice = Number(matched.price);
+        const cleanBase = product.name.replace(/\s*\(١ كيلو\)\s*$/, "");
+        itemName = `${cleanBase} (${line.variantLabel})`;
+      }
+    }
+
+    totalEGP += unitPrice * line.quantity;
     verifiedItems.push({
       product_id: product.id,
-      product_name: product.name,
-      description: (product.description || product.name).slice(0, 200),
+      product_name: itemName,
+      description: (product.description || itemName).slice(0, 200),
       unit_price: unitPrice,
-      quantity: qty,
+      quantity: line.quantity,
     });
   }
 

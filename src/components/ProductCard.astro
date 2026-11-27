@@ -10,6 +10,12 @@ const { product } = Astro.props;
 const inStock = product.stock > 0;
 const isOffer = product.category_slug === "special-offers";
 const comparePrice = product.compare_at_price && product.compare_at_price > product.price ? product.compare_at_price : null;
+const weights = !isOffer && Array.isArray(product.weight_options) && product.weight_options.length > 0 ? product.weight_options : null;
+const defaultWeight = weights ? weights[0] : null;
+const cleanBaseName = product.name.replace(/\s*\(١ كيلو\)\s*$/, "");
+const initialCartId = defaultWeight ? `${product.id}::${defaultWeight.label}` : product.id;
+const initialCartName = defaultWeight ? `${cleanBaseName} (${defaultWeight.label})` : product.name;
+const initialPrice = defaultWeight ? defaultWeight.price : product.price;
 const searchText = `${product.name} ${product.description} ${product.category}`.toLowerCase();
 ---
 
@@ -17,9 +23,11 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
   data-product-card
   data-category-slug={product.category_slug}
   data-search-text={searchText}
-  data-price={product.price}
+  data-price={initialPrice}
   data-name={product.name}
   data-stock={product.stock}
+  data-base-id={product.id}
+  data-base-name={cleanBaseName}
   class="group flex flex-col"
 >
   <a
@@ -59,10 +67,30 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
     </a>
 
     <div class="mt-auto pt-1.5 space-y-2.5">
+      {weights && (
+        <div class="flex flex-wrap gap-1" role="group" aria-label="اختر الوزن">
+          {weights.map((w, idx) => (
+            <button
+              type="button"
+              data-card-weight
+              data-weight-label={w.label}
+              data-weight-price={w.price}
+              class={
+                idx === 0
+                  ? "rounded-full bg-emerald-800 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-white transition-colors cursor-pointer"
+                  : "rounded-full border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:border-emerald-700 transition-colors cursor-pointer"
+              }
+            >
+              {w.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <div class="flex flex-wrap items-baseline gap-1.5">
-          <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
-            {formatPriceEGP(product.price)}
+          <span data-card-price class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
+            {formatPriceEGP(initialPrice)}
           </span>
           {comparePrice && (
             <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400">
@@ -84,10 +112,10 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
         type="button"
         disabled={!inStock}
         data-add-to-cart
-        data-product-id={product.id}
+        data-product-id={initialCartId}
         data-product-slug={product.slug}
-        data-product-name={product.name}
-        data-product-price={product.price}
+        data-product-name={initialCartName}
+        data-product-price={initialPrice}
         data-product-image={product.image_url}
         class="w-full rounded-full bg-emerald-800 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-900 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors cursor-pointer"
       >

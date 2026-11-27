@@ -295,6 +295,28 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             </div>
           </div>
 
+          <!-- Weight Options (for non-offer products) -->
+          <div id="weight-options-box" class="rounded-xl border border-stone-200 dark:border-gray-800 bg-stone-50/70 dark:bg-gray-950/60 p-4 space-y-3">
+            <div>
+              <p class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">أوزان المنتج المتاحة وأسعارها (اختياري)</p>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">اترك أي وزن فارغاً إذا لم يكن متوفراً لهذا المنتج.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label for="prod-weight-1kg" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">سعر ١ كيلو (ج.م.)</label>
+                <input id="prod-weight-1kg" type="number" min="0" step="1" placeholder="مثال: 150" class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none" />
+              </div>
+              <div>
+                <label for="prod-weight-half" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">سعر نصف كيلو (ج.م.)</label>
+                <input id="prod-weight-half" type="number" min="0" step="1" placeholder="مثال: 75" class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none" />
+              </div>
+              <div>
+                <label for="prod-weight-quarter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">سعر ربع كيلو (ج.م.)</label>
+                <input id="prod-weight-quarter" type="number" min="0" step="1" placeholder="مثال: 40" class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none" />
+              </div>
+            </div>
+          </div>
+
           <!-- Step 4: Description -->
           <div>
             <label for="prod-desc" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
@@ -695,6 +717,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const offerRadios = document.querySelectorAll<HTMLInputElement>('input[name="is-offer"]');
     const offerHint = document.getElementById("offer-hint");
     const comparePriceBox = document.getElementById("compare-price-box");
+    const weightOptionsBox = document.getElementById("weight-options-box");
+    const weight1kgInput = document.getElementById("prod-weight-1kg") as HTMLInputElement | null;
+    const weightHalfInput = document.getElementById("prod-weight-half") as HTMLInputElement | null;
+    const weightQuarterInput = document.getElementById("prod-weight-quarter") as HTMLInputElement | null;
     const comparePriceInput = document.getElementById("prod-compare-price") as HTMLInputElement | null;
     const priceInput = document.getElementById("prod-price") as HTMLInputElement | null;
     const discountPreview = document.getElementById("discount-preview");
@@ -790,6 +816,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         const isOffer = radio.value === "yes" && radio.checked;
         offerHint?.classList.toggle("hidden", !isOffer);
         comparePriceBox?.classList.toggle("hidden", !isOffer);
+        weightOptionsBox?.classList.toggle("hidden", isOffer);
         if (isOffer && specialOffersCategoryId && categorySelect) {
           categorySelect.value = specialOffersCategoryId;
         }
@@ -1416,6 +1443,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       fileNameLabel?.classList.add("hidden");
       offerHint?.classList.add("hidden");
       comparePriceBox?.classList.add("hidden");
+      weightOptionsBox?.classList.remove("hidden");
+      if (weight1kgInput) weight1kgInput.value = "";
+      if (weightHalfInput) weightHalfInput.value = "";
+      if (weightQuarterInput) weightQuarterInput.value = "";
       if (discountPreview) discountPreview.textContent = "";
       document.getElementById("btn-cancel-edit")?.classList.add("hidden");
       const titleEl = document.getElementById("product-form-title");
@@ -1456,6 +1487,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           ? specialOffersCategoryId
           : (categorySelect?.value || null);
 
+        const weightOptions: Array<{ label: string; price: number }> = [];
+        if (!isOfferChecked) {
+          const w1 = Number(weight1kgInput?.value || 0);
+          const wHalf = Number(weightHalfInput?.value || 0);
+          const wQuarter = Number(weightQuarterInput?.value || 0);
+          if (w1 > 0) weightOptions.push({ label: "١ كيلو", price: w1 });
+          if (wHalf > 0) weightOptions.push({ label: "نصف كيلو", price: wHalf });
+          if (wQuarter > 0) weightOptions.push({ label: "ربع كيلو", price: wQuarter });
+        }
+
         await apiFetch("POST", {
           action: "save_product",
           id: (document.getElementById("prod-id") as HTMLInputElement).value || null,
@@ -1468,6 +1509,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           description: (document.getElementById("prod-desc") as HTMLTextAreaElement).value,
           image_url: imageUrl || "/images/products/product-03.jpg",
           is_active: (document.getElementById("prod-active") as HTMLInputElement).checked,
+          weight_options: weightOptions.length > 0 ? weightOptions : null,
         });
 
         resetFormUI();
@@ -1522,7 +1564,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         if (radioToCheck) radioToCheck.checked = true;
         offerHint?.classList.toggle("hidden", !isOffer);
         comparePriceBox?.classList.toggle("hidden", !isOffer);
+        weightOptionsBox?.classList.toggle("hidden", isOffer);
         if (comparePriceInput) comparePriceInput.value = p.compare_at_price ? String(p.compare_at_price) : "";
+        const wList = Array.isArray(p.weight_options) ? p.weight_options : [];
+        const findW = (lbl: string) => wList.find((w: any) => w && w.label === lbl)?.price;
+        if (weight1kgInput) weight1kgInput.value = findW("١ كيلو") ? String(findW("١ كيلو")) : "";
+        if (weightHalfInput) weightHalfInput.value = findW("نصف كيلو") ? String(findW("نصف كيلو")) : "";
+        if (weightQuarterInput) weightQuarterInput.value = findW("ربع كيلو") ? String(findW("ربع كيلو")) : "";
         updateDiscountPreview();
 
         document.getElementById("btn-cancel-edit")?.classList.remove("hidden");

@@ -90,7 +90,7 @@ export const GET: APIRoute = async ({ request }) => {
   const [productsRes, categoriesRes, ordersRes, settingsRes, statsRes, dbSizeRes] = await Promise.all([
     supabase
       .from("products")
-      .select("id, name, slug, description, price, compare_at_price, image_url, stock, category_id, is_active, created_at")
+      .select("id, name, slug, description, price, compare_at_price, image_url, stock, category_id, is_active, weight_options, created_at")
       .order("created_at", { ascending: false }),
     supabase
       .from("categories")
@@ -223,6 +223,23 @@ export const POST: APIRoute = async ({ request }) => {
         ? imageUrlRaw
         : null;
     const isActive = body.is_active !== false;
+    const rawWeights = Array.isArray(body.weight_options) ? body.weight_options : null;
+    const weightOptions = rawWeights
+      ? rawWeights
+          .filter(
+            (w: any) =>
+              w &&
+              typeof w.label === "string" &&
+              w.label.trim().length > 0 &&
+              Number.isFinite(Number(w.price)) &&
+              Number(w.price) > 0 &&
+              Number(w.price) <= 100000
+          )
+          .map((w: any) => ({
+            label: String(w.label).trim().slice(0, 40),
+            price: Math.round(Number(w.price)),
+          }))
+      : null;
 
     if (!name || name.length > 150 || description.length > 2000 || !Number.isFinite(price) || price < 0 || price > 100000) {
       return Response.json({ error: "بيانات المنتج غير صالحة." }, { status: 400 });
@@ -238,6 +255,7 @@ export const POST: APIRoute = async ({ request }) => {
       category_id: categoryId,
       image_url: imageUrl,
       is_active: isActive,
+      weight_options: weightOptions && weightOptions.length > 0 ? weightOptions : null,
     };
 
     if (id) {

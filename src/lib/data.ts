@@ -7,6 +7,11 @@ export interface Category {
   image_url?: string | null;
 }
 
+export interface WeightOption {
+  label: string;
+  price: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -19,6 +24,7 @@ export interface Product {
   category: string;
   category_slug: string;
   is_active: boolean;
+  weight_options?: WeightOption[] | null;
 }
 
 // Real categories from Elhusseiny Products menu

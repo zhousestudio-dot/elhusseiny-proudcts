@@ -4,6 +4,7 @@
 
 <script>
   import { addToCart, syncCartBadge } from "../lib/cart";
+  import { formatPriceEGP } from "../lib/format";
 
   syncCartBadge();
 
@@ -67,7 +68,37 @@
   }
 
   document.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement | null;
+    let target = event.target as HTMLElement | null;
+    if (target && target.nodeType === 3) target = target.parentElement;
+
+    const weightBtn = target?.closest<HTMLButtonElement>("[data-card-weight]");
+    if (weightBtn) {
+      const card = weightBtn.closest<HTMLElement>("[data-product-card]");
+      if (!card) return;
+      const label = weightBtn.dataset.weightLabel || "";
+      const price = Number(weightBtn.dataset.weightPrice || 0);
+      const baseId = card.dataset.baseId || "";
+      const baseName = card.dataset.baseName || "";
+
+      card.querySelectorAll<HTMLButtonElement>("[data-card-weight]").forEach((b) => {
+        b.className =
+          b === weightBtn
+            ? "rounded-full bg-emerald-800 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-white transition-colors cursor-pointer"
+            : "rounded-full border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:border-emerald-700 transition-colors cursor-pointer";
+      });
+
+      const priceEl = card.querySelector("[data-card-price]");
+      if (priceEl && price > 0) priceEl.textContent = formatPriceEGP(price);
+
+      const addBtn = card.querySelector<HTMLButtonElement>("[data-add-to-cart]");
+      if (addBtn && price > 0) {
+        addBtn.dataset.productId = label ? `${baseId}::${label}` : baseId;
+        addBtn.dataset.productName = label ? `${baseName} (${label})` : baseName;
+        addBtn.dataset.productPrice = String(price);
+      }
+      return;
+    }
+
     const btn = target?.closest<HTMLButtonElement>("[data-add-to-cart]");
     if (!btn || btn.disabled) return;
 
