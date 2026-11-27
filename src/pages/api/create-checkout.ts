@@ -151,8 +151,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (city.length < 2 || city.length > 60) {
     return Response.json({ error: "يرجى اختيار المحافظة / المدينة." }, { status: 400 });
   }
-  if (shippingAddress.length < 5 || shippingAddress.length > 300) {
-    return Response.json({ error: "يرجى إدخال عنوان توصيل صحيح (أقل من ٣٠٠ حرف)." }, { status: 400 });
+  if (!shippingAddress || shippingAddress.length > 300) {
+    return Response.json({ error: "يرجى إدخال عنوان التوصيل." }, { status: 400 });
   }
   if (customerEmail && (customerEmail.length > 150 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail))) {
     return Response.json({ error: "البريد الإلكتروني غير صحيح." }, { status: 400 });

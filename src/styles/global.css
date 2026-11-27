@@ -8,6 +8,11 @@
 /* Base styles optimized for Arabic RTL readability and tactile warmth */
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
@@ -22,20 +27,28 @@ body {
   contain-intrinsic-size: auto 480px;
 }
 
-/* Fix mobile Chrome/Safari autofill turning text invisible */
+/* Fix mobile Chrome/Safari autofill turning text invisible or dark */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
-textarea:-webkit-autofill {
-  -webkit-text-fill-color: #111827;
-  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #111827 !important;
+  color: #111827 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
 .dark input:-webkit-autofill,
 .dark input:-webkit-autofill:hover,
 .dark input:-webkit-autofill:focus,
-.dark textarea:-webkit-autofill {
-  -webkit-text-fill-color: #f9fafb;
-  -webkit-box-shadow: 0 0 0px 1000px #030712 inset;
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill {
+  -webkit-text-fill-color: #f9fafb !important;
+  color: #f9fafb !important;
+  -webkit-box-shadow: 0 0 0px 1000px #030712 inset !important;
 }

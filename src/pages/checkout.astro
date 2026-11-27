@@ -82,6 +82,7 @@ const EGYPT_GOVERNORATES = [
       <form
         id="checkout-form"
         novalidate
+        spellcheck="false"
         class="lg:col-span-3 space-y-5 rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
       >
         <h2 class="text-lg font-bold text-gray-900 dark:text-white border-b border-stone-100 dark:border-gray-800 pb-3">
@@ -180,8 +181,8 @@ const EGYPT_GOVERNORATES = [
             id="shippingAddress"
             name="shippingAddress"
             required
-            minlength="5"
             rows="3"
+            spellcheck="false"
             placeholder="اسم الشارع، رقم العقار، الدور، الشقة، وأقرب علامة مميزة"
             class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20"
           ></textarea>
@@ -443,8 +444,8 @@ const EGYPT_GOVERNORATES = [
       const selectedMethod = String(formData.get("paymentMethod") || "vodafone_cash");
       const walletSenderPhone = String(formData.get("walletSenderPhone") || "").trim();
 
-      if (customerName.length < 2) {
-        flagFieldError("customerName", "يرجى كتابة الاسم بالكامل (حرفين على الأقل).");
+      if (customerName.length < 1) {
+        flagFieldError("customerName", "يرجى كتابة الاسم بالكامل.");
         return;
       }
       if (!isValidPhone(customerPhone)) {
@@ -459,8 +460,8 @@ const EGYPT_GOVERNORATES = [
         flagFieldError("city", "يرجى اختيار المحافظة / المدينة.");
         return;
       }
-      if (shippingAddress.length < 5) {
-        flagFieldError("shippingAddress", "يرجى كتابة العنوان بالتفصيل (اسم الشارع ورقم العقار).");
+      if (!shippingAddress) {
+        flagFieldError("shippingAddress", "يرجى كتابة العنوان بالتفصيل.");
         return;
       }
       if (selectedMethod === "vodafone_cash" && !isValidEgyptWallet(walletSenderPhone)) {
