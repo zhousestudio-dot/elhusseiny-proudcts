@@ -192,7 +192,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
           <!-- Step 2: Is this an Offer? -->
           <div class="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/70 dark:bg-amber-950/20 p-4">
-            <p class="text-sm font-bold text-gray-900 dark:text-white mb-2.5">هل هذا المنتج عرض توفير؟</p>
+            <p class="text-sm font-bold text-gray-900 dark:text-white mb-2.5">هل هذا المنتج عرض التوفير؟</p>
             <div class="grid grid-cols-2 gap-3">
               <label class="flex items-center gap-2.5 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 cursor-pointer">
                 <input type="radio" name="is-offer" value="no" checked class="text-emerald-700 focus:ring-emerald-700" />
@@ -200,7 +200,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               </label>
               <label class="flex items-center gap-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-white dark:bg-gray-900 p-3 cursor-pointer">
                 <input type="radio" name="is-offer" value="yes" class="text-amber-600 focus:ring-amber-600" />
-                <span class="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300">نعم، عرض توفير</span>
+                <span class="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300">نعم، عرض التوفير</span>
               </label>
             </div>
             <p id="offer-hint" class="hidden mt-2 text-xs font-medium text-amber-800 dark:text-amber-300">
@@ -798,7 +798,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5">
                   <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(p.name)}</h4>
-                  ${isOffer ? `<span class="shrink-0 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-emerald-950">عرض توفير</span>` : ""}
+                  ${isOffer ? `<span class="shrink-0 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-emerald-950">عرض التوفير</span>` : ""}
                 </div>
                 <p class="text-xs text-emerald-800 dark:text-emerald-400 font-bold mt-0.5">
                   ${formatPriceEGP(Number(p.price))}
