@@ -1017,9 +1017,29 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             ? "إعادة تفعيل الطلب وتأكيد الدفع ✓"
             : "تأكيد استلام الدفع ✓";
 
+          const orderTotal = Number(o.total || 0);
+          const itemsSubtotal = Array.isArray(o.order_items)
+            ? o.order_items.reduce((sum: number, it: any) => sum + Number(it.unit_price || 0) * Number(it.quantity || 0), 0)
+            : 0;
+          const shippingFee = Math.max(0, orderTotal - itemsSubtotal);
+
           const itemsHtml = Array.isArray(o.order_items) && o.order_items.length
-            ? `<div class="rounded-xl bg-stone-50 dark:bg-gray-950 border border-stone-100 dark:border-gray-800 p-3 space-y-1 text-xs">
+            ? `<div class="rounded-xl bg-stone-50 dark:bg-gray-950 border border-stone-100 dark:border-gray-800 p-3 space-y-1.5 text-xs">
                 ${o.order_items.map((it: any) => `<div class="flex justify-between"><span>${escapeHtml(it.product_name)} × ${it.quantity}</span><span class="font-semibold">${formatPriceEGP(Number(it.unit_price) * Number(it.quantity))}</span></div>`).join("")}
+                <div class="border-t border-stone-200 dark:border-gray-800 pt-1.5 mt-1.5 space-y-1 text-[11px] sm:text-xs">
+                  <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                    <span>المنتجات</span>
+                    <span class="font-semibold">${formatPriceEGP(itemsSubtotal)}</span>
+                  </div>
+                  <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                    <span>الشحن</span>
+                    <span class="font-semibold ${shippingFee > 0 ? "text-amber-700 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-400"}">${shippingFee > 0 ? formatPriceEGP(shippingFee) : "مجاني"}</span>
+                  </div>
+                  <div class="flex justify-between font-bold text-gray-900 dark:text-white pt-0.5">
+                    <span>الإجمالي</span>
+                    <span class="text-emerald-800 dark:text-emerald-400">${formatPriceEGP(orderTotal)}</span>
+                  </div>
+                </div>
               </div>`
             : "";
 
