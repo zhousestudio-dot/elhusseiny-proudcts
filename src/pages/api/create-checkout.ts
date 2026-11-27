@@ -20,10 +20,14 @@ interface CheckoutBody {
   items?: CheckoutItemInput[];
 }
 
-function normalizeEgyptPhone(raw: string): string | null {
+function normalizePhone(raw: string): string | null {
   const cleaned = raw.replace(/[\s\-()]/g, "");
-  const match = cleaned.match(/^(?:\+?20|0)?(1[0125][0-9]{8})$/);
-  return match ? `+20${match[1]}` : null;
+  // If local Egyptian 11-digit mobile starting with 01, normalize to +20
+  const egMatch = cleaned.match(/^(?:\+?20|0)?(1[0125][0-9]{8})$/);
+  if (egMatch) return `+20${egMatch[1]}`;
+  // Otherwise accept any valid international phone (7 to 15 digits, optional leading +)
+  const intlMatch = cleaned.match(/^\+?([0-9]{7,15})$/);
+  return intlMatch ? `+${intlMatch[1]}` : null;
 }
 
 function splitName(fullName: string): { firstName: string; lastName: string } {
@@ -96,7 +100,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   const customerName = (body.customerName || "").trim();
-  const normalizedPhone = normalizeEgyptPhone(body.customerPhone || "");
+  const normalizedPhone = normalizePhone(body.customerPhone || "");
   const customerEmail = (body.customerEmail || "").trim();
   const shippingAddress = (body.shippingAddress || "").trim();
   const city = (body.city || "").trim();
@@ -105,7 +109,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       ? body.paymentMethod
       : "paymob";
   const walletSenderPhone =
-    paymentMethod === "vodafone_cash" ? normalizeEgyptPhone(body.walletSenderPhone || "") : null;
+    paymentMethod === "vodafone_cash" ? normalizePhone(body.walletSenderPhone || "") : null;
 
   if (paymentMethod === "vodafone_cash" && !walletSenderPhone) {
     return Response.json(
@@ -136,7 +140,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
   if (!normalizedPhone) {
     return Response.json(
-      { error: "يرجى إدخال رقم موبايل مصري صحيح (مثال: 01012345678)." },
+      { error: "يرجى إدخال رقم موبايل صحيح." },
       { status: 400 }
     );
   }
