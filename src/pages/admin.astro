@@ -80,18 +80,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
 
       <!-- Quick Summary Cards -->
-      <div class="grid grid-cols-3 gap-3 sm:gap-4">
-        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+      <div class="grid grid-cols-3 gap-2 sm:gap-4">
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
           <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">المنتجات المعروضة</p>
-          <p id="stat-products" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">0</p>
+          <p id="stat-products" class="text-base sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">0</p>
         </div>
-        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
           <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">الطلبات المدفوعة</p>
-          <p id="stat-paid-orders" class="text-xl sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1">0</p>
+          <p id="stat-paid-orders" class="text-base sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1">0</p>
         </div>
-        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
           <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">إجمالي المبيعات</p>
-          <p id="stat-revenue" class="text-lg sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">٠ ج.م.</p>
+          <p id="stat-revenue" class="text-sm sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1 truncate">٠ ج.م.</p>
         </div>
       </div>
 
@@ -102,21 +102,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <button
           type="button"
           data-tab="products"
-          class="tab-btn rounded-xl bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white cursor-pointer"
+          class="tab-btn rounded-xl bg-emerald-800 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white cursor-pointer"
         >
           المنتجات والعروض
         </button>
         <button
           type="button"
           data-tab="orders"
-          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
+          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
         >
           طلبات العملاء
         </button>
         <button
           type="button"
           data-tab="settings"
-          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
+          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
         >
           إعدادات المتجر
         </button>
@@ -193,7 +193,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               </label>
               <label class="flex items-center gap-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-white dark:bg-gray-900 p-3 cursor-pointer">
                 <input type="radio" name="is-offer" value="yes" class="text-amber-600 focus:ring-amber-600" />
-                <span class="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300">نعم، ده عرض توفير 🔥</span>
+                <span class="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300">نعم، عرض توفير</span>
               </label>
             </div>
             <p id="offer-hint" class="hidden mt-2 text-xs font-medium text-amber-800 dark:text-amber-300">
@@ -644,7 +644,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       productsList.innerHTML = filtered
         .map((p) => {
-          const isOffer = p.category_id && p.category_id === specialOffersCategoryId;
+          const isOffer = (p.category_id && p.category_id === specialOffersCategoryId) || (p.compare_at_price && Number(p.compare_at_price) > Number(p.price));
+          const isAvailable = Number(p.stock) > 0;
           return `
           <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col justify-between gap-3">
             <div class="flex gap-3 items-center">
@@ -652,18 +653,26 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5">
                   <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(p.name)}</h4>
-                  ${isOffer ? `<span class="shrink-0 rounded bg-amber-100 dark:bg-amber-950 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">عرض</span>` : ""}
+                  ${isOffer ? `<span class="shrink-0 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-emerald-950">عرض توفير</span>` : ""}
                 </div>
                 <p class="text-xs text-emerald-800 dark:text-emerald-400 font-bold mt-0.5">
                   ${formatPriceEGP(Number(p.price))}
                   ${p.compare_at_price && Number(p.compare_at_price) > Number(p.price) ? `<span class="text-gray-400 font-normal mr-1">بدلاً من <del>${formatPriceEGP(Number(p.compare_at_price))}</del></span>` : ""}
                 </p>
-                <p class="text-[11px] text-gray-500 dark:text-gray-400">${Number(p.stock) > 0 ? "متوفر" : "غير متوفر"} | ${p.is_active ? "ظاهر للعملاء" : "مخفي"}</p>
+                <div class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="inline-flex items-center gap-1 font-bold ${isAvailable ? "text-emerald-700 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}">
+                    <span class="h-1.5 w-1.5 rounded-full ${isAvailable ? "bg-emerald-600" : "bg-red-600"}"></span>
+                    <span>${isAvailable ? "متوفر" : "غير متوفر"}</span>
+                  </span>
+                  <span class="text-gray-300 dark:text-gray-700">|</span>
+                  <span class="text-gray-500 dark:text-gray-400">${p.is_active ? "ظاهر للعملاء" : "مخفي"}</span>
+                </div>
               </div>
             </div>
             <div class="flex gap-2 pt-2 border-t border-stone-100 dark:border-gray-800">
+              <button type="button" data-toggle-stock="${escapeHtml(p.id)}" data-next-stock="${isAvailable ? "0" : "999"}" class="flex-1 rounded-lg border ${isAvailable ? "border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/30" : "border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"} py-1.5 text-xs font-semibold cursor-pointer">${isAvailable ? "جعله غير متوفر" : "جعله متوفر"}</button>
               <button type="button" data-edit-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-stone-300 dark:border-gray-700 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-gray-800 cursor-pointer">تعديل</button>
-              <button type="button" data-del-prod="${escapeHtml(p.id)}" class="flex-1 rounded-lg border border-red-200 dark:border-red-900/50 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer">حذف</button>
+              <button type="button" data-del-prod="${escapeHtml(p.id)}" class="rounded-lg border border-red-200 dark:border-red-900/50 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer">حذف</button>
             </div>
           </div>
         `;
@@ -854,8 +863,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         document.querySelectorAll<HTMLButtonElement>(".tab-btn").forEach((b) => {
           b.className =
             b.dataset.tab === tab
-              ? "tab-btn rounded-xl bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white cursor-pointer"
-              : "tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer";
+              ? "tab-btn rounded-xl bg-emerald-800 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white cursor-pointer"
+              : "tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer";
         });
       });
     });
@@ -964,11 +973,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     });
 
-    // Edit / Delete product buttons
+    // Toggle Stock / Edit / Delete product buttons
     productsList?.addEventListener("click", async (e) => {
       const target = e.target as HTMLElement | null;
+      const toggleBtn = target?.closest<HTMLElement>("[data-toggle-stock]");
+      const toggleId = toggleBtn?.dataset.toggleStock;
       const editId = target?.closest<HTMLElement>("[data-edit-prod]")?.dataset.editProd;
       const delId = target?.closest<HTMLElement>("[data-del-prod]")?.dataset.delProd;
+
+      if (toggleId && toggleBtn) {
+        const nextStock = Number(toggleBtn.dataset.nextStock || 0);
+        try {
+          await apiFetch("POST", { action: "toggle_stock", id: toggleId, stock: nextStock });
+          showToast(nextStock > 0 ? "تم تغيير حالة المنتج إلى متوفر ✓" : "تم تغيير حالة المنتج إلى غير متوفر");
+          await loadDashboard();
+        } catch (err: any) {
+          showToast(err.message || "فشل تحديث حالة التوفر.", true);
+        }
+        return;
+      }
 
       if (editId) {
         const p = cachedProducts.find((item) => item.id === editId);
@@ -1015,10 +1038,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       const target = e.target as HTMLElement | null;
       const confirmId = target?.closest<HTMLElement>("[data-confirm-pay]")?.dataset.confirmPay;
       if (!confirmId) return;
-      if (!confirm("هل تأكدت من استلام المبلغ؟ سيتم تأكيد الطلب وخصم المخزون.")) return;
+      if (!confirm("هل تأكدت من استلام المبلغ؟ سيتم تأكيد الطلب.")) return;
       try {
         await apiFetch("POST", { action: "confirm_payment", id: confirmId });
-        showToast("تم تأكيد استلام الدفع وتحديث المخزون ✓");
+        showToast("تم تأكيد استلام الدفع ✓");
         await loadDashboard();
       } catch (err: any) {
         showToast(err.message || "فشل تأكيد الدفع.", true);

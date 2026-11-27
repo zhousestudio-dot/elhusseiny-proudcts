@@ -239,6 +239,16 @@ export const POST: APIRoute = async ({ request }) => {
     return Response.json({ ok: true });
   }
 
+  if (action === "toggle_stock") {
+    const id = String(body.id || "");
+    const nextStock = Number(body.stock) > 0 ? 999 : 0;
+    if (!id) return Response.json({ error: "Missing product id" }, { status: 400 });
+
+    const { error } = await supabase.from("products").update({ stock: nextStock }).eq("id", id);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ ok: true, stock: nextStock });
+  }
+
   if (action === "update_order_status") {
     const id = String(body.id || "");
     const status = String(body.status || "");

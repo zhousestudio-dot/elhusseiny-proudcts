@@ -10,7 +10,6 @@ const { product } = Astro.props;
 const inStock = product.stock > 0;
 const isOffer = product.category_slug === "special-offers";
 const comparePrice = product.compare_at_price && product.compare_at_price > product.price ? product.compare_at_price : null;
-const discountPct = comparePrice ? Math.round(((comparePrice - product.price) / comparePrice) * 100) : 0;
 const searchText = `${product.name} ${product.description} ${product.category}`.toLowerCase();
 ---
 
