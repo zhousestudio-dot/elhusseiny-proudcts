@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { allCountries } from "country-telephone-data";
-import { getGovernorates } from "egypt-geo-navigator";
+import rawGovernorates from "../data/egypt-governorates.json";
+import rawCities from "../data/egypt-cities.json";
 import { getStoreSettings } from "../lib/settings";
 
 export const prerender = false;
@@ -30,12 +31,34 @@ const otherCountries = allCountries
   .sort((a, b) => a.name.localeCompare(b.name));
 const orderedCountries = egyptCountry ? [egyptCountry, ...otherCountries] : otherCountries;
 
-const PRIORITY_GOV_IDS = ["11", "08", "12"]; // القاهرة، الجيزة، القليوبية
-const allEgyptGovs = getGovernorates();
-const orderedGovs = [
-  ...PRIORITY_GOV_IDS.map((id) => allEgyptGovs.find((g) => g.id === id)).filter(Boolean),
-  ...allEgyptGovs.filter((g) => !PRIORITY_GOV_IDS.includes(g.id)),
-] as typeof allEgyptGovs;
+type GovRow = { id: string; governorate_name_ar: string };
+type CityRow = { id: string; governorate_id: string; city_name_ar: string };
+
+const govRows: GovRow[] = Array.isArray(rawGovernorates)
+  ? ((rawGovernorates.find((x: any) => x.type === "table")?.data as GovRow[]) || [])
+  : [];
+const cityRows: CityRow[] = Array.isArray(rawCities)
+  ? ((rawCities.find((x: any) => x.type === "table")?.data as CityRow[]) || [])
+  : [];
+
+const orderedGovs = govRows.map((g) => ({
+  id: g.id,
+  nameAr: g.governorate_name_ar,
+}));
+
+const citiesByGovId: Record<string, string[]> = {};
+for (const c of cityRows) {
+  if (!citiesByGovId[c.governorate_id]) citiesByGovId[c.governorate_id] = [];
+  if (!citiesByGovId[c.governorate_id].includes(c.city_name_ar)) {
+    citiesByGovId[c.governorate_id].push(c.city_name_ar);
+  }
+}
+if (citiesByGovId["12"]) {
+  for (const extra of ["الجبل الأصفر", "القلج"]) {
+    if (!citiesByGovId["12"].includes(extra)) citiesByGovId["12"].unshift(extra);
+  }
+}
+const citiesByGovJson = JSON.stringify(citiesByGovId);
 ---
 
 <BaseLayout
@@ -67,6 +90,7 @@ const orderedGovs = [
       <form
         id="checkout-form"
         data-shipping-settings={shippingSettingsJson}
+        data-cities-by-gov={citiesByGovJson}
         novalidate
         spellcheck="false"
         class="lg:col-span-3 space-y-5 rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
@@ -263,24 +287,9 @@ const orderedGovs = [
             </div>
           </div>
         </div>
-
-        <button
-          id="submit-checkout"
-          type="submit"
-          class="w-full rounded-xl bg-emerald-800 px-6 py-3.5 text-base font-bold text-white hover:bg-emerald-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          تأكيد الطلب وإرسال بيانات التحويل
-        </button>
-
-        <div class="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] font-semibold text-gray-500 dark:text-gray-400">
-          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">Visa</span>
-          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">Mastercard</span>
-          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">محافظ إلكترونية</span>
-          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">محافظ إلكترونية</span>
-        </div>
       </form>
 
-      <!-- Order Summary -->
+      <!-- Order Summary & Final Submit -->
       <aside class="lg:col-span-2 rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 space-y-4">
         <h2 class="text-lg font-bold text-gray-900 dark:text-white border-b border-stone-200 dark:border-gray-800 pb-3">
           ملخص الطلب
@@ -298,8 +307,23 @@ const orderedGovs = [
           <span id="summary-total" class="text-emerald-800 dark:text-emerald-400">٠ ج.م.</span>
         </div>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          يتم تأكيد الأسعار النهائية وتوفر المخزون تلقائياً من قاعدة البيانات قبل الدفع.
+          يتم تأكيد الأسعار النهائية وتوفر المنتجات تلقائياً من قاعدة البيانات قبل الدفع.
         </p>
+
+        <button
+          id="submit-checkout"
+          type="submit"
+          form="checkout-form"
+          class="w-full rounded-xl bg-emerald-800 px-6 py-3.5 text-base font-bold text-white hover:bg-emerald-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        >
+          تأكيد الطلب وإرسال بيانات التحويل
+        </button>
+
+        <div class="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">Visa</span>
+          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">Mastercard</span>
+          <span class="rounded border border-stone-200 dark:border-gray-700 px-2 py-0.5">محافظ إلكترونية</span>
+        </div>
       </aside>
     </div>
   </section>
@@ -329,9 +353,12 @@ const orderedGovs = [
       shipping_cairo_giza_fee: 100,
       shipping_other_gov_fee: 120,
     };
+    let citiesByGov: Record<string, string[]> = {};
     try {
       const rawCfg = form?.dataset.shippingSettings;
       if (rawCfg) shippingSettings = { ...shippingSettings, ...JSON.parse(rawCfg) };
+      const rawCitiesCfg = form?.dataset.citiesByGov;
+      if (rawCitiesCfg) citiesByGov = JSON.parse(rawCitiesCfg);
     } catch {}
     const errorEl = document.getElementById("checkout-error");
     const submitBtn = document.getElementById("submit-checkout") as HTMLButtonElement | null;
@@ -412,7 +439,7 @@ const orderedGovs = [
         }
       }
 
-      async function loadAreasForGovernorate(govId: string) {
+      function loadAreasForGovernorate(govId: string) {
         if (!areaSelect) return;
         if (!govId) {
           areaSelect.innerHTML = `<option value="">اختر المحافظة أولاً</option>`;
@@ -421,33 +448,16 @@ const orderedGovs = [
           return;
         }
 
-        areaSelect.disabled = true;
-        areaSelect.innerHTML = `<option value="">جاري تحميل المراكز...</option>`;
-
-        try {
-          const res = await fetch(`/api/egypt-areas?govId=${encodeURIComponent(govId)}`);
-          const data = await res.json();
-          const districts = Array.isArray(data.districts) ? data.districts : [];
-
-          if (!districts.length) {
-            areaSelect.innerHTML = `<option value="${escapeHtml(citySelect?.value || "")}">${escapeHtml(citySelect?.value || "المركز الرئيسي")}</option>`;
-          } else {
-            areaSelect.innerHTML = [
-              `<option value="">اختر المركز / المنطقة</option>`,
-              ...districts.map((d: any) => {
-                const places = Array.isArray(d.places) ? d.places : [];
-                return `<optgroup label="${escapeHtml(d.nameAr)}">
-                  <option value="${escapeHtml(d.nameAr)}">${escapeHtml(d.nameAr)}</option>
-                  ${places.map((p: string) => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("")}
-                </optgroup>`;
-              }),
-            ].join("");
-          }
-          areaSelect.disabled = false;
-        } catch {
+        const cities = citiesByGov[govId] || [];
+        if (!cities.length) {
           areaSelect.innerHTML = `<option value="${escapeHtml(citySelect?.value || "")}">${escapeHtml(citySelect?.value || "المركز الرئيسي")}</option>`;
-          areaSelect.disabled = false;
+        } else {
+          areaSelect.innerHTML = [
+            `<option value="">اختر المركز / المنطقة</option>`,
+            ...cities.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`),
+          ].join("");
         }
+        areaSelect.disabled = false;
         updateCheckoutShippingSummary();
       }
 

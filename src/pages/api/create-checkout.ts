@@ -373,7 +373,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     const completeUrl = `${siteUrl}/payment/complete?success=true&method=${encodeURIComponent(
       paymentMethod
-    )}&order=${encodeURIComponent(order.order_number)}&total=${encodeURIComponent(String(totalEGP))}`;
+    )}&order=${encodeURIComponent(order.order_number)}&total=${encodeURIComponent(
+      String(finalTotalEGP)
+    )}&shipping=${encodeURIComponent(String(shippingFeeEGP))}&subtotal=${encodeURIComponent(String(totalEGP))}`;
 
     return Response.json({
       orderNumber: order.order_number,

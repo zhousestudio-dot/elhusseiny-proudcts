@@ -64,11 +64,20 @@ const wa2 = settings.whatsapp_phone_2 || "";
     const method = params.get("method") || "paymob";
     const orderRef = params.get("merchant_order_id") || params.get("order") || "";
     const total = params.get("total") || "";
+    const shipping = Number(params.get("shipping") || 0);
+    const subtotal = params.get("subtotal") || "";
 
     const titleEl = document.getElementById("status-title");
     const descEl = document.getElementById("status-desc");
     const waBtn = document.getElementById("wa-receipt-btn") as HTMLAnchorElement | null;
     const waBtn2 = document.getElementById("wa-receipt-btn-2") as HTMLAnchorElement | null;
+
+    const amountBreakdown =
+      total && shipping > 0 && subtotal
+        ? ` (المنتجات: ${subtotal} ج.م. + الشحن: ${shipping} ج.م. — الإجمالي: ${total} ج.م.)`
+        : total
+        ? ` (الإجمالي: ${total} ج.م.)`
+        : "";
 
     if (success) {
       clearCart();
@@ -76,11 +85,11 @@ const wa2 = settings.whatsapp_phone_2 || "";
         if (titleEl) titleEl.textContent = "تم استلام طلبك بنجاح ✓";
         if (descEl) {
           descEl.textContent = orderRef
-            ? `شكراً لطلبك من منتجات الحسيني! رقم الطلب: ${orderRef}. جاري مراجعة التحويل عبر المحفظة الإلكترونية والتواصل معك قريباً لتأكيد التوصيل.`
+            ? `شكراً لطلبك من منتجات الحسيني! رقم الطلب: ${orderRef}${amountBreakdown}. جاري مراجعة التحويل عبر المحفظة الإلكترونية والتواصل معك قريباً لتأكيد التوصيل.`
             : "شكراً لطلبك! جاري مراجعة التحويل عبر المحفظة الإلكترونية والتواصل معك قريباً.";
         }
         const msg = encodeURIComponent(
-          `مرحباً، قمت بعمل طلب رقم ${orderRef || ""} بقيمة ${total ? total + " ج.م." : ""} عبر محفظة إلكترونية. مرفق صورة التحويل:`
+          `مرحباً، قمت بعمل طلب رقم ${orderRef || ""}${amountBreakdown} عبر محفظة إلكترونية. مرفق صورة التحويل:`
         );
         if (waBtn) {
           const intl1 = waBtn.dataset.waIntl || "201010231211";
@@ -98,7 +107,7 @@ const wa2 = settings.whatsapp_phone_2 || "";
         if (titleEl) titleEl.textContent = "تم تأكيد طلبك (الدفع عند الاستلام) ✓";
         if (descEl) {
           descEl.textContent = orderRef
-            ? `شكراً لطلبك من منتجات الحسيني! رقم الطلب: ${orderRef}. سيتواصل معك فريقنا قريباً لتنسيق التوصيل.`
+            ? `شكراً لطلبك من منتجات الحسيني! رقم الطلب: ${orderRef}${amountBreakdown}. سيتواصل معك فريقنا قريباً لتنسيق التوصيل.`
             : "شكراً لطلبك! سيتواصل معك فريقنا قريباً لتنسيق التوصيل.";
         }
       } else {
