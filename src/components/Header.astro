@@ -107,7 +107,7 @@ const { freeShippingThreshold: _unused = 0 } = Astro.props;
         id="header-cart-trigger"
         href="/cart"
         aria-label="سلة التسوق"
-        class="flex items-center gap-1 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-800 dark:text-gray-100 hover:border-emerald-700 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors"
+        class="relative flex items-center gap-1 rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-800 dark:text-gray-100 hover:border-emerald-700 hover:text-emerald-800 dark:hover:text-emerald-400 transition-all duration-200"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -127,9 +127,16 @@ const { freeShippingThreshold: _unused = 0 } = Astro.props;
         <span class="hidden sm:inline text-xs sm:text-sm font-semibold">السلة</span>
         <span
           id="cart-count"
-          class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-800 px-1.5 text-xs font-bold text-white"
+          class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-800 px-1.5 text-xs font-bold text-white transition-transform duration-200"
         >
           0
+        </span>
+        <span
+          id="cart-added-pop"
+          aria-hidden="true"
+          class="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 rounded-full bg-emerald-700 px-2 py-0.5 text-[11px] font-bold text-white shadow-md opacity-0 scale-75 transition-all duration-200 whitespace-nowrap"
+        >
+          +1 ✓
         </span>
       </a>
     </nav>
