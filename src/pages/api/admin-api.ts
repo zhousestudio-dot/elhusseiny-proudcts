@@ -266,31 +266,7 @@ export const POST: APIRoute = async ({ request }) => {
       .maybeSingle();
 
     if (updErr) return Response.json({ error: updErr.message }, { status: 500 });
-
-    // Reduce product stock once when confirming payment
-    if (updated) {
-      const { data: items } = await supabase
-        .from("order_items")
-        .select("product_id, quantity")
-        .eq("order_id", id);
-
-      if (items) {
-        for (const item of items) {
-          if (!item.product_id) continue;
-          const { data: prod } = await supabase
-            .from("products")
-            .select("stock")
-            .eq("id", item.product_id)
-            .maybeSingle();
-          if (prod) {
-            await supabase
-              .from("products")
-              .update({ stock: Math.max(0, Number(prod.stock) - item.quantity) })
-              .eq("id", item.product_id);
-          }
-        }
-      }
-    }
+    void updated;
 
     return Response.json({ ok: true });
   }

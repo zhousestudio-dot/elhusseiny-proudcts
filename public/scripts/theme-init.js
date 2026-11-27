@@ -5,5 +5,10 @@
     if (saved === "dark" || (!saved && prefersDark)) {
       document.documentElement.classList.add("dark");
     }
+    var lang = localStorage.getItem("elhusseiny_lang");
+    if (lang === "en") {
+      document.documentElement.lang = "en";
+      document.documentElement.dir = "ltr";
+    }
   } catch (e) {}
 })();

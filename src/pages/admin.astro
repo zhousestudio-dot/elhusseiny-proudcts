@@ -260,16 +260,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
             <div>
               <label for="prod-stock" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
-                الكمية المتوفرة في المخزن *
+                حالة التوفر *
               </label>
-              <input
+              <select
                 id="prod-stock"
-                type="number"
-                min="0"
-                value="20"
-                required
                 class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
-              />
+              >
+                <option value="999" selected>متوفر</option>
+                <option value="0">غير متوفر</option>
+              </select>
             </div>
           </div>
 
@@ -659,7 +658,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                   ${formatPriceEGP(Number(p.price))}
                   ${p.compare_at_price && Number(p.compare_at_price) > Number(p.price) ? `<span class="text-gray-400 font-normal mr-1">بدلاً من <del>${formatPriceEGP(Number(p.compare_at_price))}</del></span>` : ""}
                 </p>
-                <p class="text-[11px] text-gray-500 dark:text-gray-400">المتوفر: ${Number(p.stock)} | ${p.is_active ? "ظاهر للعملاء" : "مخفي"}</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400">${Number(p.stock) > 0 ? "متوفر" : "غير متوفر"} | ${p.is_active ? "ظاهر للعملاء" : "مخفي"}</p>
               </div>
             </div>
             <div class="flex gap-2 pt-2 border-t border-stone-100 dark:border-gray-800">
@@ -893,7 +892,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       productForm?.reset();
       (document.getElementById("prod-id") as HTMLInputElement).value = "";
       (document.getElementById("prod-slug") as HTMLInputElement).value = "";
-      (document.getElementById("prod-stock") as HTMLInputElement).value = "20";
+      (document.getElementById("prod-stock") as HTMLSelectElement).value = "999";
       if (previewImg) previewImg.src = "/images/products/product-03.jpg";
       fileNameLabel?.classList.add("hidden");
       offerHint?.classList.add("hidden");
@@ -946,7 +945,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           category_id: selectedCategory,
           price: Number((document.getElementById("prod-price") as HTMLInputElement).value),
           compare_at_price: isOfferChecked && comparePriceInput?.value ? Number(comparePriceInput.value) : null,
-          stock: Number((document.getElementById("prod-stock") as HTMLInputElement).value),
+          stock: Number((document.getElementById("prod-stock") as HTMLSelectElement).value),
           description: (document.getElementById("prod-desc") as HTMLTextAreaElement).value,
           image_url: imageUrl || "/images/products/product-03.jpg",
           is_active: (document.getElementById("prod-active") as HTMLInputElement).checked,
@@ -978,7 +977,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         (document.getElementById("prod-slug") as HTMLInputElement).value = p.slug || "";
         (document.getElementById("prod-name") as HTMLInputElement).value = p.name;
         (document.getElementById("prod-price") as HTMLInputElement).value = String(p.price);
-        (document.getElementById("prod-stock") as HTMLInputElement).value = String(p.stock);
+        (document.getElementById("prod-stock") as HTMLSelectElement).value = Number(p.stock) > 0 ? "999" : "0";
         (document.getElementById("prod-desc") as HTMLTextAreaElement).value = p.description || "";
         if (urlInput) urlInput.value = p.image_url || "";
         if (previewImg) previewImg.src = safeImageUrl(p.image_url);

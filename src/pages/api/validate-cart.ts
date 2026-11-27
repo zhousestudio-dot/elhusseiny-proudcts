@@ -71,9 +71,9 @@ export const POST: APIRoute = async ({ request }) => {
     const requestedQty = qtyById.get(product.id) ?? 0;
     if (requestedQty <= 0) continue;
 
-    if (product.stock < requestedQty) {
+    if (product.stock <= 0) {
       return Response.json(
-        { error: `الكمية المطلوبة غير متوفرة للمنتج: ${product.name}` },
+        { error: `المنتج غير متوفر حالياً: ${product.name}` },
         { status: 409 }
       );
     }

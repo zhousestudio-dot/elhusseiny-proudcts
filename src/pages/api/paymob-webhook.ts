@@ -285,35 +285,7 @@ export const POST: APIRoute = async ({ request }) => {
     console.error("[paymob-webhook] Failed to update payment:", paymentUpdateError.message);
   }
 
-  const { data: orderItems, error: itemsError } = await supabase
-    .from("order_items")
-    .select("product_id, quantity")
-    .eq("order_id", order.id);
-
-  if (itemsError) {
-    console.error("[paymob-webhook] Failed to fetch order_items for stock:", itemsError.message);
-  } else if (orderItems) {
-    for (const item of orderItems) {
-      if (!item.product_id) continue;
-      const { data: prod } = await supabase
-        .from("products")
-        .select("stock")
-        .eq("id", item.product_id)
-        .maybeSingle();
-
-      if (prod) {
-        const nextStock = Math.max(0, Number(prod.stock) - item.quantity);
-        const { error: stockErr } = await supabase
-          .from("products")
-          .update({ stock: nextStock })
-          .eq("id", item.product_id);
-
-        if (stockErr) {
-          console.error(`[paymob-webhook] Stock update failed for ${item.product_id}:`, stockErr.message);
-        }
-      }
-    }
-  }
+  // Stock counts are managed as Available/Unavailable from Admin; no per-order numeric decrement needed.
 
   const resendKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL;

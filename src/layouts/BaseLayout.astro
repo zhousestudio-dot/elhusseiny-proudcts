@@ -62,6 +62,7 @@ const fullOgImage = ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}
 
     <!-- Prevent flash of wrong theme before first paint (external script for strict CSP) -->
     <script is:inline src="/scripts/theme-init.js"></script>
+    <script is:inline src="/scripts/i18n.js" defer></script>
   </head>
   <body class="min-h-screen overflow-x-hidden flex flex-col bg-[#FAF9F5] text-gray-900 dark:bg-gray-950 dark:text-gray-100 font-sans transition-colors duration-200">
     <Header freeShippingThreshold={settings.free_shipping_threshold} />
