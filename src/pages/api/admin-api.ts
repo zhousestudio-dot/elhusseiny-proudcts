@@ -103,7 +103,7 @@ export const GET: APIRoute = async ({ request }) => {
       .limit(100),
     supabase
       .from("store_settings")
-      .select("free_shipping_threshold, wallet_phone_1, wallet_phone_2, whatsapp_phone_1, whatsapp_phone_2")
+      .select("free_shipping_threshold, wallet_phone_1, wallet_phone_2, whatsapp_phone_1, whatsapp_phone_2, shipping_qalag_fee, shipping_marg_fee, shipping_cairo_giza_fee, shipping_other_gov_fee")
       .eq("id", 1)
       .maybeSingle(),
   ]);
@@ -118,6 +118,10 @@ export const GET: APIRoute = async ({ request }) => {
       wallet_phone_2: "",
       whatsapp_phone_1: "01010231211",
       whatsapp_phone_2: "",
+      shipping_qalag_fee: 20,
+      shipping_marg_fee: 40,
+      shipping_cairo_giza_fee: 100,
+      shipping_other_gov_fee: 120,
     },
   });
 };
@@ -365,6 +369,10 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (action === "save_settings") {
     const threshold = Math.max(0, Math.min(100000, Math.floor(Number(body.free_shipping_threshold || 0))));
+    const qalagFee = Math.max(0, Math.min(10000, Math.floor(Number(body.shipping_qalag_fee ?? 20))));
+    const margFee = Math.max(0, Math.min(10000, Math.floor(Number(body.shipping_marg_fee ?? 40))));
+    const cairoGizaFee = Math.max(0, Math.min(10000, Math.floor(Number(body.shipping_cairo_giza_fee ?? 100))));
+    const otherGovFee = Math.max(0, Math.min(10000, Math.floor(Number(body.shipping_other_gov_fee ?? 120))));
     const wallet1 = String(body.wallet_phone_1 || "").trim();
     const wallet2 = String(body.wallet_phone_2 || "").trim();
     const wa1 = String(body.whatsapp_phone_1 || "").trim();
@@ -379,6 +387,10 @@ export const POST: APIRoute = async ({ request }) => {
       .upsert({
         id: 1,
         free_shipping_threshold: threshold,
+        shipping_qalag_fee: qalagFee,
+        shipping_marg_fee: margFee,
+        shipping_cairo_giza_fee: cairoGizaFee,
+        shipping_other_gov_fee: otherGovFee,
         wallet_phone_1: wallet1,
         wallet_phone_2: wallet2,
         whatsapp_phone_1: wa1,

@@ -528,6 +528,64 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-stone-100 dark:border-gray-800">
             <div>
+              <label for="set-ship-qalag" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                سعر شحن القلج / الخانكة / الجبل (ج.م.)
+              </label>
+              <input
+                id="set-ship-qalag"
+                type="number"
+                min="0"
+                step="5"
+                placeholder="20"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="set-ship-marg" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                سعر شحن حدود المرج (ج.م.)
+              </label>
+              <input
+                id="set-ship-marg"
+                type="number"
+                min="0"
+                step="5"
+                placeholder="40"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="set-ship-cairo" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                سعر شحن القاهرة والجيزة (ج.م.)
+              </label>
+              <input
+                id="set-ship-cairo"
+                type="number"
+                min="0"
+                step="5"
+                placeholder="100"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="set-ship-other" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                سعر شحن باقي المحافظات (ج.م.)
+              </label>
+              <input
+                id="set-ship-other"
+                type="number"
+                min="0"
+                step="5"
+                placeholder="120"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-stone-100 dark:border-gray-800">
+            <div>
               <label for="set-wallet-1" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
                 رقم المحفظة الإلكترونية الأساسي *
               </label>
@@ -760,11 +818,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         if (data.settings) {
           const s = data.settings;
           const fsInput = document.getElementById("set-free-shipping") as HTMLInputElement | null;
+          const qalagInput = document.getElementById("set-ship-qalag") as HTMLInputElement | null;
+          const margInput = document.getElementById("set-ship-marg") as HTMLInputElement | null;
+          const cairoInput = document.getElementById("set-ship-cairo") as HTMLInputElement | null;
+          const otherInput = document.getElementById("set-ship-other") as HTMLInputElement | null;
           const w1Input = document.getElementById("set-wallet-1") as HTMLInputElement | null;
           const w2Input = document.getElementById("set-wallet-2") as HTMLInputElement | null;
           const wa1Input = document.getElementById("set-wa-1") as HTMLInputElement | null;
           const wa2Input = document.getElementById("set-wa-2") as HTMLInputElement | null;
           if (fsInput) fsInput.value = String(s.free_shipping_threshold ?? 2500);
+          if (qalagInput) qalagInput.value = String(s.shipping_qalag_fee ?? 20);
+          if (margInput) margInput.value = String(s.shipping_marg_fee ?? 40);
+          if (cairoInput) cairoInput.value = String(s.shipping_cairo_giza_fee ?? 100);
+          if (otherInput) otherInput.value = String(s.shipping_other_gov_fee ?? 120);
           if (w1Input) w1Input.value = s.wallet_phone_1 || "";
           if (w2Input) w2Input.value = s.wallet_phone_2 || "";
           if (wa1Input) wa1Input.value = s.whatsapp_phone_1 || "";
@@ -1254,6 +1320,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         await apiFetch("POST", {
           action: "save_settings",
           free_shipping_threshold: Number((document.getElementById("set-free-shipping") as HTMLInputElement).value || 0),
+          shipping_qalag_fee: Number((document.getElementById("set-ship-qalag") as HTMLInputElement).value ?? 20),
+          shipping_marg_fee: Number((document.getElementById("set-ship-marg") as HTMLInputElement).value ?? 40),
+          shipping_cairo_giza_fee: Number((document.getElementById("set-ship-cairo") as HTMLInputElement).value ?? 100),
+          shipping_other_gov_fee: Number((document.getElementById("set-ship-other") as HTMLInputElement).value ?? 120),
           wallet_phone_1: (document.getElementById("set-wallet-1") as HTMLInputElement).value,
           wallet_phone_2: (document.getElementById("set-wallet-2") as HTMLInputElement).value,
           whatsapp_phone_1: (document.getElementById("set-wa-1") as HTMLInputElement).value,

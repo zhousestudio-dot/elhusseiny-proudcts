@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { allCountries } from "country-telephone-data";
+import { getGovernorates } from "egypt-geo-navigator";
 import { getStoreSettings } from "../lib/settings";
 
 export const prerender = false;
@@ -8,6 +9,13 @@ Astro.response.headers.set("Cache-Control", "public, s-maxage=15, stale-while-re
 
 const settings = await getStoreSettings();
 const walletPhones = [settings.wallet_phone_1, settings.wallet_phone_2].filter(Boolean);
+const shippingSettingsJson = JSON.stringify({
+  free_shipping_threshold: settings.free_shipping_threshold,
+  shipping_qalag_fee: settings.shipping_qalag_fee,
+  shipping_marg_fee: settings.shipping_marg_fee,
+  shipping_cairo_giza_fee: settings.shipping_cairo_giza_fee,
+  shipping_other_gov_fee: settings.shipping_other_gov_fee,
+});
 
 function iso2ToFlag(iso2: string): string {
   return iso2
@@ -22,35 +30,12 @@ const otherCountries = allCountries
   .sort((a, b) => a.name.localeCompare(b.name));
 const orderedCountries = egyptCountry ? [egyptCountry, ...otherCountries] : otherCountries;
 
-const EGYPT_GOVERNORATES = [
-  "القاهرة",
-  "الجيزة",
-  "الإسكندرية",
-  "القليوبية",
-  "الدقهلية",
-  "الشرقية",
-  "الغربية",
-  "المنوفية",
-  "البحيرة",
-  "كفر الشيخ",
-  "دمياط",
-  "بورسعيد",
-  "الإسماعيلية",
-  "السويس",
-  "الفيوم",
-  "بني سويف",
-  "المنيا",
-  "أسيوط",
-  "سوهاج",
-  "قنا",
-  "الأقصر",
-  "أسوان",
-  "البحر الأحمر",
-  "مطروح",
-  "شمال سيناء",
-  "جنوب سيناء",
-  "الوادي الجديد",
-];
+const PRIORITY_GOV_IDS = ["11", "08", "12"]; // القاهرة، الجيزة، القليوبية
+const allEgyptGovs = getGovernorates();
+const orderedGovs = [
+  ...PRIORITY_GOV_IDS.map((id) => allEgyptGovs.find((g) => g.id === id)).filter(Boolean),
+  ...allEgyptGovs.filter((g) => !PRIORITY_GOV_IDS.includes(g.id)),
+] as typeof allEgyptGovs;
 ---
 
 <BaseLayout
@@ -81,6 +66,7 @@ const EGYPT_GOVERNORATES = [
       <!-- Shipping Form -->
       <form
         id="checkout-form"
+        data-shipping-settings={shippingSettingsJson}
         novalidate
         spellcheck="false"
         class="lg:col-span-3 space-y-5 rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
@@ -156,21 +142,38 @@ const EGYPT_GOVERNORATES = [
           </div>
         </div>
 
-        <div>
-          <label for="city" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1.5">
-            المحافظة / المدينة <span class="text-red-600">*</span>
-          </label>
-          <select
-            id="city"
-            name="city"
-            required
-            class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20"
-          >
-            <option value="">اختر المحافظة</option>
-            {EGYPT_GOVERNORATES.map((gov) => (
-              <option value={gov}>{gov}</option>
-            ))}
-          </select>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="city" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1.5">
+              المحافظة <span class="text-red-600">*</span>
+            </label>
+            <select
+              id="city"
+              name="city"
+              required
+              class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20"
+            >
+              <option value="">اختر المحافظة</option>
+              {orderedGovs.map((gov) => (
+                <option value={gov.nameAr} data-gov-id={gov.id}>{gov.nameAr}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label for="area" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1.5">
+              المركز / المنطقة <span class="text-red-600">*</span>
+            </label>
+            <select
+              id="area"
+              name="area"
+              required
+              disabled
+              class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20 disabled:opacity-60"
+            >
+              <option value="">اختر المحافظة أولاً</option>
+            </select>
+          </div>
         </div>
 
         <div>
@@ -287,8 +290,8 @@ const EGYPT_GOVERNORATES = [
           id="summary-shipping-row"
           class="hidden border-t border-stone-100 dark:border-gray-800 pt-3 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300"
         >
-          <span>رسوم الشحن (القلج)</span>
-          <span class="font-semibold text-emerald-800 dark:text-emerald-400">٢٠ ج.م.</span>
+          <span id="summary-shipping-label">رسوم الشحن</span>
+          <span id="summary-shipping-value" class="font-semibold text-emerald-800 dark:text-emerald-400">٠ ج.م.</span>
         </div>
         <div class="border-t border-stone-200 dark:border-gray-800 pt-4 flex items-center justify-between text-base font-bold text-gray-900 dark:text-white">
           <span>الإجمالي</span>
@@ -305,15 +308,31 @@ const EGYPT_GOVERNORATES = [
     import { getCart, getCartTotalEGP, syncCartBadge } from "../lib/cart";
     import { formatPriceEGP } from "../lib/format";
     import { escapeHtml } from "../lib/sanitize";
+    import { calculateShippingFee } from "../lib/shipping";
 
     const emptyEl = document.getElementById("checkout-empty");
     const contentEl = document.getElementById("checkout-content");
     const summaryItemsEl = document.getElementById("summary-items");
     const summaryShippingRow = document.getElementById("summary-shipping-row");
+    const summaryShippingLabel = document.getElementById("summary-shipping-label");
+    const summaryShippingValue = document.getElementById("summary-shipping-value");
     const summaryTotalEl = document.getElementById("summary-total");
     const shippingAddressInput = document.getElementById("shippingAddress") as HTMLTextAreaElement | HTMLInputElement | null;
     const citySelect = document.getElementById("city") as HTMLSelectElement | null;
+    const areaSelect = document.getElementById("area") as HTMLSelectElement | null;
     const form = document.getElementById("checkout-form") as HTMLFormElement | null;
+
+    let shippingSettings = {
+      free_shipping_threshold: 2500,
+      shipping_qalag_fee: 20,
+      shipping_marg_fee: 40,
+      shipping_cairo_giza_fee: 100,
+      shipping_other_gov_fee: 120,
+    };
+    try {
+      const rawCfg = form?.dataset.shippingSettings;
+      if (rawCfg) shippingSettings = { ...shippingSettings, ...JSON.parse(rawCfg) };
+    } catch {}
     const errorEl = document.getElementById("checkout-error");
     const submitBtn = document.getElementById("submit-checkout") as HTMLButtonElement | null;
     const vfBox = document.getElementById("vodafone-cash-box");
@@ -371,17 +390,74 @@ const EGYPT_GOVERNORATES = [
           .join("");
       }
       function updateCheckoutShippingSummary() {
-        const addrText = `${shippingAddressInput?.value || ""} ${citySelect?.value || ""}`;
-        const isQalag = /القلج|قلج|qalag/i.test(addrText);
-        const shippingFee = isQalag ? 20 : 0;
-        summaryShippingRow?.classList.toggle("hidden", !isQalag);
+        const cityVal = citySelect?.value || "";
+        const areaVal = areaSelect?.value || "";
+        const addrVal = shippingAddressInput?.value || "";
+        const subtotal = getCartTotalEGP(items);
+
+        if (!cityVal) {
+          summaryShippingRow?.classList.add("hidden");
+          if (summaryTotalEl) summaryTotalEl.textContent = formatPriceEGP(subtotal);
+          return;
+        }
+
+        const quote = calculateShippingFee(cityVal, areaVal, addrVal, subtotal, shippingSettings);
+        summaryShippingRow?.classList.remove("hidden");
+        if (summaryShippingLabel) summaryShippingLabel.textContent = quote.label;
+        if (summaryShippingValue) {
+          summaryShippingValue.textContent = quote.fee === 0 ? "مجاني ✓" : formatPriceEGP(quote.fee);
+        }
         if (summaryTotalEl) {
-          summaryTotalEl.textContent = formatPriceEGP(getCartTotalEGP(items) + shippingFee);
+          summaryTotalEl.textContent = formatPriceEGP(subtotal + quote.fee);
         }
       }
 
+      async function loadAreasForGovernorate(govId: string) {
+        if (!areaSelect) return;
+        if (!govId) {
+          areaSelect.innerHTML = `<option value="">اختر المحافظة أولاً</option>`;
+          areaSelect.disabled = true;
+          updateCheckoutShippingSummary();
+          return;
+        }
+
+        areaSelect.disabled = true;
+        areaSelect.innerHTML = `<option value="">جاري تحميل المراكز...</option>`;
+
+        try {
+          const res = await fetch(`/api/egypt-areas?govId=${encodeURIComponent(govId)}`);
+          const data = await res.json();
+          const districts = Array.isArray(data.districts) ? data.districts : [];
+
+          if (!districts.length) {
+            areaSelect.innerHTML = `<option value="${escapeHtml(citySelect?.value || "")}">${escapeHtml(citySelect?.value || "المركز الرئيسي")}</option>`;
+          } else {
+            areaSelect.innerHTML = [
+              `<option value="">اختر المركز / المنطقة</option>`,
+              ...districts.map((d: any) => {
+                const places = Array.isArray(d.places) ? d.places : [];
+                return `<optgroup label="${escapeHtml(d.nameAr)}">
+                  <option value="${escapeHtml(d.nameAr)}">${escapeHtml(d.nameAr)}</option>
+                  ${places.map((p: string) => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("")}
+                </optgroup>`;
+              }),
+            ].join("");
+          }
+          areaSelect.disabled = false;
+        } catch {
+          areaSelect.innerHTML = `<option value="${escapeHtml(citySelect?.value || "")}">${escapeHtml(citySelect?.value || "المركز الرئيسي")}</option>`;
+          areaSelect.disabled = false;
+        }
+        updateCheckoutShippingSummary();
+      }
+
+      citySelect?.addEventListener("change", () => {
+        const selectedOption = citySelect.selectedOptions?.[0];
+        const govId = selectedOption?.dataset.govId || "";
+        loadAreasForGovernorate(govId);
+      });
+      areaSelect?.addEventListener("change", updateCheckoutShippingSummary);
       shippingAddressInput?.addEventListener("input", updateCheckoutShippingSummary);
-      citySelect?.addEventListener("change", updateCheckoutShippingSummary);
       updateCheckoutShippingSummary();
     }
 
@@ -460,6 +536,7 @@ const EGYPT_GOVERNORATES = [
       const customerPhone = combinePhoneWithCode(rawCustomerPhone, phoneCode);
       const customerEmail = String(formData.get("customerEmail") || "").trim();
       const city = String(formData.get("city") || "").trim();
+      const area = String(formData.get("area") || "").trim();
       const shippingAddress = String(formData.get("shippingAddress") || "").trim();
       const selectedMethod = String(formData.get("paymentMethod") || "vodafone_cash");
       const walletSenderPhone = String(formData.get("walletSenderPhone") || "").trim();
@@ -477,7 +554,11 @@ const EGYPT_GOVERNORATES = [
         return;
       }
       if (!city) {
-        flagFieldError("city", "يرجى اختيار المحافظة / المدينة.");
+        flagFieldError("city", "يرجى اختيار المحافظة.");
+        return;
+      }
+      if (!area) {
+        flagFieldError("area", "يرجى اختيار المركز / المنطقة.");
         return;
       }
       if (!shippingAddress) {
@@ -494,6 +575,7 @@ const EGYPT_GOVERNORATES = [
         customerPhone,
         customerEmail,
         city,
+        area,
         shippingAddress,
         paymentMethod: selectedMethod,
         walletSenderPhone,

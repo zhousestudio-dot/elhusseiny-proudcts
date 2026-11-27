@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@supabase/supabase-js";
+import { getStoreSettings } from "../../lib/settings";
+import { calculateShippingFee } from "../../lib/shipping";
 
 export const prerender = false;
 
@@ -15,6 +17,7 @@ interface CheckoutBody {
   customerEmail?: string;
   shippingAddress?: string;
   city?: string;
+  area?: string;
   paymentMethod?: "paymob" | "vodafone_cash" | "cod";
   walletSenderPhone?: string;
   items?: CheckoutItemInput[];
@@ -108,6 +111,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const customerEmail = (body.customerEmail || "").trim();
   const shippingAddress = (body.shippingAddress || "").trim();
   const city = (body.city || "").trim();
+  const area = (body.area || "").trim();
+  const fullShippingAddress = area ? `${area} — ${shippingAddress}` : shippingAddress;
   const paymentMethod: "paymob" | "vodafone_cash" | "cod" =
     body.paymentMethod === "vodafone_cash" || body.paymentMethod === "cod"
       ? body.paymentMethod
@@ -292,8 +297,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return Response.json({ error: "لا توجد منتجات صالحة في الطلب." }, { status: 400 });
   }
 
-  const isElQalag = /القلج|قلج|qalag/i.test(`${shippingAddress} ${city}`);
-  const shippingFeeEGP = isElQalag ? 20 : 0;
+  const storeSettings = await getStoreSettings();
+  const shippingQuote = calculateShippingFee(city, area, shippingAddress, totalEGP, storeSettings);
+  const shippingFeeEGP = shippingQuote.fee;
   const finalTotalEGP = totalEGP + shippingFeeEGP;
   const amountCents = Math.round(finalTotalEGP * 100);
 
@@ -303,7 +309,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       customer_name: customerName,
       customer_phone: normalizedPhone,
       customer_email: customerEmail || null,
-      shipping_address: shippingAddress,
+      shipping_address: fullShippingAddress,
       city,
       total: finalTotalEGP,
       status: "pending",
@@ -357,8 +363,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
             <p><strong>رقم الطلب:</strong> ${order.order_number}</p>
             <p><strong>العميل:</strong> ${customerName} (${normalizedPhone})</p>
             ${walletSenderPhone ? `<p><strong>رقم محفظة التحويل:</strong> ${walletSenderPhone}</p>` : ""}
-            <p><strong>العنوان:</strong> ${city} — ${shippingAddress}</p>
-            ${shippingFeeEGP > 0 ? `<p><strong>رسوم الشحن (القلج):</strong> ${shippingFeeEGP} ج.م.</p>` : ""}
+            <p><strong>العنوان:</strong> ${city} — ${fullShippingAddress}</p>
+            ${shippingFeeEGP > 0 ? `<p><strong>${shippingQuote.label}:</strong> ${shippingFeeEGP} ج.م.</p>` : ""}
             <p><strong>الإجمالي:</strong> ${finalTotalEGP} ج.م.</p>
           </div>`,
         }),
@@ -392,9 +398,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       ...(shippingFeeEGP > 0
         ? [
             {
-              name: "رسوم الشحن (القلج)",
+              name: shippingQuote.label,
               amount: Math.round(shippingFeeEGP * 100),
-              description: "رسوم توصيل لمنطقة القلج",
+              description: shippingQuote.label,
               quantity: 1,
             },
           ]
