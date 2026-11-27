@@ -329,29 +329,10 @@ const citiesByGovJson = JSON.stringify(citiesByGovId);
   </section>
 
   <script>
-    import { createClient } from "@supabase/supabase-js";
     import { getCart, getCartTotalEGP, syncCartBadge } from "../lib/cart";
     import { formatPriceEGP } from "../lib/format";
     import { escapeHtml } from "../lib/sanitize";
     import { calculateShippingFee } from "../lib/shipping";
-
-    const sbUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-    const sbAnon = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-    const supabaseAuth =
-      sbUrl && sbAnon && !sbUrl.includes("your-project-id") ? createClient(sbUrl, sbAnon) : null;
-    let checkoutAuthToken = "";
-    if (supabaseAuth) {
-      supabaseAuth.auth.getSession().then(({ data }) => {
-        const session = data.session;
-        if (!session?.access_token) return;
-        checkoutAuthToken = session.access_token;
-        const nameField = document.getElementById("customerName") as HTMLInputElement | null;
-        const emailField = document.getElementById("customerEmail") as HTMLInputElement | null;
-        const fullName = (session.user?.user_metadata?.full_name as string) || (session.user?.user_metadata?.name as string) || "";
-        if (nameField && !nameField.value && fullName) nameField.value = fullName;
-        if (emailField && !emailField.value && session.user?.email) emailField.value = session.user.email;
-      });
-    }
 
     const emptyEl = document.getElementById("checkout-empty");
     const contentEl = document.getElementById("checkout-content");
@@ -621,11 +602,9 @@ const citiesByGovJson = JSON.stringify(citiesByGovId);
       }
 
       try {
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
-        if (checkoutAuthToken) headers.Authorization = `Bearer ${checkoutAuthToken}`;
         const res = await fetch("/api/create-checkout", {
           method: "POST",
-          headers,
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 
