@@ -26,14 +26,18 @@ const categoryImages: Record<string, string> = {
   <!-- Circular organic category showcase (no boxed borders) -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-7 text-center">
     {categories.map((cat) => {
-      const thumb = categoryImages[cat.slug] || "/images/products/product-03.jpg";
+      const thumb = cat.image_url || categoryImages[cat.slug] || "/images/products/product-03.jpg";
+      const color = cat.accent_color && /^#[0-9a-fA-F]{6}$/.test(cat.accent_color) ? cat.accent_color : "#065f46";
       return (
         <a
           href={`/products?category=${cat.slug}`}
           data-astro-prefetch
           class="group flex flex-col items-center gap-3"
         >
-          <div class="relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full bg-stone-100 dark:bg-gray-800 shadow-sm ring-2 ring-transparent group-hover:ring-emerald-700/60 transition-all duration-300">
+          <div
+            class="relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full bg-stone-100 dark:bg-gray-800 shadow-sm ring-2 transition-all duration-300 group-hover:scale-105"
+            style={`--tw-ring-color: ${color}55;`}
+          >
             <img
               src={thumb}
               alt={cat.name}
@@ -45,8 +49,9 @@ const categoryImages: Record<string, string> = {
             />
           </div>
           <div>
-            <h3 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition-colors">
-              {cat.name}
+            <h3 class="inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition-colors">
+              <span class="h-2 w-2 rounded-full shrink-0" style={`background-color: ${color};`} aria-hidden="true"></span>
+              <span>{cat.name}</span>
             </h3>
             <p class="hidden sm:block text-[11px] text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5 max-w-[180px] mx-auto">
               {cat.description}

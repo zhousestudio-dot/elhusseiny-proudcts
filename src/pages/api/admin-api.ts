@@ -94,7 +94,7 @@ export const GET: APIRoute = async ({ request }) => {
       .order("created_at", { ascending: false }),
     supabase
       .from("categories")
-      .select("id, name, slug")
+      .select("id, name, slug, description, sort_order, is_active, accent_color, image_url")
       .order("sort_order", { ascending: true }),
     supabase
       .from("orders")
@@ -247,6 +247,72 @@ export const POST: APIRoute = async ({ request }) => {
     const { error } = await supabase.from("products").update({ stock: nextStock }).eq("id", id);
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ ok: true, stock: nextStock });
+  }
+
+  if (action === "save_category") {
+    const id = body.id ? String(body.id) : null;
+    const name = String(body.name || "").trim();
+    const description = String(body.description || "").trim();
+    const colorRaw = String(body.accent_color || "#065f46").trim();
+    const accentColor = /^#[0-9a-fA-F]{6}$/.test(colorRaw) ? colorRaw : "#065f46";
+    const imageUrlRaw = body.image_url ? String(body.image_url).trim() : null;
+    const imageUrl =
+      imageUrlRaw && (imageUrlRaw.startsWith("https://") || imageUrlRaw.startsWith("/images/"))
+        ? imageUrlRaw
+        : null;
+    const sortOrder = Math.max(0, Math.min(999, Math.floor(Number(body.sort_order || 0))));
+    const isActive = body.is_active !== false;
+
+    if (!name || name.length > 100 || description.length > 500) {
+      return Response.json({ error: "بيانات القسم غير صالحة." }, { status: 400 });
+    }
+
+    const record: Record<string, unknown> = {
+      name,
+      description,
+      accent_color: accentColor,
+      image_url: imageUrl,
+      sort_order: sortOrder,
+      is_active: isActive,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (id) {
+      const { error } = await supabase.from("categories").update(record).eq("id", id);
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ ok: true, updated: id });
+    } else {
+      record.slug = `${slugify(name)}-${Date.now().toString().slice(-4)}`;
+      const { data, error } = await supabase
+        .from("categories")
+        .insert(record)
+        .select("id")
+        .single();
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ ok: true, created: data.id });
+    }
+  }
+
+  if (action === "delete_category") {
+    const id = String(body.id || "");
+    if (!id) return Response.json({ error: "Missing category id" }, { status: 400 });
+
+    const { count, error: countErr } = await supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("category_id", id);
+
+    if (countErr) return Response.json({ error: countErr.message }, { status: 500 });
+    if ((count ?? 0) > 0) {
+      return Response.json(
+        { error: "لا يمكن حذف قسم يحتوي على منتجات — انقل المنتجات لقسم آخر أولاً." },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase.from("categories").delete().eq("id", id);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ ok: true });
   }
 
   if (action === "update_order_status") {

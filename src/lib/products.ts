@@ -11,6 +11,8 @@ interface RawCategoryRow {
   name: string;
   slug: string;
   description: string | null;
+  accent_color?: string | null;
+  image_url?: string | null;
 }
 
 interface RawProductRow {
@@ -36,7 +38,7 @@ export async function getActiveCategories(): Promise<Category[]> {
 
   const { data, error } = await supabase
     .from("categories")
-    .select("id, name, slug, description")
+    .select("id, name, slug, description, accent_color, image_url")
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
@@ -51,6 +53,8 @@ export async function getActiveCategories(): Promise<Category[]> {
     name: c.name,
     slug: c.slug,
     description: c.description ?? "",
+    accent_color: c.accent_color ?? null,
+    image_url: c.image_url ?? null,
   }));
 }
 

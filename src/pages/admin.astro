@@ -108,6 +108,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </button>
         <button
           type="button"
+          data-tab="categories"
+          class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
+        >
+          الأقسام
+        </button>
+        <button
+          type="button"
           data-tab="orders"
           class="tab-btn rounded-xl border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
         >
@@ -313,6 +320,143 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             />
           </div>
           <div id="admin-products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+
+      <!-- Categories Tab -->
+      <div id="tab-categories" class="hidden space-y-8">
+        <form id="category-form" class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6 space-y-5 shadow-xs">
+          <div class="flex items-center justify-between border-b border-stone-100 dark:border-gray-800 pb-3">
+            <div>
+              <h2 id="cat-form-title" class="text-lg font-bold text-gray-900 dark:text-white">إضافة قسم جديد</h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">تحكم في اسم القسم، اللون المميز له، وصورته في المتجر.</p>
+            </div>
+            <button
+              id="btn-cancel-cat-edit"
+              type="button"
+              class="hidden rounded-lg border border-stone-300 dark:border-gray-700 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-stone-100 dark:hover:bg-gray-800 cursor-pointer"
+            >
+              إلغاء التعديل
+            </button>
+          </div>
+
+          <input type="hidden" id="cat-id" />
+
+          <div class="flex flex-col sm:flex-row items-center gap-5 rounded-2xl border border-stone-200 dark:border-gray-800 bg-stone-50/70 dark:bg-gray-950/60 p-4">
+            <div
+              id="cat-preview-ring"
+              class="h-24 w-24 shrink-0 overflow-hidden rounded-full bg-white dark:bg-gray-900 ring-4 transition-all"
+              style="--tw-ring-color: #065f4655;"
+            >
+              <img
+                id="cat-image-preview"
+                src="/images/products/product-03.jpg"
+                alt="معاينة صورة القسم"
+                class="h-full w-full object-cover"
+              />
+            </div>
+
+            <div class="flex-1 text-center sm:text-right space-y-2 w-full">
+              <p class="text-sm font-bold text-gray-900 dark:text-white">صورة القسم (دائرية في المتجر)</p>
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-800 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-900 transition-colors">
+                  <span>اختر صورة من جهازك</span>
+                  <input id="cat-image-file" type="file" accept="image/*" class="hidden" />
+                </label>
+                <span id="cat-file-name" class="text-xs text-emerald-700 dark:text-emerald-400 font-medium hidden"></span>
+              </div>
+              <input
+                id="cat-image-url"
+                type="text"
+                dir="ltr"
+                placeholder="أو رابط صورة اختياري (https://... أو /images/...)"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-1.5 text-xs text-gray-900 dark:text-white text-left"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="cat-name" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                اسم القسم *
+              </label>
+              <input
+                id="cat-name"
+                type="text"
+                required
+                placeholder="مثال: منتجات الألبان الطبيعية"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="cat-sort" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                ترتيب الظهور
+              </label>
+              <input
+                id="cat-sort"
+                type="number"
+                min="0"
+                max="999"
+                value="1"
+                class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="cat-desc" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+              وصف مختصر للقسم
+            </label>
+            <input
+              id="cat-desc"
+              type="text"
+              placeholder="مثال: سمن بلدي، زبدة طبيعية، وقشطة طازجة ١٠٠٪"
+              class="w-full rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:border-emerald-700 focus:outline-none"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label for="cat-color" class="block text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
+              اللون المميز للقسم
+            </label>
+            <div class="flex flex-wrap items-center gap-3">
+              <input
+                id="cat-color"
+                type="color"
+                value="#065f46"
+                class="h-10 w-14 cursor-pointer rounded-xl border border-stone-300 dark:border-gray-700 bg-white dark:bg-gray-950 p-1"
+              />
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" data-color-preset="#065f46" title="أخضر زمردي" class="h-7 w-7 rounded-full border-2 border-white shadow-xs cursor-pointer" style="background-color: #065f46;"></button>
+                <button type="button" data-color-preset="#b45309" title="عسلي ذهبي" class="h-7 w-7 rounded-full border-2 border-white shadow-xs cursor-pointer" style="background-color: #b45309;"></button>
+                <button type="button" data-color-preset="#4d7c0f" title="زيتوني" class="h-7 w-7 rounded-full border-2 border-white shadow-xs cursor-pointer" style="background-color: #4d7c0f;"></button>
+                <button type="button" data-color-preset="#9a3412" title="بني محمص" class="h-7 w-7 rounded-full border-2 border-white shadow-xs cursor-pointer" style="background-color: #9a3412;"></button>
+                <button type="button" data-color-preset="#334155" title="رمادي داكن" class="h-7 w-7 rounded-full border-2 border-white shadow-xs cursor-pointer" style="background-color: #334155;"></button>
+                <button type="button" data-color-preset="#6b21a8" title="بنفسجي هادئ" class="h-7 w-7 rounded-full border-2 border-white shadow-xs cursor-pointer" style="background-color: #6b21a8;"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <label class="inline-flex items-center gap-2.5 text-sm font-semibold text-gray-800 dark:text-gray-200 cursor-pointer">
+              <input id="cat-active" type="checkbox" checked class="h-4 w-4 rounded border-stone-300 text-emerald-700 focus:ring-emerald-700" />
+              <span>ظاهر للعملاء في المتجر</span>
+            </label>
+
+            <button
+              id="btn-save-category"
+              type="submit"
+              class="rounded-xl bg-emerald-800 px-8 py-3 text-sm sm:text-base font-bold text-white hover:bg-emerald-900 transition-colors cursor-pointer"
+            >
+              حفظ القسم
+            </button>
+          </div>
+        </form>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white">الأقسام الحالية</h3>
+          <div id="admin-categories-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
       </div>
 
@@ -609,6 +753,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         if (statRev) statRev.textContent = formatPriceEGP(revenue);
 
         renderProducts(cachedProducts);
+        renderCategories(cachedCategories);
         renderOrders(orders);
 
         // Populate store settings form
@@ -858,6 +1003,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       btn.addEventListener("click", () => {
         const tab = btn.dataset.tab;
         document.getElementById("tab-products")?.classList.toggle("hidden", tab !== "products");
+        document.getElementById("tab-categories")?.classList.toggle("hidden", tab !== "categories");
         document.getElementById("tab-orders")?.classList.toggle("hidden", tab !== "orders");
         document.getElementById("tab-settings")?.classList.toggle("hidden", tab !== "settings");
         document.querySelectorAll<HTMLButtonElement>(".tab-btn").forEach((b) => {
@@ -868,6 +1014,190 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         });
       });
     });
+
+    // Categories Management
+    const categoriesList = document.getElementById("admin-categories-list");
+    const categoryForm = document.getElementById("category-form") as HTMLFormElement | null;
+    const catFileInput = document.getElementById("cat-image-file") as HTMLInputElement | null;
+    const catUrlInput = document.getElementById("cat-image-url") as HTMLInputElement | null;
+    const catPreviewImg = document.getElementById("cat-image-preview") as HTMLImageElement | null;
+    const catPreviewRing = document.getElementById("cat-preview-ring");
+    const catColorInput = document.getElementById("cat-color") as HTMLInputElement | null;
+    const catFileNameLabel = document.getElementById("cat-file-name");
+    const saveCatBtn = document.getElementById("btn-save-category") as HTMLButtonElement | null;
+
+    function updateCatColorPreview(hex: string) {
+      if (catPreviewRing) {
+        catPreviewRing.style.setProperty("--tw-ring-color", `${hex}66`);
+      }
+    }
+
+    catColorInput?.addEventListener("input", () => {
+      updateCatColorPreview(catColorInput.value || "#065f46");
+    });
+
+    document.querySelectorAll<HTMLButtonElement>("[data-color-preset]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const hex = btn.dataset.colorPreset || "#065f46";
+        if (catColorInput) catColorInput.value = hex;
+        updateCatColorPreview(hex);
+      });
+    });
+
+    catFileInput?.addEventListener("change", () => {
+      const file = catFileInput.files?.[0];
+      if (!file) return;
+      if (catFileNameLabel) {
+        catFileNameLabel.textContent = `تم اختيار: ${file.name}`;
+        catFileNameLabel.classList.remove("hidden");
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (catPreviewImg && reader.result) catPreviewImg.src = String(reader.result);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    catUrlInput?.addEventListener("input", () => {
+      const val = catUrlInput.value.trim();
+      if (val && catPreviewImg) catPreviewImg.src = safeImageUrl(val);
+    });
+
+    function renderCategories(categories: any[]) {
+      if (!categoriesList) return;
+      if (!categories.length) {
+        categoriesList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400">لا توجد أقسام بعد.</p>`;
+        return;
+      }
+
+      categoriesList.innerHTML = categories
+        .map((c) => {
+          const color = c.accent_color && /^#[0-9a-fA-F]{6}$/.test(c.accent_color) ? c.accent_color : "#065f46";
+          const prodCount = cachedProducts.filter((p) => p.category_id === c.id).length;
+          return `
+            <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-stone-50 dark:bg-gray-950 ring-2" style="--tw-ring-color: ${color}88;">
+                  <img src="${safeImageUrl(c.image_url || "/images/products/product-03.jpg")}" alt="${escapeHtml(c.name)}" class="h-full w-full object-cover" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: ${color};"></span>
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(c.name)}</h4>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">${escapeHtml(c.description || "بدون وصف")}</p>
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">${prodCount} منتج | ترتيب: ${Number(c.sort_order || 0)} | ${c.is_active !== false ? "ظاهر" : "مخفي"}</p>
+                </div>
+              </div>
+              <div class="flex gap-2 pt-2 border-t border-stone-100 dark:border-gray-800">
+                <button type="button" data-edit-cat="${escapeHtml(c.id)}" class="flex-1 rounded-lg border border-stone-300 dark:border-gray-700 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-gray-800 cursor-pointer">تعديل</button>
+                <button type="button" data-del-cat="${escapeHtml(c.id)}" class="rounded-lg border border-red-200 dark:border-red-900/50 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer">حذف</button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function resetCategoryFormUI() {
+      categoryForm?.reset();
+      (document.getElementById("cat-id") as HTMLInputElement).value = "";
+      (document.getElementById("cat-sort") as HTMLInputElement).value = "1";
+      if (catColorInput) catColorInput.value = "#065f46";
+      updateCatColorPreview("#065f46");
+      if (catPreviewImg) catPreviewImg.src = "/images/products/product-03.jpg";
+      catFileNameLabel?.classList.add("hidden");
+      document.getElementById("btn-cancel-cat-edit")?.classList.add("hidden");
+      const titleEl = document.getElementById("cat-form-title");
+      if (titleEl) titleEl.textContent = "إضافة قسم جديد";
+    }
+
+    categoryForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (saveCatBtn) {
+        saveCatBtn.disabled = true;
+        saveCatBtn.textContent = "جاري الحفظ...";
+      }
+      let imageUrl = catUrlInput?.value.trim() || "";
+      try {
+        const file = catFileInput?.files?.[0];
+        if (file) {
+          const base64Data = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          const uploaded = await apiFetch("POST", {
+            action: "upload_image",
+            fileName: file.name,
+            contentType: file.type,
+            base64Data,
+          });
+          imageUrl = uploaded.imageUrl;
+          if (catUrlInput) catUrlInput.value = imageUrl;
+        }
+
+        await apiFetch("POST", {
+          action: "save_category",
+          id: (document.getElementById("cat-id") as HTMLInputElement).value || null,
+          name: (document.getElementById("cat-name") as HTMLInputElement).value,
+          description: (document.getElementById("cat-desc") as HTMLInputElement).value,
+          accent_color: catColorInput?.value || "#065f46",
+          image_url: imageUrl || null,
+          sort_order: Number((document.getElementById("cat-sort") as HTMLInputElement).value || 0),
+          is_active: (document.getElementById("cat-active") as HTMLInputElement).checked,
+        });
+
+        resetCategoryFormUI();
+        showToast("تم حفظ القسم بنجاح ✓");
+        await loadDashboard();
+      } catch (err: any) {
+        showToast(err.message || "فشل حفظ القسم.", true);
+      } finally {
+        if (saveCatBtn) {
+          saveCatBtn.disabled = false;
+          saveCatBtn.textContent = "حفظ القسم";
+        }
+      }
+    });
+
+    categoriesList?.addEventListener("click", async (e) => {
+      const target = e.target as HTMLElement | null;
+      const editId = target?.closest<HTMLElement>("[data-edit-cat]")?.dataset.editCat;
+      const delId = target?.closest<HTMLElement>("[data-del-cat]")?.dataset.delCat;
+
+      if (editId) {
+        const c = cachedCategories.find((item) => item.id === editId);
+        if (!c) return;
+        (document.getElementById("cat-id") as HTMLInputElement).value = c.id;
+        (document.getElementById("cat-name") as HTMLInputElement).value = c.name || "";
+        (document.getElementById("cat-desc") as HTMLInputElement).value = c.description || "";
+        (document.getElementById("cat-sort") as HTMLInputElement).value = String(c.sort_order ?? 1);
+        (document.getElementById("cat-active") as HTMLInputElement).checked = c.is_active !== false;
+        const hex = c.accent_color && /^#[0-9a-fA-F]{6}$/.test(c.accent_color) ? c.accent_color : "#065f46";
+        if (catColorInput) catColorInput.value = hex;
+        updateCatColorPreview(hex);
+        if (catUrlInput) catUrlInput.value = c.image_url || "";
+        if (catPreviewImg) catPreviewImg.src = safeImageUrl(c.image_url || "/images/products/product-03.jpg");
+
+        document.getElementById("btn-cancel-cat-edit")?.classList.remove("hidden");
+        const titleEl = document.getElementById("cat-form-title");
+        if (titleEl) titleEl.textContent = `تعديل قسم: ${c.name}`;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (delId) {
+        if (!confirm("هل أنت متأكد من حذف هذا القسم؟")) return;
+        try {
+          await apiFetch("POST", { action: "delete_category", id: delId });
+          showToast("تم حذف القسم.");
+          await loadDashboard();
+        } catch (err: any) {
+          showToast(err.message || "فشل حذف القسم.", true);
+        }
+      }
+    });
+
+    document.getElementById("btn-cancel-cat-edit")?.addEventListener("click", resetCategoryFormUI);
 
     // Save Store Settings
     document.getElementById("settings-form")?.addEventListener("submit", async (e) => {
