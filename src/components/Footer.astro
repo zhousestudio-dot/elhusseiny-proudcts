@@ -15,7 +15,7 @@ const waUrl2 = wa2 ? `https://wa.me/${toWhatsAppIntl(wa2)}?text=${whatsappMessag
 ---
 
 <footer class="border-t border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300">
-  <div class="mx-auto max-w-6xl px-4 py-10">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 py-10">
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
       <div>
         <p class="text-lg font-bold text-gray-900 dark:text-white mb-2">منتجات الحسيني</p>
@@ -59,7 +59,12 @@ const waUrl2 = wa2 ? `https://wa.me/${toWhatsAppIntl(wa2)}?text=${whatsappMessag
               </a>
             </li>
           )}
-          <li>يوجد شحن</li>
+          <li>
+            {settings.free_shipping_threshold > 0
+              ? `يوجد شحن • شحن مجاني للطلبات فوق ${settings.free_shipping_threshold} ج.م. يشمل القاهرة والجيزة`
+              : "يوجد شحن"}
+          </li>
+          <li>دفع آمن بالفيزا أو المحافظ الإلكترونية أو عند الاستلام</li>
           <li class="pt-1 flex flex-wrap gap-2">
             <a
               href={waUrl1}

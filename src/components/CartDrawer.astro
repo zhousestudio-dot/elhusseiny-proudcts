@@ -154,10 +154,10 @@ const { freeShippingThreshold = 0 } = Astro.props;
       if (shippingBar) shippingBar.style.width = `${progress}%`;
       if (shippingMsg) {
         if (total >= freeShippingLimit) {
-          shippingMsg.textContent = "مبروك! طلبك مؤهل للشحن المجاني";
+          shippingMsg.textContent = "مبروك! طلبك مؤهل للشحن المجاني (يشمل القاهرة والجيزة)";
         } else {
           const remaining = freeShippingLimit - total;
-          shippingMsg.textContent = `أضف بقيمة ${formatPriceEGP(remaining)} للحصول على شحن مجاني (فوق ${formatPriceEGP(freeShippingLimit)})`;
+          shippingMsg.textContent = `أضف بقيمة ${formatPriceEGP(remaining)} — شحن مجاني للطلبات فوق ${formatPriceEGP(freeShippingLimit)} يشمل القاهرة والجيزة`;
         }
       }
     } else {
