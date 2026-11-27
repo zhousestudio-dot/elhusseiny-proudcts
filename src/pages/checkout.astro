@@ -60,6 +60,7 @@ const EGYPT_GOVERNORATES = [
       <!-- Shipping Form -->
       <form
         id="checkout-form"
+        novalidate
         class="lg:col-span-3 space-y-5 rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
       >
         <h2 class="text-lg font-bold text-gray-900 dark:text-white border-b border-stone-100 dark:border-gray-800 pb-3">
@@ -329,9 +330,48 @@ const EGYPT_GOVERNORATES = [
       errorEl.classList.remove("hidden");
     }
 
+    function isValidEgyptPhone(raw: string): boolean {
+      const cleaned = raw.replace(/[\s\-()]/g, "");
+      return /^(?:\+?20|0)?1[0125][0-9]{8}$/.test(cleaned);
+    }
+
+    function clearFieldErrors() {
+      form?.querySelectorAll("[data-field-error]").forEach((el) => el.remove());
+      form?.querySelectorAll("input, select, textarea").forEach((el) => {
+        el.classList.remove("border-red-500", "ring-2", "ring-red-500/20");
+      });
+    }
+
+    function flagFieldError(fieldId: string, message: string) {
+      const field = document.getElementById(fieldId) as HTMLElement | null;
+      if (!field) {
+        showError(message);
+        return;
+      }
+      field.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+
+      const hint = document.createElement("p");
+      hint.dataset.fieldError = fieldId;
+      hint.className = "mt-1.5 text-xs font-bold text-red-600 dark:text-red-400";
+      hint.textContent = message;
+      field.insertAdjacentElement("afterend", hint);
+
+      field.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => field.focus({ preventScroll: true }), 250);
+    }
+
+    // Clear individual field error as soon as user starts fixing it
+    form?.addEventListener("input", (e) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.id) return;
+      target.classList.remove("border-red-500", "ring-2", "ring-red-500/20");
+      form.querySelector(`[data-field-error="${target.id}"]`)?.remove();
+    });
+
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
       errorEl?.classList.add("hidden");
+      clearFieldErrors();
 
       const currentItems = getCart();
       if (!currentItems.length) {
@@ -340,15 +380,47 @@ const EGYPT_GOVERNORATES = [
       }
 
       const formData = new FormData(form);
+      const customerName = String(formData.get("customerName") || "").trim();
+      const customerPhone = String(formData.get("customerPhone") || "").trim();
+      const customerEmail = String(formData.get("customerEmail") || "").trim();
+      const city = String(formData.get("city") || "").trim();
+      const shippingAddress = String(formData.get("shippingAddress") || "").trim();
       const selectedMethod = String(formData.get("paymentMethod") || "vodafone_cash");
+      const walletSenderPhone = String(formData.get("walletSenderPhone") || "").trim();
+
+      if (customerName.length < 2) {
+        flagFieldError("customerName", "يرجى كتابة الاسم بالكامل (حرفين على الأقل).");
+        return;
+      }
+      if (!isValidEgyptPhone(customerPhone)) {
+        flagFieldError("customerPhone", "رقم الموبايل غير صحيح — أدخل ١١ رقم يبدأ بـ 010 أو 011 أو 012 أو 015.");
+        return;
+      }
+      if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+        flagFieldError("customerEmail", "البريد الإلكتروني غير صحيح (أو اتركه فارغاً لأنه اختياري).");
+        return;
+      }
+      if (!city) {
+        flagFieldError("city", "يرجى اختيار المحافظة / المدينة.");
+        return;
+      }
+      if (shippingAddress.length < 5) {
+        flagFieldError("shippingAddress", "يرجى كتابة العنوان بالتفصيل (اسم الشارع ورقم العقار).");
+        return;
+      }
+      if (selectedMethod === "vodafone_cash" && !isValidEgyptPhone(walletSenderPhone)) {
+        flagFieldError("walletSenderPhone", "يرجى إدخال رقم المحفظة الصحيح الذي حوّلت منه (١١ رقم).");
+        return;
+      }
+
       const payload = {
-        customerName: String(formData.get("customerName") || ""),
-        customerPhone: String(formData.get("customerPhone") || ""),
-        customerEmail: String(formData.get("customerEmail") || ""),
-        city: String(formData.get("city") || ""),
-        shippingAddress: String(formData.get("shippingAddress") || ""),
+        customerName,
+        customerPhone,
+        customerEmail,
+        city,
+        shippingAddress,
         paymentMethod: selectedMethod,
-        walletSenderPhone: String(formData.get("walletSenderPhone") || ""),
+        walletSenderPhone,
         items: currentItems.map((item) => ({
           productId: item.id,
           slug: item.slug,
