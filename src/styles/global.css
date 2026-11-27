@@ -11,6 +11,16 @@ html {
   color-scheme: light;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 button,
@@ -30,12 +40,6 @@ button,
 
 html.dark {
   color-scheme: dark;
-}
-
-body {
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
 /* Performance: defer rendering of offscreen sections without affecting layout */
