@@ -21,9 +21,13 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
   data-price={product.price}
   data-name={product.name}
   data-stock={product.stock}
-  class="group flex flex-col overflow-hidden rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-emerald-700/50 hover:shadow-md transition-all duration-200"
+  class="group flex flex-col"
 >
-  <a href={`/products/${product.slug}`} data-astro-prefetch class="relative block aspect-square bg-stone-50 dark:bg-gray-800 overflow-hidden">
+  <a
+    href={`/products/${product.slug}`}
+    data-astro-prefetch
+    class="relative block aspect-square overflow-hidden rounded-3xl bg-stone-100 dark:bg-gray-900 shadow-xs group-hover:shadow-md transition-shadow duration-300"
+  >
     <img
       src={product.image_url}
       alt={product.name}
@@ -31,22 +35,22 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
       height="520"
       loading="lazy"
       decoding="async"
-      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
     />
     {(isOffer || comparePrice) && inStock && (
-      <span class="absolute top-2.5 right-2.5 rounded-lg bg-amber-400 px-2.5 py-0.5 text-[11px] font-bold text-emerald-950 shadow-xs">
+      <span class="absolute top-3 right-3 rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-bold text-emerald-950 shadow-xs">
         {discountPct > 0 ? `وفر ${discountPct}٪` : "عرض توفير"}
       </span>
     )}
     {!inStock && (
-      <span class="absolute top-2.5 right-2.5 rounded-lg bg-red-600 px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs">
+      <span class="absolute top-3 right-3 rounded-full bg-red-600 px-3 py-0.5 text-[11px] font-bold text-white shadow-xs">
         نفدت الكمية
       </span>
     )}
   </a>
 
-  <div class="flex flex-1 flex-col p-3 sm:p-4">
-    <span class="text-[11px] sm:text-xs font-medium text-emerald-800 dark:text-emerald-400 mb-1 truncate">
+  <div class="flex flex-1 flex-col pt-3 px-1">
+    <span class="text-[11px] font-medium text-emerald-800 dark:text-emerald-400 mb-0.5 truncate">
       {product.category}
     </span>
     <a href={`/products/${product.slug}`} data-astro-prefetch>
@@ -54,22 +58,17 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
         {product.name}
       </h3>
     </a>
-    <p class="hidden sm:block text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3 flex-1">
-      {product.description}
-    </p>
 
-    <div class="mt-auto pt-2.5 border-t border-stone-100 dark:border-gray-800 space-y-2">
-      <div class="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
-        <div class="flex flex-wrap items-baseline gap-1.5">
-          <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
-            {formatPriceEGP(product.price)}
+    <div class="mt-auto pt-1.5 space-y-2.5">
+      <div class="flex flex-wrap items-baseline gap-1.5">
+        <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
+          {formatPriceEGP(product.price)}
+        </span>
+        {comparePrice && (
+          <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400">
+            بدلاً من <del class="line-through font-medium">{formatPriceEGP(comparePrice)}</del>
           </span>
-          {comparePrice && (
-            <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400">
-              بدلاً من <del class="line-through font-medium">{formatPriceEGP(comparePrice)}</del>
-            </span>
-          )}
-        </div>
+        )}
       </div>
 
       <button
@@ -81,7 +80,7 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
         data-product-name={product.name}
         data-product-price={product.price}
         data-product-image={product.image_url}
-        class="w-full rounded-xl bg-emerald-800 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-900 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        class="w-full rounded-full bg-emerald-800 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-900 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors cursor-pointer"
       >
         {inStock ? "أضف للسلة" : "غير متوفر"}
       </button>

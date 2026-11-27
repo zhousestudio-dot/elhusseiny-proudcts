@@ -83,10 +83,10 @@ const storeSchema = {
     </div>
   </section>
 
-  <!-- Brand Story & Craftsmanship -->
-  <section class="border-y border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 py-12 sm:py-16 cv-auto">
+  <!-- Brand Story & Craftsmanship (Open layout without heavy boxes) -->
+  <section class="bg-[#F4F1EA] dark:bg-gray-900/60 py-12 sm:py-16 cv-auto">
     <div class="mx-auto max-w-6xl px-4">
-      <div class="max-w-2xl mb-8">
+      <div class="max-w-2xl mb-10">
         <span class="text-xs font-bold text-emerald-800 dark:text-emerald-400">جودة يمكنك الوثوق بها</span>
         <h2 class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1 mb-2">
           لماذا يختار عملاؤنا منتجات الحسيني؟
@@ -96,9 +96,9 @@ const storeSchema = {
         </p>
       </div>
 
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-[#FAF9F5] dark:bg-gray-900 p-6">
-          <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <div class="flex flex-col items-start">
+          <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-800/10 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-5 w-5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
           </div>
           <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1.5">طحينة وزيت عصر على البارد</h3>
@@ -107,8 +107,8 @@ const storeSchema = {
           </p>
         </div>
 
-        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-[#FAF9F5] dark:bg-gray-900 p-6">
-          <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
+        <div class="flex flex-col items-start">
+          <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-5 w-5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1.5">عسل نحل خام غير مبستر</h3>
@@ -117,8 +117,8 @@ const storeSchema = {
           </p>
         </div>
 
-        <div class="rounded-2xl border border-stone-200 dark:border-gray-800 bg-[#FAF9F5] dark:bg-gray-900 p-6">
-          <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+        <div class="flex flex-col items-start">
+          <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-800/10 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-5 w-5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </div>
           <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1.5">تغليف محكم وتوصيل سريع</h3>
@@ -130,11 +130,11 @@ const storeSchema = {
     </div>
   </section>
 
-  <!-- FAQ Accordion (Zero-JS native HTML5 details) -->
+  <!-- FAQ Accordion (Clean open list with subtle dividers) -->
   <section class="mx-auto max-w-4xl px-4 py-12 sm:py-14 cv-auto">
-    <h2 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-5 text-center">الأسئلة الشائعة</h2>
-    <div class="space-y-3">
-      <details class="group rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-5">
+    <h2 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">الأسئلة الشائعة</h2>
+    <div class="divide-y divide-stone-200 dark:divide-gray-800 border-y border-stone-200 dark:border-gray-800">
+      <details class="group py-4 sm:py-5">
         <summary class="flex cursor-pointer items-center justify-between text-sm sm:text-base font-bold text-gray-900 dark:text-white list-none">
           <span>ما هي طرق الدفع المتاحة؟</span>
           <span class="text-emerald-700 dark:text-emerald-400 transition-transform group-open:rotate-180">▾</span>
@@ -144,7 +144,7 @@ const storeSchema = {
         </p>
       </details>
 
-      <details class="group rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-5">
+      <details class="group py-4 sm:py-5">
         <summary class="flex cursor-pointer items-center justify-between text-sm sm:text-base font-bold text-gray-900 dark:text-white list-none">
           <span>كم تستغرق مدة التوصيل داخل مصر؟</span>
           <span class="text-emerald-700 dark:text-emerald-400 transition-transform group-open:rotate-180">▾</span>
@@ -154,7 +154,7 @@ const storeSchema = {
         </p>
       </details>
 
-      <details class="group rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-5">
+      <details class="group py-4 sm:py-5">
         <summary class="flex cursor-pointer items-center justify-between text-sm sm:text-base font-bold text-gray-900 dark:text-white list-none">
           <span>هل المنتجات تحتوي على أي مواد حافظة أو زيوت مهدرجة؟</span>
           <span class="text-emerald-700 dark:text-emerald-400 transition-transform group-open:rotate-180">▾</span>
