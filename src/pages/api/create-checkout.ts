@@ -292,7 +292,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return Response.json({ error: "لا توجد منتجات صالحة في الطلب." }, { status: 400 });
   }
 
-  const amountCents = Math.round(totalEGP * 100);
+  const isElQalag = /القلج|قلج|qalag/i.test(`${shippingAddress} ${city}`);
+  const shippingFeeEGP = isElQalag ? 20 : 0;
+  const finalTotalEGP = totalEGP + shippingFeeEGP;
+  const amountCents = Math.round(finalTotalEGP * 100);
 
   const { data: order, error: orderError } = await supabase
     .from("orders")
@@ -302,7 +305,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       customer_email: customerEmail || null,
       shipping_address: shippingAddress,
       city,
-      total: totalEGP,
+      total: finalTotalEGP,
       status: "pending",
       payment_status: paymentMethod === "cod" ? "unpaid" : "pending",
       payment_method: paymentMethod,
@@ -348,14 +351,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         body: JSON.stringify({
           from: fromEmail,
           to: [adminNotify],
-          subject: `طلب جديد (${methodLabel}): ${order.order_number} — ${totalEGP} ج.م.`,
+          subject: `طلب جديد (${methodLabel}): ${order.order_number} — ${finalTotalEGP} ج.م.`,
           html: `<div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;">
             <h2>طلب جديد (${methodLabel})</h2>
             <p><strong>رقم الطلب:</strong> ${order.order_number}</p>
             <p><strong>العميل:</strong> ${customerName} (${normalizedPhone})</p>
             ${walletSenderPhone ? `<p><strong>رقم محفظة التحويل:</strong> ${walletSenderPhone}</p>` : ""}
             <p><strong>العنوان:</strong> ${city} — ${shippingAddress}</p>
-            <p><strong>الإجمالي:</strong> ${totalEGP} ج.م.</p>
+            ${shippingFeeEGP > 0 ? `<p><strong>رسوم الشحن (القلج):</strong> ${shippingFeeEGP} ج.م.</p>` : ""}
+            <p><strong>الإجمالي:</strong> ${finalTotalEGP} ج.م.</p>
           </div>`,
         }),
       }).catch(() => {});
@@ -378,12 +382,24 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     amount: amountCents,
     currency: "EGP",
     payment_methods: integrationIds,
-    items: verifiedItems.map((item) => ({
-      name: item.product_name,
-      amount: Math.round(item.unit_price * 100),
-      description: item.description,
-      quantity: item.quantity,
-    })),
+    items: [
+      ...verifiedItems.map((item) => ({
+        name: item.product_name,
+        amount: Math.round(item.unit_price * 100),
+        description: item.description,
+        quantity: item.quantity,
+      })),
+      ...(shippingFeeEGP > 0
+        ? [
+            {
+              name: "رسوم الشحن (القلج)",
+              amount: Math.round(shippingFeeEGP * 100),
+              description: "رسوم توصيل لمنطقة القلج",
+              quantity: 1,
+            },
+          ]
+        : []),
+    ],
     billing_data: {
       first_name: firstName,
       last_name: lastName,

@@ -283,6 +283,13 @@ const EGYPT_GOVERNORATES = [
           ملخص الطلب
         </h2>
         <div id="summary-items" class="space-y-3 text-sm"></div>
+        <div
+          id="summary-shipping-row"
+          class="hidden border-t border-stone-100 dark:border-gray-800 pt-3 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300"
+        >
+          <span>رسوم الشحن (القلج)</span>
+          <span class="font-semibold text-emerald-800 dark:text-emerald-400">٢٠ ج.م.</span>
+        </div>
         <div class="border-t border-stone-200 dark:border-gray-800 pt-4 flex items-center justify-between text-base font-bold text-gray-900 dark:text-white">
           <span>الإجمالي</span>
           <span id="summary-total" class="text-emerald-800 dark:text-emerald-400">٠ ج.م.</span>
@@ -302,7 +309,10 @@ const EGYPT_GOVERNORATES = [
     const emptyEl = document.getElementById("checkout-empty");
     const contentEl = document.getElementById("checkout-content");
     const summaryItemsEl = document.getElementById("summary-items");
+    const summaryShippingRow = document.getElementById("summary-shipping-row");
     const summaryTotalEl = document.getElementById("summary-total");
+    const shippingAddressInput = document.getElementById("shippingAddress") as HTMLTextAreaElement | HTMLInputElement | null;
+    const citySelect = document.getElementById("city") as HTMLSelectElement | null;
     const form = document.getElementById("checkout-form") as HTMLFormElement | null;
     const errorEl = document.getElementById("checkout-error");
     const submitBtn = document.getElementById("submit-checkout") as HTMLButtonElement | null;
@@ -360,9 +370,19 @@ const EGYPT_GOVERNORATES = [
           )
           .join("");
       }
-      if (summaryTotalEl) {
-        summaryTotalEl.textContent = formatPriceEGP(getCartTotalEGP(items));
+      function updateCheckoutShippingSummary() {
+        const addrText = `${shippingAddressInput?.value || ""} ${citySelect?.value || ""}`;
+        const isQalag = /القلج|قلج|qalag/i.test(addrText);
+        const shippingFee = isQalag ? 20 : 0;
+        summaryShippingRow?.classList.toggle("hidden", !isQalag);
+        if (summaryTotalEl) {
+          summaryTotalEl.textContent = formatPriceEGP(getCartTotalEGP(items) + shippingFee);
+        }
       }
+
+      shippingAddressInput?.addEventListener("input", updateCheckoutShippingSummary);
+      citySelect?.addEventListener("change", updateCheckoutShippingSummary);
+      updateCheckoutShippingSummary();
     }
 
     function showError(msg: string) {
