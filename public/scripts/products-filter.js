@@ -35,8 +35,8 @@
     filterButtons.forEach(function (btn) {
       var isSelected = btn.dataset.filterCategory === activeCategory;
       btn.className = isSelected
-        ? "filter-btn rounded-full bg-emerald-800 px-4 py-1.5 text-xs sm:text-sm font-medium text-white transition-colors"
-        : "filter-btn rounded-full border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-emerald-700 transition-colors";
+        ? "filter-btn inline-flex items-center gap-1.5 rounded-full bg-emerald-800 px-4 py-1.5 text-xs sm:text-sm font-medium text-white transition-colors"
+        : "filter-btn inline-flex items-center gap-1.5 rounded-full border border-stone-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-emerald-700 transition-colors";
     });
   }
 
