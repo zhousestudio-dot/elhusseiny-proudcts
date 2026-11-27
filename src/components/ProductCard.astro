@@ -60,15 +60,25 @@ const searchText = `${product.name} ${product.description} ${product.category}`.
     </a>
 
     <div class="mt-auto pt-1.5 space-y-2.5">
-      <div class="flex flex-wrap items-baseline gap-1.5">
-        <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
-          {formatPriceEGP(product.price)}
-        </span>
-        {comparePrice && (
-          <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400">
-            بدلاً من <del class="line-through font-medium">{formatPriceEGP(comparePrice)}</del>
+      <div class="flex flex-wrap items-center justify-between gap-1.5">
+        <div class="flex flex-wrap items-baseline gap-1.5">
+          <span class="text-sm sm:text-base font-bold text-emerald-800 dark:text-emerald-300">
+            {formatPriceEGP(product.price)}
           </span>
-        )}
+          {comparePrice && (
+            <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400">
+              بدلاً من <del class="line-through font-medium">{formatPriceEGP(comparePrice)}</del>
+            </span>
+          )}
+        </div>
+        <span
+          class={`inline-flex items-center gap-1 text-[11px] font-bold ${
+            inStock ? "text-emerald-700 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+          }`}
+        >
+          <span class={`h-1.5 w-1.5 rounded-full ${inStock ? "bg-emerald-600" : "bg-red-600"}`}></span>
+          <span>{inStock ? "متوفر" : "غير متوفر"}</span>
+        </span>
       </div>
 
       <button

@@ -41,6 +41,7 @@
     "غير متوفر حالياً": "Currently Unavailable",
     "نفدت الكمية": "Out of Stock",
     "عرض توفير": "Value Offer",
+    "متوفر": "Available",
     "متابعة التسوق": "Continue Shopping",
     "جميع المنتجات": "All Products",
     "إتمام الطلب": "Checkout",
